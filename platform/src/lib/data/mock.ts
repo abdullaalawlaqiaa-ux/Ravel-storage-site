@@ -10,18 +10,22 @@ function rng(seed: number) {
   };
 }
 
-const FIRST = ['محمد', 'عبدالله', 'فهد', 'سارة', 'نورة', 'خالد', 'ريم', 'سلطان', 'هند', 'عمر', 'لطيفة', 'تركي', 'مها', 'ناصر', 'جود', 'بدر', 'العنود', 'يوسف'];
-const LAST = ['العتيبي', 'القحطاني', 'الدوسري', 'الشهري', 'الغامدي', 'الحربي', 'الزهراني', 'المطيري', 'السبيعي', 'العنزي', 'الشمري', 'الأحمدي'];
-const COMPANIES = ['مؤسسة الريادة للتجارة', 'شركة نماء للتجزئة', 'متجر بيت الأناقة', 'مؤسسة الأفق للأثاث', 'شركة سهل اللوجستية', 'متجر عطور الورد'];
+const FIRST = ['محمد', 'عبدالله', 'حمدان', 'سارة', 'مريم', 'خالد', 'ريم', 'سلطان', 'هند', 'عمر', 'لطيفة', 'سعيد', 'شما', 'راشد', 'فاطمة', 'منصور', 'Fares', 'John'];
+const LAST = ['المنصوري', 'الكعبي', 'الظاهري', 'النعيمي', 'المزروعي', 'الشامسي', 'الهاملي', 'السويدي', 'العامري', 'البلوشي', 'الرميثي', 'المهيري'];
+const COMPANIES = ['مطعم السنبلة', 'كافيه الركن', 'معرض الأفق للأثاث', 'شركة سهل للنقل', 'ورشة الإتقان للصيانة', 'محل أزياء الورد'];
 
 function seed(): { units: Unit[]; invoices: Invoice[] } {
   const r = rng(20261106);
   const pick = <T,>(a: T[]) => a[Math.floor(r() * a.length)];
   const today = todayISO();
-  const zones: { zone: string; size: UnitSize; count: number }[] = [
-    { zone: 'A', size: 'small', count: 28 },
-    { zone: 'B', size: 'medium', count: 20 },
-    { zone: 'C', size: 'large', count: 10 },
+  // ⚠️ بيانات تجريبية للعرض فقط – الأسعار هنا ليست أسعار رافل المعتمدة
+  const DEMO_PRICE: Record<UnitSize, number> = { small: 350, medium: 900, large: 1800, space: 0 };
+  const zones: { zone: string; floor: string; size: UnitSize; count: number; dims?: [number, number][] }[] = [
+    { zone: 'A', floor: 'أرضي', size: 'small', count: 24 },
+    { zone: 'B', floor: 'أرضي', size: 'medium', count: 16 },
+    { zone: 'S', floor: 'أرضي', size: 'space', count: 3, dims: [[11, 10], [5, 4], [4, 3]] },
+    { zone: 'C', floor: 'ميزانين', size: 'small', count: 20 },
+    { zone: 'D', floor: 'ميزانين', size: 'large', count: 8 },
   ];
   const units: Unit[] = [];
   const invoices: Invoice[] = [];
@@ -29,17 +33,20 @@ function seed(): { units: Unit[]; invoices: Invoice[] } {
 
   for (const z of zones) {
     for (let i = 1; i <= z.count; i++) {
-      const d = SIZE_DEFAULTS[z.size];
+      const base = SIZE_DEFAULTS[z.size];
+      const [widthM, depthM] = z.dims?.[i - 1] ?? [base.widthM, base.depthM];
+      const price = z.size === 'space' ? Math.round(widthM * depthM * 45) : DEMO_PRICE[z.size];
+      const d = { widthM, depthM, price };
       const roll = r();
       const status: UnitStatus =
         roll < 0.72 ? 'occupied' : roll < 0.77 ? 'reserved' : roll < 0.8 ? 'maintenance' : 'available';
       const code = `${z.zone}-${String(i).padStart(2, '0')}`;
       const u: Unit = {
-        id: `mock-${code}`, code, zone: z.zone, size: z.size,
+        id: `mock-${code}`, code, zone: z.zone, branch: 'الفرع الرئيسي', floor: z.floor, size: z.size,
         widthM: d.widthM, depthM: d.depthM, status, monthlyPrice: d.price,
       };
       if (status === 'occupied' || status === 'reserved') {
-        const isCompany = z.size === 'large' ? r() < 0.6 : r() < 0.12;
+        const isCompany = z.size === 'space' ? true : z.size === 'large' ? r() < 0.6 : r() < 0.12;
         u.customerName = isCompany ? pick(COMPANIES) : `${pick(FIRST)} ${pick(LAST)}`;
         u.customerPhone = `05${Math.floor(10000000 + r() * 89999999)}`;
         const monthsAgo = status === 'reserved' ? 0 : 1 + Math.floor(r() * 16);

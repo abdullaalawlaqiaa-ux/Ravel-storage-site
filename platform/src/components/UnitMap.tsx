@@ -9,6 +9,11 @@ import { UnitDrawer } from './UnitDrawer';
 const STATES: DisplayState[] = ['available', 'occupied', 'reserved', 'expiring', 'overdue', 'maintenance'];
 const ICON: Record<DisplayState, string> = { available: '✓', occupied: '●', reserved: '◐', expiring: '⏳', overdue: '!', maintenance: '🔧' };
 const fill = (s: DisplayState) => `var(--st-${s})`;
+const zoneTitle = (z: string) => {
+  const parts = z.split(' · ');
+  const last = parts.pop()!;
+  return [...parts, last === 'S' ? 'المساحات المفتوحة' : `منطقة ${last}`].join(' · ');
+};
 const textOn = (s: DisplayState) => (s === 'reserved' ? 'var(--st-text-dark)' : 'var(--st-text)');
 
 export function UnitMap() {
@@ -19,6 +24,8 @@ export function UnitMap() {
   const [loading, setLoading] = useState(true);
   const [updatedAt, setUpdatedAt] = useState<string>('');
   const [zone, setZone] = useState('all');
+  const [branch, setBranch] = useState('all');
+  const [floor, setFloor] = useState('all');
   const [hidden, setHidden] = useState<Set<DisplayState>>(new Set());
   const [q, setQ] = useState('');
   const [selId, setSelId] = useState<string | null>(null);
@@ -30,7 +37,7 @@ export function UnitMap() {
       const j = await r.json();
       if (!r.ok) throw new Error(j.error);
       setUnits(j.units); setMode(j.mode); setErr(null);
-      setUpdatedAt(new Date(j.at).toLocaleTimeString('ar-SA-u-nu-latn', { hour: '2-digit', minute: '2-digit' }));
+      setUpdatedAt(new Date(j.at).toLocaleTimeString('ar-AE-u-nu-latn', { hour: '2-digit', minute: '2-digit' }));
     } catch (e) { setErr((e as Error).message); }
     finally { setLoading(false); }
   }, []);
@@ -49,9 +56,19 @@ export function UnitMap() {
     }
   }, [params, units, selId]);
 
-  const zones = useMemo(() => [...new Set(units.map((u) => u.zone))].sort(), [units]);
-  const visible = useMemo(() => (zone === 'all' ? units : units.filter((u) => u.zone === zone)), [units, zone]);
-  const layout = useMemo(() => layoutUnits(visible), [visible]);
+  const branches = useMemo(() => [...new Set(units.map((u) => u.branch))].sort(), [units]);
+  const inBranch = useMemo(() => units.filter((u) => branch === 'all' || u.branch === branch), [units, branch]);
+  const floors = useMemo(() => [...new Set(inBranch.map((u) => u.floor))].sort((a, b) => (a === 'أرضي' ? -1 : b === 'أرضي' ? 1 : a.localeCompare(b))), [inBranch]);
+  const inFloor = useMemo(() => inBranch.filter((u) => floor === 'all' || u.floor === floor), [inBranch, floor]);
+  const zones = useMemo(() => [...new Set(inFloor.map((u) => u.zone))].sort(), [inFloor]);
+  const visible = useMemo(() => (zone === 'all' ? inFloor : inFloor.filter((u) => u.zone === zone)), [inFloor, zone]);
+  // عند وجود أكثر من فرع نجمع وحدات كل فرع/طابق كمنطقة مستقلة على الخارطة
+  const multi = branches.length > 1 && branch === 'all';
+  const forLayout = useMemo(
+    () => visible.map((u) => ({ ...u, zone: `${multi ? u.branch + ' · ' : ''}${floor === 'all' ? u.floor + ' · ' : ''}${u.zone}` })),
+    [visible, multi, floor],
+  );
+  const layout = useMemo(() => layoutUnits(forLayout), [forLayout]);
   const counts = useMemo(() => {
     const c = Object.fromEntries(STATES.map((s) => [s, 0])) as Record<DisplayState, number>;
     for (const u of visible) c[u.display]++;
@@ -84,6 +101,16 @@ export function UnitMap() {
         <div className="card">
           <div className="map-toolbar">
             <input className="input" placeholder="ابحث برقم الوحدة أو اسم العميل أو الجوال" value={q} onChange={(e) => setQ(e.target.value)} />
+            {branches.length > 1 && (
+              <select className="input" value={branch} onChange={(e) => { setBranch(e.target.value); setFloor('all'); setZone('all'); }} aria-label="الفرع">
+                <option value="all">كل الفروع</option>
+                {branches.map((b) => <option key={b} value={b}>{b}</option>)}
+              </select>
+            )}
+            <select className="input" value={floor} onChange={(e) => { setFloor(e.target.value); setZone('all'); }} aria-label="الطابق">
+              <option value="all">كل الطوابق</option>
+              {floors.map((f) => <option key={f} value={f}>{f}</option>)}
+            </select>
             <select className="input" value={zone} onChange={(e) => setZone(e.target.value)} aria-label="المنطقة">
               <option value="all">كل المناطق</option>
               {zones.map((z) => <option key={z} value={z}>منطقة {z}</option>)}
@@ -103,7 +130,7 @@ export function UnitMap() {
                 {layout.zones.map((z) => (
                   <g key={z.zone}>
                     <rect x={z.x + 0.1} y={z.y - 0.3} width={z.w - 0.2} height={z.h + 0.6} rx={0.4} fill="var(--zone)" />
-                    <text x={z.x + z.w / 2} y={z.y - 0.8} fontSize={1.1} textAnchor="middle" className="zone-label">منطقة {z.zone}</text>
+                    <text x={z.x + z.w / 2} y={z.y - 0.8} fontSize={1.1} textAnchor="middle" className="zone-label" style={{ direction: 'rtl' }}>{zoneTitle(z.zone)}</text>
                   </g>
                 ))}
                 {layout.placed.map(({ unit: u, x, y, w, h }) => {
@@ -163,7 +190,8 @@ export function UnitMap() {
           <div>{ICON[tip.u.display]} {DISPLAY_LABEL[tip.u.display]}</div>
           {tip.u.customerName && <div>{tip.u.customerName}</div>}
           {tip.u.balanceDue > 0 && <div style={{ color: 'var(--danger)' }}>مستحق: {money(tip.u.balanceDue)}</div>}
-          <div style={{ color: 'var(--ink-3)' }}>{money(tip.u.monthlyPrice)} / شهر</div>
+          <div style={{ color: 'var(--ink-3)' }}>{tip.u.branch} · {tip.u.floor}{tip.u.size === 'space' ? ` · ${Math.round(tip.u.widthM * tip.u.depthM)} م²` : ''}</div>
+          <div style={{ color: 'var(--ink-3)' }}>{tip.u.monthlyPrice > 0 ? `${money(tip.u.monthlyPrice)} / شهر` : 'السعر غير محدد'}</div>
         </div>
       )}
     </>

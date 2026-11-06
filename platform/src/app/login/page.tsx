@@ -16,7 +16,7 @@ function LoginForm() {
       setBusy(false);
       if (r.ok) router.replace(next.startsWith('/') ? next : '/'); else setErr(j.error);
     }}>
-      <div className="brand" style={{ justifyContent: 'center' }}><span className="brand-mark">R</span><span>رافيل<small>CONTROL CENTER</small></span></div>
+      <div className="brand" style={{ justifyContent: 'center' }}><span className="brand-mark">R</span><span>رافل<small>CONTROL CENTER</small></span></div>
       <div className="field"><label>كلمة المرور</label><input className="input" type="password" autoFocus value={pw} onChange={(e) => setPw(e.target.value)} /></div>
       {err && <div className="notice err">{err}</div>}
       <button className="btn" style={{ width: '100%' }} disabled={busy}>دخول</button>

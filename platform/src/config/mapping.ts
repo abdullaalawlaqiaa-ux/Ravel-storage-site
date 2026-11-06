@@ -9,6 +9,8 @@ export interface CreatorMapping {
   fields: {
     code: string;
     zone: string;
+    branch: string;
+    floor: string;
     size: string;
     status: string;
     price: string;
@@ -24,13 +26,15 @@ export interface CreatorMapping {
   };
   /** القيم كما هي مكتوبة في Creator لكل حالة. أول قيمة تُستخدم عند الكتابة. */
   statusValues: Record<'available' | 'occupied' | 'reserved' | 'maintenance', string[]>;
-  sizeValues: Record<'small' | 'medium' | 'large', string[]>;
+  sizeValues: Record<'small' | 'medium' | 'large' | 'space', string[]>;
 }
 
 const DEFAULT_MAPPING: CreatorMapping = {
   fields: {
     code: 'Unit_Number',
     zone: 'Zone',
+    branch: 'Branch',
+    floor: 'Floor',
     size: 'Unit_Size',
     status: 'Status',
     price: 'Monthly_Price',
@@ -54,6 +58,7 @@ const DEFAULT_MAPPING: CreatorMapping = {
     small: ['صغيرة', 'صغير', 'Small', 'S', '2x1.5'],
     medium: ['متوسطة', 'متوسط', 'Medium', 'M', '3x3'],
     large: ['كبيرة', 'كبير', 'Large', 'L', '6x3'],
+    space: ['مساحة', 'مساحة مفتوحة', 'مساحة تخزينية', 'Open Space', 'Space', 'Area'],
   },
 };
 
@@ -75,11 +80,15 @@ function load(): CreatorMapping {
 
 export const mapping = load();
 
-/** الأبعاد والأسعار الافتراضية (من موقع رافيل) */
+/**
+ * أبعاد افتراضية للرسم فقط عندما لا يحتوي سجل Creator على الأبعاد.
+ * الأسعار لا تُخمَّن أبداً: تُقرأ من Zoho، والسعر الفارغ يظهر "—".
+ */
 export const SIZE_DEFAULTS = {
-  small: { widthM: 2, depthM: 1.5, price: 199 },
-  medium: { widthM: 3, depthM: 3, price: 449 },
-  large: { widthM: 6, depthM: 3, price: 849 },
+  small: { widthM: 1.5, depthM: 1.5 },
+  medium: { widthM: 3, depthM: 3 },
+  large: { widthM: 6, depthM: 4 },
+  space: { widthM: 6, depthM: 5 },
 } as const;
 
 export const settings = {
@@ -88,5 +97,7 @@ export const settings = {
   /** مدة استحقاق الفاتورة بالأيام */
   invoiceDueDays: Number(process.env.INVOICE_DUE_DAYS ?? 7),
   /** نسبة الضريبة المضافة (تُطبّق في Zoho Books حسب إعداداتكم) */
-  currency: 'SAR',
+  currency: 'AED',
+  /** ضريبة القيمة المضافة في الإمارات – تُطبَّق من إعدادات الضريبة في Zoho Books */
+  vatRate: 0.05,
 };

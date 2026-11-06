@@ -8,10 +8,10 @@ type Tab = 'book' | 'extend' | 'invoice' | 'vacate' | 'maintenance' | 'price';
 
 function waLink(u: EnrichedUnit) {
   if (!u.customerPhone) return null;
-  const phone = u.customerPhone.replace(/\D/g, '').replace(/^0/, '966');
+  const phone = u.customerPhone.replace(/\D/g, '').replace(/^0/, '971');
   const text = u.overdue
-    ? `مرحباً ${u.customerName}، نذكّركم بوجود مبلغ مستحق ${Math.round(u.balanceDue)} ر.س على وحدة التخزين ${u.code} لدى رافيل للتخزين. شاكرين تعاونكم.`
-    : `مرحباً ${u.customerName}، عقد وحدة التخزين ${u.code} لدى رافيل للتخزين ينتهي بتاريخ ${fmtDate(u.contractEnd)}. هل ترغب بالتمديد؟`;
+    ? `مرحباً ${u.customerName}، نذكّركم بوجود مبلغ مستحق ${Math.round(u.balanceDue)} درهم على وحدة التخزين ${u.code} لدى رافل للتخزين. شاكرين تعاونكم.`
+    : `مرحباً ${u.customerName}، عقد وحدة التخزين ${u.code} لدى رافل للتخزين ينتهي بتاريخ ${fmtDate(u.contractEnd)}. هل ترغب بالتمديد؟`;
   return `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
 }
 
@@ -72,8 +72,10 @@ export function UnitDrawer({ unit: u, onClose, onDone }: { unit: EnrichedUnit; o
       </div>
 
       <dl className="kv">
-        <dt>المنطقة</dt><dd>{u.zone}</dd>
-        <dt>السعر الشهري</dt><dd className="num">{money(u.monthlyPrice)}</dd>
+        <dt>الفرع</dt><dd>{u.branch}</dd>
+        <dt>الطابق / المنطقة</dt><dd>{u.floor} · {u.zone}</dd>
+        {u.size === 'space' && <><dt>المساحة</dt><dd className="num">{Math.round(u.widthM * u.depthM)} م²</dd></>}
+        <dt>السعر الشهري</dt><dd className="num">{u.monthlyPrice > 0 ? money(u.monthlyPrice) : <span style={{ color: 'var(--danger)' }}>غير محدد</span>}</dd>
         {rented && <>
           <dt>العميل</dt><dd>{u.customerName ?? '—'}</dd>
           <dt>الجوال</dt><dd className="num" dir="ltr" style={{ textAlign: 'right' }}>{u.customerPhone ?? '—'}</dd>
@@ -150,7 +152,7 @@ export function UnitDrawer({ unit: u, onClose, onDone }: { unit: EnrichedUnit; o
 
       {tab === 'price' && (
         <form onSubmit={(e) => { e.preventDefault(); run({ type: 'price', monthlyPrice: price }); }}>
-          <div className="field"><label>السعر الشهري (ر.س)</label><input className="input" type="number" min={1} value={price} onChange={(e) => setPrice(Number(e.target.value))} /></div>
+          <div className="field"><label>السعر الشهري (درهم)</label><input className="input" type="number" min={1} value={price} onChange={(e) => setPrice(Number(e.target.value))} /></div>
           <button className="btn ghost" disabled={busy} style={{ width: '100%' }}>حفظ السعر</button>
         </form>
       )}

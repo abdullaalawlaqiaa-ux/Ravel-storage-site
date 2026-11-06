@@ -2,8 +2,8 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'رافيل – مركز التحكم',
-  description: 'منصة موحّدة لإدارة وحدات رافيل للتخزين مع Zoho Creator و Zoho Books',
+  title: 'رافل – مركز التحكم',
+  description: 'منصة موحّدة لإدارة وحدات رافل للتخزين مع Zoho Creator و Zoho Books',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

@@ -33,7 +33,7 @@ export default async function Dashboard() {
         <div className="card kpi">
           <div className="label">نسبة الإشغال</div>
           <div className="value num">{pct(k.occupancy)}</div>
-          <div className="sub">{num(k.rented)} مؤجّرة من {num(k.total - k.maintenance)} · {num(k.maintenance)} صيانة</div>
+          <div className="sub">{num(k.rented)} مؤجّرة من {num(k.total - k.maintenance)} · بالمساحة {pct(k.occupancyArea)}</div>
         </div>
         <div className="card kpi">
           <div className="label">الدخل الشهري المتكرر</div>

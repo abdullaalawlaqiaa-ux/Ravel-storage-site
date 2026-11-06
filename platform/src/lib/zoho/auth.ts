@@ -5,6 +5,7 @@
  */
 export const ZOHO_DCS: { key: string; label: string; accounts: string; api: string }[] = [
   { key: 'com', label: 'أمريكا (zoho.com)', accounts: 'https://accounts.zoho.com', api: 'https://www.zohoapis.com' },
+  { key: 'ae', label: 'الإمارات (zoho.ae)', accounts: 'https://accounts.zoho.ae', api: 'https://www.zohoapis.ae' },
   { key: 'sa', label: 'السعودية (zoho.sa)', accounts: 'https://accounts.zoho.sa', api: 'https://www.zohoapis.sa' },
   { key: 'eu', label: 'أوروبا (zoho.eu)', accounts: 'https://accounts.zoho.eu', api: 'https://www.zohoapis.eu' },
   { key: 'in', label: 'الهند (zoho.in)', accounts: 'https://accounts.zoho.in', api: 'https://www.zohoapis.in' },

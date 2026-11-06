@@ -16,7 +16,7 @@ export function Sidebar({ mode, canLogout }: { mode: 'mock' | 'zoho'; canLogout:
     <aside className="side">
       <div className="brand">
         <span className="brand-mark">R</span>
-        <span>رافيل<small>CONTROL CENTER</small></span>
+        <span>رافل<small>CONTROL CENTER</small></span>
       </div>
       {LINKS.map((l) => (
         <Link key={l.href} href={l.href} className={`nav-link ${path === l.href ? 'active' : ''}`}>

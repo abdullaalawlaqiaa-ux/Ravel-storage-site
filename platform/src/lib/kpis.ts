@@ -8,6 +8,8 @@ export interface Kpis {
   available: number;
   maintenance: number;
   occupancy: number;
+  /** الإشغال بالمساحة (م²) */
+  occupancyArea: number;
   mrr: number;
   potentialMrr: number;
   lostPerDay: number;
@@ -23,12 +25,14 @@ export interface Kpis {
 
 const AR_MONTHS = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
 
+const area = (us: EnrichedUnit[]) => us.reduce((a, u) => a + u.widthM * u.depthM, 0);
+
 export function computeKpis(units: EnrichedUnit[], invoices: Invoice[], today = todayISO()): Kpis {
   const usable = units.filter((u) => u.status !== 'maintenance');
   const rentedUnits = units.filter((u) => u.status === 'occupied' || u.status === 'reserved');
   const avail = units.filter((u) => u.status === 'available');
 
-  const sizes: UnitSize[] = ['small', 'medium', 'large'];
+  const sizes: UnitSize[] = ['small', 'medium', 'large', 'space'];
   const bySize = sizes.map((size) => {
     const all = units.filter((u) => u.size === size);
     const us = all.filter((u) => u.status !== 'maintenance');
@@ -74,6 +78,7 @@ export function computeKpis(units: EnrichedUnit[], invoices: Invoice[], today = 
     available: avail.length,
     maintenance: units.length - usable.length,
     occupancy: usable.length ? rentedUnits.length / usable.length : 0,
+    occupancyArea: area(usable) ? area(rentedUnits) / area(usable) : 0,
     mrr: rentedUnits.reduce((a, b) => a + b.monthlyPrice, 0),
     potentialMrr: usable.reduce((a, b) => a + b.monthlyPrice, 0),
     lostPerDay: avail.reduce((a, b) => a + b.monthlyPrice, 0) / 30,

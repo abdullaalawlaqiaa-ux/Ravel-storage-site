@@ -1,7 +1,6 @@
 import type { DataSource, Unit } from './types';
-import { settings, SIZE_DEFAULTS } from '@/config/mapping';
+import { settings } from '@/config/mapping';
 import { addDays, addMonths, todayISO } from './dates';
-import { SIZE_LABEL } from './format';
 
 export type UnitAction =
   | { type: 'book'; customerName: string; customerPhone?: string; startDate?: string; months: number; invoice: boolean; reserveOnly?: boolean }
@@ -12,7 +11,8 @@ export type UnitAction =
   | { type: 'price'; monthlyPrice: number };
 
 function lineName(u: Unit, months: number, from: string) {
-  return `إيجار وحدة ${SIZE_LABEL[u.size] ?? ''} ${u.code} – ${months} شهر (من ${from})`;
+  const what = u.size === 'space' ? `مساحة ${Math.round(u.widthM * u.depthM)} م²` : `وحدة ${u.widthM}×${u.depthM} م`;
+  return `إيجار ${what} ${u.code} – ${u.branch} / ${u.floor} – ${months} شهر (من ${from})`;
 }
 
 export async function runUnitAction(ds: DataSource, unitId: string, a: UnitAction) {
@@ -21,14 +21,17 @@ export async function runUnitAction(ds: DataSource, unitId: string, a: UnitActio
   if (!u) throw new Error('الوحدة غير موجودة');
   const today = todayISO();
   const months = 'months' in a ? Math.max(1, Math.min(36, Math.floor(Number(a.months) || 1))) : 0;
-  const price = u.monthlyPrice || SIZE_DEFAULTS[u.size].price;
+  const price = u.monthlyPrice;
+  const needPrice = () => { if (!(price > 0)) throw new Error('حدّد السعر الشهري للوحدة أولاً (تبويب السعر)'); };
 
-  const invoice = async (customerName: string, customerPhone: string | undefined, from: string) =>
-    ds.createInvoice({
+  const invoice = async (customerName: string, customerPhone: string | undefined, from: string) => {
+    needPrice();
+    return ds.createInvoice({
       customerName, customerPhone, unitCode: u.code, date: today,
       dueDate: addDays(today, settings.invoiceDueDays),
       items: [{ name: lineName(u, months, from), rate: price, quantity: months }],
     });
+  };
 
   switch (a.type) {
     case 'book': {
@@ -73,7 +76,7 @@ export async function runUnitAction(ds: DataSource, unitId: string, a: UnitActio
       const p = Number(a.monthlyPrice);
       if (!(p > 0)) throw new Error('سعر غير صالح');
       await ds.updateUnit(u.id, { monthlyPrice: p });
-      return { message: `تم تحديث سعر ${u.code} إلى ${p} ر.س` };
+      return { message: `تم تحديث سعر ${u.code} إلى ${p} درهم` };
     }
     default:
       throw new Error('إجراء غير معروف');

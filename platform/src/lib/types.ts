@@ -1,10 +1,14 @@
-export type UnitSize = 'small' | 'medium' | 'large';
+export type UnitSize = 'small' | 'medium' | 'large' | 'space';
 export type UnitStatus = 'available' | 'occupied' | 'reserved' | 'maintenance';
 
 export interface Unit {
   id: string;
   code: string;
   zone: string;
+  /** الفرع */
+  branch: string;
+  /** الطابق: أرضي / ميزانين */
+  floor: string;
   size: UnitSize;
   /** أبعاد الوحدة بالمتر (للرسم على الخارطة) */
   widthM: number;

@@ -1,10 +1,10 @@
-const nf = new Intl.NumberFormat('ar-SA-u-nu-latn', { maximumFractionDigits: 0 });
+const nf = new Intl.NumberFormat('ar-AE-u-nu-latn', { maximumFractionDigits: 0 });
 
-export const money = (n: number) => `${nf.format(Math.round(n))} ر.س`;
+export const money = (n: number) => `${nf.format(Math.round(n))} درهم`;
 export const num = (n: number) => nf.format(n);
 export const pct = (n: number) => `${Math.round(n * 100)}%`;
 
-export const SIZE_LABEL: Record<string, string> = { small: 'صغيرة', medium: 'متوسطة', large: 'كبيرة' };
+export const SIZE_LABEL: Record<string, string> = { small: 'صغيرة', medium: 'متوسطة', large: 'كبيرة', space: 'مساحة مفتوحة' };
 
 export const DISPLAY_LABEL: Record<string, string> = {
   available: 'متاحة',
