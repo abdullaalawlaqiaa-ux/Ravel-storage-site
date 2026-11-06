@@ -40,6 +40,8 @@ body{font-family:'Tajawal',sans-serif;color:#fff}
 @keyframes shake{0%,100%{transform:translateX(0) rotate(0)}25%{transform:translateX(-14px) rotate(-.7deg)}75%{transform:translateX(14px) rotate(.7deg)}}
 @keyframes bulge{to{transform:scale(1.045,.97)}}
 @keyframes mark{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes squeeze{0%{transform:none}100%{transform:scale(.62,1.12)}}
+#squeeze.on{animation:squeeze .3s cubic-bezier(.65,0,.35,1) 2.45s 4 alternate both}
 @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
 @keyframes sweep{from{transform:translateX(-1400px) rotate(18deg)}to{transform:translateX(1400px) rotate(18deg)}}
 @keyframes dopen{from{transform:translateY(0)}to{transform:translateY(-100%)}}
@@ -117,7 +119,7 @@ body{font-family:'Tajawal',sans-serif;color:#fff}
 <section class="scene" id="s1" data-in="0" data-out="3.5"><div class="grain"></div>
   <div class="abs center ax" dir="rtl" style="top:200px;font-size:170px;z-index:5;text-shadow:0 10px 30px rgba(12,21,51,.6)">
     <span class="w a up" style="--d:.05s">بيتك</span> <span class="w a up" style="--d:.22s">صار</span><br>
-    <span class="w a up gold" style="--d:.4s;font-size:250px">ضيّق؟</span>
+    <span class="w a up gold" style="--d:.4s;font-size:250px"><span class="w" id="squeeze">ضيّق؟</span></span>
   </div>
   <div class="abs" style="inset:0;color:#fff">
    <div class="abs" style="inset:0;transform-origin:540px 1560px;animation:bulge .35s ease-in-out 2.45s 4 alternate both">
@@ -238,7 +240,7 @@ body{font-family:'Tajawal',sans-serif;color:#fff}
 <!-- S6 TIDY HOME 28–30 -->
 <section class="scene" id="s6" data-in="28" data-out="30"><div class="grain"></div>
   <div class="abs center ax" dir="rtl" style="top:230px;font-size:120px">
-    <span class="w a up" style="--d:28.05s">رجّع</span> <span class="w a up" style="--d:28.17s">لبيتك</span><br><span class="w a up" style="--d:28.29s;font-size:160px"><span class="mk" style="--md:28.6s">مساحته</span></span>
+    <span class="w a up" style="--d:28.05s">رجّع</span> <span class="w a up" style="--d:28.17s">لبيتك</span><br><span class="w a up" style="--d:28.29s;font-size:160px"><span class="mk" style="--md:28.6s"><span id="stretch">مساحته</span></span></span>
   </div>
   <div class="abs" style="inset:0;color:var(--navy)">
     <svg class="abs" style="left:60px;top:760px;width:960px;height:150px" viewBox="0 0 960 150"><path d="M20 145L480 12L940 145" stroke="currentColor" stroke-width="12" fill="none" stroke-linejoin="round" stroke-linecap="round"/></svg>
@@ -281,6 +283,9 @@ const grps=[...document.querySelectorAll('.grp')];
 const rolls=[...document.querySelectorAll('#roll div')];
 const dots=[...document.querySelectorAll('#dots i')];
 const ROW=120;
+const STRETCH={{STRETCH}};
+const stEl=document.getElementById('stretch');
+if(STRETCH){document.getElementById('squeeze').classList.add('on');stEl.parentNode.parentNode.style.fontSize='132px';}
 window.setTime=function(t){
   scenes.forEach(s=>{s.style.display=(t>=+s.dataset.in&&t<+s.dataset.out)?'block':'none'});
   // panel sweep transition on every cut
@@ -303,6 +308,7 @@ window.setTime=function(t){
     r.style.filter=`blur(${Math.min(8,ad*6)}px)`;
     r.style.color=ad<.42?(k==4?'#152249':'#b07f2c'):'#b9ad97';});
   const act=Math.round(p);dots.forEach((d,k)=>{d.style.background=k<=act?'#d6aa5a':'#d9ccb3';d.style.width=k==act?'70px':'26px'});
+  if(STRETCH){const n=Math.round(2*ioC(seg(t,28.75,29.45)));const T='\u0640'.repeat(n);stEl.textContent='م'+T+'س'+T+'ا'+'ح'+T+'ت'+T+'ه';}
   document.getAnimations().forEach(a=>{a.pause();a.currentTime=t*1000});
 };
 window.setTime(0);
