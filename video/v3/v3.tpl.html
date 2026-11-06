@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="node_modules/@fontsource/alexandria/800.css">
+<link rel="stylesheet" href="node_modules/@fontsource/alexandria/900.css">
+<link rel="stylesheet" href="node_modules/@fontsource/tajawal/500.css">
+<link rel="stylesheet" href="node_modules/@fontsource/tajawal/800.css">
+<style>
+:root{--navy:#152249;--navy2:#0c1533;--blue:#8fc9f2;--blueD:#2e78b8;--grey:#eef1f6;--grey2:#dde3ec}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:1080px;height:1920px;overflow:hidden;background:#000}
+body{font-family:'Tajawal',sans-serif;color:#fff}
+.scene{position:absolute;inset:0;overflow:hidden;display:none}
+.abs{position:absolute}
+.center{left:0;right:0;text-align:center}
+.ax{font-family:'Alexandria',sans-serif;font-weight:900;line-height:1.25}
+.ax8{font-family:'Alexandria',sans-serif;font-weight:800;line-height:1.3}
+.tj{font-family:'Tajawal',sans-serif;font-weight:800}
+.blue{color:var(--blue)} .blueD{color:var(--blueD)} .navy{color:var(--navy)}
+.w{display:inline-block}
+.ltr{direction:ltr;unicode-bidi:isolate;display:inline-block}
+.it{position:absolute}
+
+.a{animation-fill-mode:both;animation-delay:var(--d,0s)}
+.up{animation-name:up;animation-duration:.6s;animation-timing-function:cubic-bezier(.16,1,.3,1)}
+.pop{animation-name:pop;animation-duration:.5s;animation-timing-function:cubic-bezier(.34,1.56,.64,1)}
+.drop{animation-name:drop;animation-duration:.6s;animation-timing-function:cubic-bezier(.5,0,.75,0)}
+.fade{animation-name:fade;animation-duration:.5s;animation-timing-function:ease-out}
+.slideR{animation-name:slideR;animation-duration:.7s;animation-timing-function:cubic-bezier(.16,1,.3,1)}
+.reveal{animation-name:reveal;animation-duration:.9s;animation-timing-function:cubic-bezier(.65,0,.35,1)}
+.stor{animation-name:stor;animation-duration:.6s;animation-timing-function:cubic-bezier(.16,1,.3,1)}
+@keyframes up{0%{transform:translateY(90px);opacity:0;filter:blur(12px)}100%{transform:none;opacity:1;filter:blur(0)}}
+@keyframes pop{0%{transform:scale(0);opacity:0}100%{transform:scale(1);opacity:1}}
+@keyframes drop{0%{transform:translateY(-1500px)}85%{transform:translateY(0)}92%{transform:scale(1.06,.9)}100%{transform:none}}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@keyframes slideR{from{transform:translateX(900px);opacity:0}to{transform:none;opacity:1}}
+@keyframes reveal{from{clip-path:inset(-5% 100% -5% -5%)}to{clip-path:inset(-5% -5% -5% -5%)}}
+@keyframes stor{from{transform:scaleX(1.35);opacity:0;filter:blur(8px)}to{transform:none;opacity:1;filter:blur(0)}}
+@keyframes shake{0%,100%{transform:translateX(0) rotate(0)}25%{transform:translateX(-14px) rotate(-.7deg)}75%{transform:translateX(14px) rotate(.7deg)}}
+@keyframes wob{0%,100%{transform:none}50%{transform:scale(1.03,.98)}}
+@keyframes mark{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+@keyframes sweep{from{transform:translateX(-1400px) rotate(18deg)}to{transform:translateX(1400px) rotate(18deg)}}
+
+.mk{position:relative;display:inline-block;z-index:0;padding:0 .18em}
+.mk::before{content:"";position:absolute;left:0;right:0;top:52%;height:38%;background:var(--blue);opacity:.6;z-index:-1;border-radius:8px;transform-origin:right;animation:mark .45s cubic-bezier(.65,0,.35,1) var(--md) both}
+
+#panel{position:absolute;inset:0;background:var(--blue);z-index:60;transform:translateX(110%)}
+#panel::after{content:"";position:absolute;inset:0 0 0 auto;width:140px;background:var(--navy)}
+.logo{position:absolute;left:0;right:0;margin:0 auto;color:#fff}
+.logo svg{display:block;width:100%;fill:currentColor}
+
+.navybg{background:radial-gradient(1100px 900px at 50% 35%,#1d2d60 0%,var(--navy) 55%,var(--navy2) 100%)}
+.greybg{background:radial-gradient(1100px 1000px at 50% 40%,#fff 0%,var(--grey) 55%,var(--grey2) 100%);color:var(--navy)}
+.grain{position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,.05) 1.5px,transparent 1.5px);background-size:44px 44px}
+.greybg .grain{background-image:radial-gradient(rgba(21,34,73,.06) 1.5px,transparent 1.5px)}
+.sweepLight{position:absolute;top:-400px;left:0;width:260px;height:2800px;background:linear-gradient(90deg,transparent,rgba(143,201,242,.18),transparent);animation:sweep 3s cubic-bezier(.45,0,.55,1) var(--d) both}
+
+.kbar{display:inline-block;position:relative;white-space:nowrap;text-align:right}
+.kg{display:inline-block;transform-origin:right center;margin-right:-5px}
+.kitems{position:absolute;left:0;right:0;height:0}
+
+/* grid scene */
+.grid{position:absolute}
+.tile{position:absolute;border-radius:10px;background:#fff;border:3px solid #d3dbe7}
+.tile.on{background:var(--blue);border-color:#5fa9de}
+.chip{display:inline-block;background:var(--navy);color:#fff;font-family:'Alexandria';font-weight:800;font-size:58px;padding:10px 40px 18px;border-radius:999px}
+
+.feat{position:absolute;left:90px;right:90px;height:150px;border-radius:75px;background:#fff;color:var(--navy);display:flex;align-items:center;gap:30px;padding:0 24px 0 50px;font-family:'Alexandria';font-weight:800;font-size:56px;box-shadow:0 24px 50px rgba(0,0,0,.3)}
+.feat .ib{width:108px;height:108px;border-radius:54px;background:var(--navy);display:grid;place-items:center;flex:none}
+.cta{display:inline-block;background:var(--blue);color:var(--navy);font-family:'Alexandria';font-weight:900;font-size:80px;padding:24px 70px 30px;border-radius:999px;box-shadow:0 24px 60px rgba(143,201,242,.35)}
+.cta.pulse{animation:pulse 1s ease-in-out var(--d) infinite}
+.wa{display:inline-flex;align-items:center;gap:24px;background:#fff;color:var(--navy);border-radius:999px;padding:16px 44px 16px 24px;font-family:'Alexandria';font-weight:800;font-size:62px}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute"><defs>
+{{SYMBOLS}}
+  <symbol id="sack" viewBox="0 0 120 150"><path d="M20 30Q10 90 18 140H102Q110 90 100 30Z" fill="#e9dcc3"/><path d="M28 30Q60 10 92 30L86 18Q60 4 34 18Z" fill="#d8c7a6"/><rect x="34" y="70" width="52" height="34" rx="6" fill="#2e78b8"/></symbol>
+  <symbol id="crate" viewBox="0 0 160 140"><rect width="160" height="140" rx="8" fill="#5e7fb5"/><g fill="#7f9fd1"><rect x="10" y="12" width="140" height="22" rx="4"/><rect x="10" y="48" width="140" height="22" rx="4"/><rect x="10" y="84" width="140" height="22" rx="4"/></g><g fill="#e8eef7"><circle cx="40" cy="122" r="9"/><circle cx="80" cy="122" r="9"/><circle cx="120" cy="122" r="9"/></g></symbol>
+  <symbol id="rchair" viewBox="0 0 100 170"><rect x="14" y="0" width="72" height="80" rx="14" fill="#8a94ab"/><rect x="6" y="78" width="88" height="18" rx="6" fill="#6b7590"/><rect x="12" y="96" width="10" height="74" rx="4" fill="#4b546b"/><rect x="78" y="96" width="10" height="74" rx="4" fill="#4b546b"/></symbol>
+  <symbol id="fridge" viewBox="0 0 120 240"><rect width="120" height="240" rx="14" fill="#e6ebf2"/><rect x="0" y="86" width="120" height="6" fill="#b8c3d3"/><rect x="96" y="30" width="8" height="40" rx="4" fill="#8a94ab"/><rect x="96" y="110" width="8" height="60" rx="4" fill="#8a94ab"/></symbol>
+  <symbol id="truck" viewBox="0 0 300 160"><rect x="0" y="10" width="190" height="110" rx="10" fill="#fff"/><rect x="10" y="20" width="170" height="90" rx="6" fill="#152249"/><path d="M196 40H250L290 80V120H196Z" fill="#8fc9f2"/><rect x="214" y="52" width="40" height="30" rx="4" fill="#152249"/><circle cx="60" cy="130" r="22" fill="#2b3442"/><circle cx="60" cy="130" r="9" fill="#c9d1dc"/><circle cx="240" cy="130" r="22" fill="#2b3442"/><circle cx="240" cy="130" r="9" fill="#c9d1dc"/></symbol>
+  <symbol id="shop" viewBox="0 0 640 700"><rect x="20" y="130" width="600" height="560" fill="none" stroke="#152249" stroke-width="14" stroke-linejoin="round"/><g><path d="M0 40H640V130H0Z" fill="#152249"/><g fill="#8fc9f2"><path d="M0 130Q40 175 80 130Z"/><path d="M160 130Q200 175 240 130Z"/><path d="M320 130Q360 175 400 130Z"/><path d="M480 130Q520 175 560 130Z"/></g><g fill="#fff"><path d="M80 130Q120 175 160 130Z"/><path d="M240 130Q280 175 320 130Z"/><path d="M400 130Q440 175 480 130Z"/><path d="M560 130Q600 175 640 130Z"/></g></g></symbol>
+</defs></svg>
+
+<!-- S1 HOOK 0–3.5 -->
+<section class="scene navybg" id="s1" data-in="0" data-out="3.5"><div class="grain"></div>
+  <div class="abs center ax" dir="rtl" style="top:560px;font-size:120px;z-index:5;text-shadow:0 10px 30px rgba(12,21,51,.6)">
+    <span class="w a up" style="--d:.05s">مخزن</span> <span class="w a up" style="--d:.2s">محلك</span>
+  </div>
+  <div class="abs center" dir="rtl" style="top:960px">
+   <div class="w" style="animation:shake .1s linear 2.5s 6 both">
+    <span class="w ax blue a up" style="--d:.38s;font-size:175px;white-space:nowrap"><span>ضـ</span><span class="kbar" data-w="560" data-fit="1050" data-base="560" data-t0=".7" data-t1="1.3"><span class="kg">ـ</span><span class="kitems">
+      <svg class="it a drop" style="--d:1.4s;right:8px;bottom:0;width:100px;height:200px"><use href="#fridge"/></svg>
+      <svg class="it a drop" style="--d:1.6s;right:120px;bottom:0;width:150px;height:131px"><use href="#crate"/></svg>
+      <svg class="it a drop" style="--d:1.76s;right:282px;bottom:0;width:90px;height:112px"><use href="#sack"/></svg>
+      <svg class="it a drop" style="--d:1.9s;right:380px;bottom:0;width:80px;height:136px"><use href="#rchair"/></svg>
+      <svg class="it a drop" style="--d:2.0s;right:466px;bottom:0;width:86px;height:75px"><use href="#box"/></svg>
+      <svg class="it a drop" style="--d:2.08s;right:130px;bottom:131px;width:120px;height:105px"><use href="#box"/></svg>
+      <svg class="it a drop" style="--d:2.15s;right:285px;bottom:112px;width:84px;height:105px"><use href="#sack"/></svg>
+      <svg class="it a drop" style="--d:2.2s;right:470px;bottom:75px;width:76px;height:66px"><use href="#box"/></svg>
+      <svg class="it a drop" style="--d:2.24s;right:14px;bottom:200px;width:90px;height:79px"><use href="#box"/></svg>
+      <svg class="it a drop" style="--d:2.28s;right:380px;bottom:136px;width:80px;height:136px"><use href="#rchair"/></svg>
+    </span></span><span>ـاق؟</span></span>
+   </div>
+  </div>
+</section>
+
+<!-- S2 PROBLEM 3.5–7 -->
+<section class="scene greybg" id="s2" data-in="3.5" data-out="7"><div class="grain"></div>
+  <div class="abs center ax8" dir="rtl" style="top:200px;font-size:92px">
+    <span class="w a up" style="--d:3.6s">المخزون</span> <span class="w a up" style="--d:3.72s">يكبر…</span><br>
+    <span class="w a up" style="--d:5.0s">والمحل</span> <span class="w a up" style="--d:5.12s"><span class="mk" style="--md:5.45s">ما يكبر</span></span>
+  </div>
+  <div class="abs" style="left:220px;top:720px;width:640px;height:700px;animation:wob .18s ease-in-out 6.1s 4 both">
+    <svg class="abs" style="inset:0;width:640px;height:700px"><use href="#shop"/></svg>
+    <div class="abs" id="pile" style="inset:0"></div>
+  </div>
+</section>
+
+<!-- S3 BRAND 7–10 -->
+<section class="scene navybg" id="s3" data-in="7" data-out="10"><div class="grain"></div>
+  <div class="sweepLight" style="--d:7.4s"></div>
+  <div class="logo" style="top:640px;width:860px">
+    <svg viewBox="0 0 2100 1000" class="a reveal" style="--d:7.15s;animation-duration:.8s"><use href="#lg-script"/></svg>
+    <svg viewBox="0 0 2100 230" class="a stor" style="--d:7.8s;margin-top:86px"><use href="#lg-storage"/></svg>
+  </div>
+  <div class="abs center tj a up blue" dir="rtl" style="--d:8.3s;top:1360px;font-size:70px">مساحات تخزين للشركات</div>
+</section>
+
+<!-- S4 PER-SQM GRID 10–18 -->
+<section class="scene greybg" id="s4" data-in="10" data-out="18"><div class="grain"></div>
+  <div class="abs center ax" dir="rtl" style="top:170px;font-size:92px;white-space:nowrap">
+    <span class="w a up" style="--d:10.05s">تأجير</span> <span class="w a up" style="--d:10.17s"><span class="mk" style="--md:10.5s">بالمتر المربع</span></span>
+  </div>
+  <div class="abs center a fade" dir="rtl" style="--d:10.35s;top:360px;display:flex;justify-content:center;align-items:center;gap:36px">
+    <span class="chip" id="chip">مطعم</span>
+    <span class="ax navy" style="font-size:100px"><span class="ltr" id="cnt">0</span> م²</span>
+  </div>
+  <div class="grid" id="gA" style="left:90px;top:560px;width:900px;height:750px"></div>
+  <div class="grid" id="gB" style="left:92px;top:600px;width:896px;height:640px"></div>
+  <div class="abs" id="itA" style="inset:0">
+    <svg class="it a pop" style="--d:11.5s;left:262px;top:820px;width:110px;height:220px;transform-origin:50% 100%"><use href="#fridge"/></svg>
+    <svg class="it a pop" style="--d:11.62s;left:400px;top:900px;width:160px;height:140px;transform-origin:50% 100%"><use href="#crate"/></svg>
+    <svg class="it a pop" style="--d:11.72s;left:580px;top:900px;width:110px;height:137px;transform-origin:50% 100%"><use href="#sack"/></svg>
+    <svg class="it a pop" style="--d:11.8s;left:710px;top:870px;width:100px;height:170px;transform-origin:50% 100%"><use href="#rchair"/></svg>
+  </div>
+  <div class="abs" id="itB" style="inset:0">
+    <svg class="it a pop" style="--d:14.1s;left:270px;top:920px;width:320px;height:181px;transform-origin:50% 100%"><use href="#sofa"/></svg>
+    <svg class="it a pop" style="--d:14.24s;left:620px;top:780px;width:160px;height:282px;transform-origin:50% 100%"><use href="#wardrobe"/></svg>
+    <svg class="it a pop" style="--d:14.34s;left:805px;top:925px;width:150px;height:167px;transform-origin:50% 100%"><use href="#chair"/></svg>
+    <svg class="it a pop" style="--d:14.42s;left:320px;top:640px;width:120px;height:105px;transform-origin:50% 100%"><use href="#box"/></svg>
+  </div>
+  <div class="abs" id="itC" style="inset:0">
+    <svg class="it a pop" style="--d:16.6s;left:250px;top:1050px;width:330px;height:176px;transform-origin:50% 100%"><use href="#truck"/></svg>
+    <svg class="it a pop" style="--d:16.7s;left:600px;top:1050px;width:250px;height:133px;transform-origin:50% 100%"><use href="#truck"/></svg>
+    <svg class="it a pop" style="--d:16.76s;left:250px;top:620px;width:180px;height:420px;transform-origin:50% 100%"><use href="#rack"/></svg>
+    <svg class="it a pop" style="--d:16.82s;left:460px;top:620px;width:180px;height:420px;transform-origin:50% 100%"><use href="#rack"/></svg>
+    <svg class="it a pop" style="--d:16.87s;left:670px;top:620px;width:180px;height:420px;transform-origin:50% 100%"><use href="#rack"/></svg>
+  </div>
+  <div class="abs center ax a up" dir="rtl" style="--d:16.4s;top:1420px;font-size:110px">على <span class="mk" style="--md:16.8s">قد احتياجك</span></div>
+</section>
+
+<!-- S5 FEATURES 18–22 -->
+<section class="scene navybg" id="s5" data-in="18" data-out="22"><div class="grain"></div>
+  <div class="feat a slideR" style="--d:18.15s;top:470px"><div class="ib"><svg width="70" height="70"><use href="#i-cam"/></svg></div><span>مراقبة وحارس أمن <span class="ltr blueD">24/7</span></span></div>
+  <div class="feat a slideR" style="--d:18.6s;top:660px"><div class="ib"><svg width="70" height="70"><use href="#i-key"/></svg></div><span>دخول لمساحتك <span class="ltr blueD">24/7</span></span></div>
+  <div class="feat a slideR" style="--d:18.95s;top:850px"><div class="ib"><svg width="70" height="70"><use href="#i-snow"/></svg></div><span>مكيّفة وغير مكيّفة</span></div>
+  <div class="feat a slideR" style="--d:19.22s;top:1040px"><div class="ib"><svg width="70" height="70"><use href="#i-clean"/></svg></div><span>نظيفة ومعقّمة</span></div>
+  <div class="abs center ax a up" dir="rtl" style="--d:20.3s;top:1340px;font-size:104px">خزّن بضاعتك<br><span class="blue">وارتاح</span></div>
+</section>
+
+<!-- S6 CTA 22–25.5 -->
+<section class="scene navybg" id="s6" data-in="22" data-out="26"><div class="grain"></div>
+  <div class="sweepLight" style="--d:22.4s"></div>
+  <div class="logo" style="top:360px;width:700px">
+    <svg viewBox="0 0 2100 1000" class="a reveal" style="--d:22.1s;animation-duration:.7s"><use href="#lg-script"/></svg>
+    <svg viewBox="0 0 2100 230" class="a stor" style="--d:22.65s;margin-top:70px"><use href="#lg-storage"/></svg>
+  </div>
+  <div class="abs center" style="top:1040px"><div class="a pop" style="--d:23.0s;display:inline-block"><div class="cta pulse" style="--d:23.7s" dir="rtl">احجز مساحتك الحين</div></div></div>
+  <div class="abs center a up" style="--d:23.35s;top:1300px"><div class="wa"><svg width="92" height="92"><use href="#i-wa"/></svg><span class="ltr">050 3250551</span></div></div>
+  <div class="abs center a fade" style="--d:23.6s;top:1470px;font:700 50px Alexandria;letter-spacing:2px;opacity:.9">ravelstorage.com</div>
+</section>
+
+<div id="panel"></div>
+
+<script>
+const scenes=[...document.querySelectorAll('.scene')];
+const cuts=[3.5,7,10,18,22];
+const clamp=x=>Math.max(0,Math.min(1,x));
+const seg=(t,a,b)=>clamp((t-a)/(b-a));
+const ioC=x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2;
+const oBack=x=>{const c1=1.70158,c3=c1+1;return 1+c3*Math.pow(x-1,3)+c1*Math.pow(x-1,2)};
+const lerp=(a,b,f)=>a+(b-a)*f;
+
+// S2 pile of boxes: fills the shop bottom-up, then overflows onto the roof and sides (accelerating)
+const pile=document.getElementById('pile');const PB=[];
+for(let r=0;r<4;r++)for(let c=0;c<4;c++)PB.push([40+c*140,690-118*(r+1),130,113]);
+PB.push([60,30,120,105],[250,-10,140,122],[440,25,120,105],[-140,580,120,105],[650,580,130,113],[330,-120,110,96]);
+PB.forEach((b,i)=>{const d=3.75+2.3*Math.sqrt(i/PB.length);pile.insertAdjacentHTML('beforeend',`<svg class="it a pop" style="--d:${d.toFixed(2)}s;left:${b[0]}px;top:${b[1]}px;width:${b[2]}px;height:${b[3]}px;transform-origin:50% 100%"><use href="#box"/></svg>`)});
+
+// S4 grids
+const PH=[{t:10.4,g:'gA',cols:6,rows:5,tile:150,n:12,w:4,label:'مطعم',end:12.9},
+          {t:12.9,g:'gA',cols:6,rows:5,tile:150,n:20,w:5,label:'محل أثاث',end:15.4},
+          {t:15.4,g:'gB',cols:14,rows:10,tile:64,n:110,w:11,label:'شركة نقل',end:99}];
+const grids={};
+for(const id of ['gA','gB']){const p=PH.find(x=>x.g==id);const el=document.getElementById(id);grids[id]=[];
+  for(let r=0;r<p.rows;r++)for(let c=0;c<p.cols;c++){const d=document.createElement('div');d.className='tile';
+    Object.assign(d.style,{right:(c*p.tile+3)+'px',top:(r*p.tile+3)+'px',width:(p.tile-6)+'px',height:(p.tile-6)+'px'});el.appendChild(d);grids[id].push({el:d,r,c});}}
+PH.forEach(p=>{const h=p.n/p.w,co=Math.floor((p.cols-p.w)/2),ro=Math.floor((p.rows-h)/2);
+  p.lit=new Map();for(let i=0;i<p.n;i++){const r=ro+Math.floor(i/p.w),c=co+i%p.w;p.lit.set(r*p.cols+c,p.t+.25+1.3*Math.sqrt(i/p.n));}});
+const chip=document.getElementById('chip'),cnt=document.getElementById('cnt');
+const itA=document.getElementById('itA'),itB=document.getElementById('itB'),itC=document.getElementById('itC');
+
+const kbars=[...document.querySelectorAll('.kbar')];
+async function initK(){
+  await document.fonts.load('900 175px Alexandria','ـضاق');await document.fonts.ready;
+  scenes.forEach(x=>x.style.display='block');
+  const cv=document.createElement('canvas');cv.width=800;cv.height=800;const cx=cv.getContext('2d');
+  for(const k of kbars){
+    const kg=k.querySelector('.kg');const fs=getComputedStyle(kg).fontSize;
+    k._w0=kg.getBoundingClientRect().width;
+    cx.clearRect(0,0,800,800);cx.font=`900 ${fs} Alexandria`;cx.fillText('ـ',100,600);
+    const W=Math.max(4,k._w0|0),d=cx.getImageData(100,0,W,800).data;let top=600;
+    for(let y=0;y<800;y++){let hit=false;for(let x=0;x<W;x++)if(d[(y*W+x)*4+3]>128){hit=true;break}if(hit){top=y;break}}
+    const m=document.createElement('i');m.style.cssText='display:inline-block;width:0;height:0;vertical-align:baseline';k.appendChild(m);
+    const base=m.getBoundingClientRect().top,bot=k.getBoundingClientRect().bottom;m.remove();
+    if(k.dataset.fit){const o=k.previousElementSibling.getBoundingClientRect().width+k.nextElementSibling.getBoundingClientRect().width;k.dataset.w=Math.floor(+k.dataset.fit-o);}
+    const ki=k.querySelector('.kitems');
+    if(ki){ki.style.bottom=(bot-base+(600-top))+'px';if(k.dataset.base){ki.style.transformOrigin='right bottom';ki.style.transform=`scale(${k.dataset.w/k.dataset.base})`;}}
+  }
+}
+window.ready=initK().then(()=>window.setTime(0));
+
+window.setTime=function(t){
+  scenes.forEach(s=>{s.style.display=(t>=+s.dataset.in&&t<+s.dataset.out)?'block':'none'});
+  let x=110;for(const c of cuts){if(t>=c-.3&&t<c)x=lerp(110,0,ioC(seg(t,c-.3,c)));else if(t>=c&&t<c+.3)x=lerp(0,-110,ioC(seg(t,c,c+.3)));}
+  document.getElementById('panel').style.transform=`translateX(${x}%)`;
+  kbars.forEach(k=>{if(!k._w0)return;const W=+k.dataset.w*ioC(seg(t,+k.dataset.t0,+k.dataset.t1));k.style.width=W+'px';k.firstElementChild.style.transform=`scaleX(${(W+10)/k._w0})`;});
+  // S4
+  const pi=t<12.9?0:t<15.4?1:2,p=PH[pi];
+  chip.textContent=p.label;
+  let lit=0;
+  for(const id of ['gA','gB'])grids[id].forEach((g,idx)=>{const ti=(PH[pi].g==id)?p.lit.get(idx):undefined;
+    if(ti!==undefined&&t>=ti){lit++;const k=seg(t,ti,ti+.2);g.el.classList.add('on');g.el.style.transform=`scale(${.5+.5*oBack(k)})`;}
+    else{g.el.classList.remove('on');g.el.style.transform='none';}});
+  cnt.textContent=lit;
+  // phase switch: chip pop, grid zoom from big tiles to small tiles
+  chip.style.transform=`scale(${.6+.4*oBack(seg(t,p.t,p.t+.35))})`;
+  const z=seg(t,15.2,15.6);const gA=document.getElementById('gA'),gB=document.getElementById('gB');
+  gA.style.opacity=1-seg(t,15.2,15.45);gA.style.transform=`scale(${lerp(1,.45,ioC(z))})`;
+  gB.style.opacity=seg(t,15.3,15.55);gB.style.transform=`scale(${lerp(2.2,1,ioC(z))})`;
+  gA.style.transformOrigin=gB.style.transformOrigin='50% 50%';
+  itA.style.opacity=1-seg(t,12.75,12.95);itA.style.display=t<12.95?'block':'none';
+  itB.style.opacity=1-seg(t,15.2,15.4);itB.style.display=(t>=12.9&&t<15.4)?'block':'none';
+  itC.style.display=t>=15.4?'block':'none';
+  document.getAnimations().forEach(a=>{a.pause();a.currentTime=t*1000});
+};
+</script>
+</body>
+</html>
