@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="node_modules/@fontsource/alexandria/800.css">
+<link rel="stylesheet" href="node_modules/@fontsource/alexandria/900.css">
+<link rel="stylesheet" href="node_modules/@fontsource/tajawal/500.css">
+<link rel="stylesheet" href="node_modules/@fontsource/tajawal/800.css">
+<style>
+:root{--navy:#152249;--navy2:#0c1533;--navy3:#22346e;--gold:#d6aa5a;--gold2:#ecc988;--goldD:#b07f2c;--sand:#f6f0e5;--sand2:#ece2cf}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:1080px;height:1920px;overflow:hidden;background:#000}
+body{font-family:'Tajawal',sans-serif;color:#fff}
+.scene{position:absolute;inset:0;overflow:hidden;display:none}
+.abs{position:absolute}
+.center{left:0;right:0;text-align:center}
+.ax{font-family:'Alexandria',sans-serif;font-weight:900;line-height:1.25}
+.ax8{font-family:'Alexandria',sans-serif;font-weight:800;line-height:1.3}
+.tj{font-family:'Tajawal',sans-serif;font-weight:800}
+.gold{color:var(--gold)} .goldD{color:var(--goldD)} .navy{color:var(--navy)}
+.w{display:inline-block}
+.ltr{direction:ltr;unicode-bidi:isolate;display:inline-block}
+
+/* entrance helpers: --d is an absolute time on the master timeline */
+.a{animation-fill-mode:both;animation-delay:var(--d,0s)}
+.up{animation-name:up;animation-duration:.6s;animation-timing-function:cubic-bezier(.16,1,.3,1)}
+.pop{animation-name:pop;animation-duration:.55s;animation-timing-function:cubic-bezier(.34,1.56,.64,1)}
+.drop{animation-name:drop;animation-duration:.6s;animation-timing-function:cubic-bezier(.5,0,.75,0)}
+.fade{animation-name:fade;animation-duration:.5s;animation-timing-function:ease-out}
+.slideR{animation-name:slideR;animation-duration:.8s;animation-timing-function:cubic-bezier(.16,1,.3,1)}
+.reveal{animation-name:reveal;animation-duration:.9s;animation-timing-function:cubic-bezier(.65,0,.35,1)}
+.stor{animation-name:stor;animation-duration:.6s;animation-timing-function:cubic-bezier(.16,1,.3,1)}
+@keyframes up{0%{transform:translateY(90px);opacity:0;filter:blur(12px)}100%{transform:none;opacity:1;filter:blur(0)}}
+@keyframes pop{0%{transform:scale(0);opacity:0}100%{transform:scale(1);opacity:1}}
+@keyframes drop{0%{transform:translateY(-1500px)}85%{transform:translateY(0) scaleY(1)}92%{transform:translateY(0) scale(1.06,.9)}100%{transform:none}}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@keyframes slideR{from{transform:translateX(700px);opacity:0}to{transform:none;opacity:1}}
+@keyframes reveal{from{clip-path:inset(-5% 100% -5% -5%)}to{clip-path:inset(-5% -5% -5% -5%)}}
+@keyframes stor{from{transform:scaleX(1.35);opacity:0;filter:blur(8px)}to{transform:none;opacity:1;filter:blur(0)}}
+@keyframes shake{0%,100%{transform:translateX(0) rotate(0)}25%{transform:translateX(-14px) rotate(-.7deg)}75%{transform:translateX(14px) rotate(.7deg)}}
+@keyframes bulge{to{transform:scale(1.045,.97)}}
+@keyframes mark{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+@keyframes sweep{from{transform:translateX(-1400px) rotate(18deg)}to{transform:translateX(1400px) rotate(18deg)}}
+@keyframes dopen{from{transform:translateY(0)}to{transform:translateY(-100%)}}
+@keyframes hero{0%{transform:translate(var(--dx),var(--dy)) scale(0);opacity:0}22%{transform:translate(var(--dx),var(--dy)) scale(1.5);opacity:1}62%{transform:translate(var(--dx),var(--dy)) scale(1.5)}100%{transform:none;opacity:1}}
+
+.mk{position:relative;display:inline-block;z-index:0;padding:0 .18em}
+.mk::before{content:"";position:absolute;left:0;right:0;top:52%;height:38%;background:var(--gold);opacity:.55;z-index:-1;border-radius:8px;transform-origin:right;animation:mark .45s cubic-bezier(.65,0,.35,1) var(--md) both}
+
+#panel{position:absolute;inset:0;background:var(--gold);z-index:60;transform:translateX(110%)}
+#panel::after{content:"";position:absolute;inset:0 0 0 auto;width:140px;background:var(--navy)}
+
+/* logo */
+.logo{position:absolute;left:0;right:0;margin:0 auto;color:#fff}
+.logo svg{display:block;width:100%;fill:currentColor}
+
+/* furniture & room */
+.room{position:absolute;border:12px solid currentColor;border-top:none;border-radius:0 0 28px 28px}
+.it{position:absolute}
+
+/* scene backgrounds */
+#s1,#s3,#s5,#s7{background:radial-gradient(1100px 900px at 50% 35%,#1d2d60 0%,var(--navy) 55%,var(--navy2) 100%)}
+#s2,#s4,#s6{background:radial-gradient(1100px 1000px at 50% 40%,#fffaf1 0%,var(--sand) 55%,var(--sand2) 100%);color:var(--navy)}
+.grain{position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,.05) 1.5px,transparent 1.5px);background-size:44px 44px}
+#s2 .grain,#s4 .grain,#s6 .grain{background-image:radial-gradient(rgba(21,34,73,.06) 1.5px,transparent 1.5px)}
+.sweepLight{position:absolute;top:-400px;left:0;width:260px;height:2800px;background:linear-gradient(90deg,transparent,rgba(236,201,136,.16),transparent);animation:sweep 3.2s cubic-bezier(.45,0,.55,1) var(--d) both}
+
+/* scene 4 */
+#unit{position:absolute;border:14px solid var(--navy);border-radius:22px;background:linear-gradient(#22346e,#1a2754);box-shadow:0 40px 80px rgba(21,34,73,.28);overflow:hidden}
+#unit .floor{position:absolute;left:0;right:0;bottom:0;height:16px;background:#2f4488}
+#unit .rolled{position:absolute;left:0;right:0;top:0;height:30px;background:repeating-linear-gradient(#d9dde8 0 9px,#aeb6cb 9px 11px);z-index:4}
+#unit .door{position:absolute;inset:0;background:repeating-linear-gradient(#d9dde8 0 40px,#aeb6cb 40px 46px);z-index:5;animation:dopen .55s cubic-bezier(.65,0,.35,1) var(--d) both}
+.anchor{position:absolute;left:50%;bottom:16px;width:0;height:0}
+.grp{position:absolute;left:0;bottom:0}
+.grp .it{bottom:0}
+#roll{position:absolute;left:0;right:0;top:400px;height:240px;overflow:hidden;-webkit-mask-image:linear-gradient(transparent,#000 30%,#000 70%,transparent)}
+#roll div{position:absolute;left:0;right:0;top:60px;height:120px;text-align:center;font-family:'Alexandria';font-weight:800;font-size:78px;line-height:120px;white-space:nowrap}
+.dots{position:absolute;left:0;right:0;top:1590px;display:flex;justify-content:center;gap:22px}
+.dots i{display:block;width:26px;height:26px;border-radius:13px;background:#d9ccb3}
+
+/* scene 5 */
+.card{position:absolute;width:450px;height:330px;border-radius:44px;background:#fff;color:var(--navy);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;text-align:center;box-shadow:0 30px 70px rgba(0,0,0,.35);animation:hero 1.05s cubic-bezier(.65,0,.35,1) var(--d) both}
+.card .ib{width:124px;height:124px;border-radius:36px;background:var(--navy);display:grid;place-items:center}
+.card h3{font-family:'Alexandria';font-weight:800;font-size:50px;line-height:1.2;padding:0 20px}
+
+/* scene 7 */
+.cta{display:inline-block;background:var(--gold);color:var(--navy);font-family:'Alexandria';font-weight:900;font-size:84px;padding:26px 74px 30px;border-radius:999px;box-shadow:0 24px 60px rgba(214,170,90,.35)}
+.cta.pulse{animation:pulse 1s ease-in-out var(--d) infinite}
+.wa{display:inline-flex;align-items:center;gap:26px;background:#fff;color:var(--navy);border-radius:999px;padding:18px 44px 18px 26px;font-family:'Alexandria';font-weight:800;font-size:66px}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+ <defs>
+  <symbol id="sofa" viewBox="0 0 300 170"><rect x="30" y="18" width="240" height="92" rx="26" fill="#3f5c9e"/><rect x="40" y="28" width="105" height="76" rx="18" fill="#5a78bb"/><rect x="155" y="28" width="105" height="76" rx="18" fill="#5a78bb"/><rect x="0" y="62" width="300" height="80" rx="30" fill="#304b88"/><rect x="0" y="50" width="54" height="96" rx="24" fill="#253c70"/><rect x="246" y="50" width="54" height="96" rx="24" fill="#253c70"/><rect x="36" y="140" width="14" height="30" rx="5" fill="#d6aa5a"/><rect x="250" y="140" width="14" height="30" rx="5" fill="#d6aa5a"/></symbol>
+  <symbol id="wardrobe" viewBox="0 0 170 300"><rect width="170" height="285" rx="14" fill="#7c5132"/><rect x="12" y="12" width="70" height="262" rx="8" fill="#9a6640"/><rect x="88" y="12" width="70" height="262" rx="8" fill="#9a6640"/><rect x="68" y="128" width="8" height="42" rx="4" fill="#ecc988"/><rect x="94" y="128" width="8" height="42" rx="4" fill="#ecc988"/><rect x="14" y="282" width="20" height="18" rx="4" fill="#3b2414"/><rect x="136" y="282" width="20" height="18" rx="4" fill="#3b2414"/></symbol>
+  <symbol id="chair" viewBox="0 0 180 200"><rect x="25" width="130" height="120" rx="40" fill="#e0b46a"/><rect x="10" y="90" width="160" height="70" rx="26" fill="#d6aa5a"/><rect y="70" width="40" height="100" rx="20" fill="#bf8f3e"/><rect x="140" y="70" width="40" height="100" rx="20" fill="#bf8f3e"/><rect x="28" y="165" width="14" height="35" rx="5" fill="#152249"/><rect x="138" y="165" width="14" height="35" rx="5" fill="#152249"/></symbol>
+  <symbol id="box" viewBox="0 0 160 140"><rect y="20" width="160" height="120" rx="10" fill="#cfa274"/><path d="M0 30L-6 2L70 9L80 30ZM160 30L166 2L90 9L80 30Z" fill="#b98a5a"/><rect x="68" y="20" width="24" height="120" fill="#f3e3c5" opacity=".9"/><rect x="16" y="96" width="40" height="24" rx="4" fill="#fff" opacity=".7"/></symbol>
+  <symbol id="lamp" viewBox="0 0 120 300"><path d="M20 90L40 0H80L100 90Z" fill="#ecc988"/><rect x="56" y="90" width="8" height="190" fill="#8f9bbd"/><ellipse cx="60" cy="288" rx="45" ry="12" fill="#8f9bbd"/></symbol>
+  <symbol id="plant" viewBox="0 0 120 220"><path d="M60 140C20 120 10 70 30 40C50 70 58 100 60 140ZM60 140C100 120 110 70 90 40C70 70 62 100 60 140ZM60 140C40 90 45 40 60 5C75 40 80 90 60 140Z" fill="#5f8f6a"/><path d="M25 140H95L85 220H35Z" fill="#d6aa5a"/></symbol>
+  <symbol id="rack" viewBox="0 0 300 700"><g fill="#d6aa5a"><rect width="16" height="700" rx="4"/><rect x="284" width="16" height="700" rx="4"/><rect y="215" width="300" height="16"/><rect y="450" width="300" height="16"/><rect y="684" width="300" height="16"/></g>
+   <g><use href="#box" x="24" y="95" width="130" height="120"/><use href="#box" x="150" y="105" width="120" height="110"/><use href="#box" x="24" y="320" width="120" height="130"/><use href="#box" x="146" y="340" width="130" height="110"/><use href="#box" x="24" y="560" width="250" height="124"/></g></symbol>
+  <symbol id="i-snow" viewBox="0 0 100 100"><g stroke="#ecc988" stroke-width="9" stroke-linecap="round" fill="none"><path d="M50 8V92M14 29L86 71M14 71L86 29"/><path d="M38 14L50 24L62 14M38 86L50 76L62 86"/></g></symbol>
+  <symbol id="i-cam" viewBox="0 0 100 100"><path d="M10 30L70 18L76 46L16 58Z" fill="#ecc988"/><circle cx="62" cy="36" r="7" fill="#152249"/><rect x="38" y="56" width="10" height="26" fill="#ecc988"/><rect x="20" y="80" width="46" height="10" rx="4" fill="#ecc988"/><circle cx="85" cy="22" r="6" fill="#f87171"/></symbol>
+  <symbol id="i-guard" viewBox="0 0 100 100"><path d="M50 6L86 20V48C86 70 70 86 50 94C30 86 14 70 14 48V20Z" fill="#ecc988"/><path d="M34 50L46 62L68 38" stroke="#152249" stroke-width="9" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-key" viewBox="0 0 100 100"><circle cx="32" cy="50" r="20" fill="none" stroke="#ecc988" stroke-width="10"/><path d="M52 50H92M80 50V68M68 50V62" stroke="#ecc988" stroke-width="10" stroke-linecap="round"/></symbol>
+  <symbol id="i-clean" viewBox="0 0 100 100"><path d="M42 8L50 34L76 42L50 50L42 76L34 50L8 42L34 34Z" fill="#ecc988"/><path d="M76 58L80 72L94 76L80 80L76 94L72 80L58 76L72 72Z" fill="#ecc988"/></symbol>
+  <symbol id="i-tag" viewBox="0 0 100 100"><path d="M10 14V48L54 92L92 54L48 10H14Z" fill="#ecc988"/><circle cx="30" cy="30" r="9" fill="#152249"/></symbol>
+  <symbol id="i-wa" viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="#25D366"/><path d="M50 18C32 18 18 32 18 49C18 55 20 61 23 66L19 82L35 78C40 80 45 81 50 81C68 81 82 67 82 49C82 32 68 18 50 18Z" fill="#fff"/><path d="M38 34C36 34 34 36 34 40C34 48 44 62 58 66C62 67 66 65 67 61L66 58L58 54L54 58C49 56 44 51 42 46L46 42L42 34Z" fill="#25D366"/></symbol>
+  <symbol id="lg-script" viewBox="0 0 2100 1000"><path d="{{SCRIPT}}" fill-rule="evenodd"/></symbol>
+  <symbol id="lg-storage" viewBox="0 0 2100 230"><path d="{{STORAGE}}" fill-rule="evenodd"/></symbol>
+ </defs>
+</svg>
+
+<!-- S1 HOOK 0–3.5 -->
+<section class="scene" id="s1" data-in="0" data-out="3.5"><div class="grain"></div>
+  <div class="abs center ax" dir="rtl" style="top:200px;font-size:170px;z-index:5;text-shadow:0 10px 30px rgba(12,21,51,.6)">
+    <span class="w a up" style="--d:.05s">بيتك</span> <span class="w a up" style="--d:.22s">صار</span><br>
+    <span class="w a up gold" style="--d:.4s;font-size:250px">ضيّق؟</span>
+  </div>
+  <div class="abs" style="inset:0;color:#fff">
+   <div class="abs" style="inset:0;transform-origin:540px 1560px;animation:bulge .35s ease-in-out 2.45s 4 alternate both">
+    <svg class="abs" style="left:60px;top:760px;width:960px;height:150px" viewBox="0 0 960 150"><path d="M20 145L480 12L940 145" stroke="#fff" stroke-width="12" fill="none" stroke-linejoin="round" stroke-linecap="round"/></svg>
+    <div class="room" style="left:90px;top:880px;width:900px;height:700px"></div>
+    <div class="abs" style="inset:0;animation:shake .1s linear 2.45s 6 both">
+      <svg class="it a drop" style="--d:.55s;left:650px;top:1150px;width:240px;height:420px"><use href="#wardrobe"/></svg>
+      <svg class="it a drop" style="--d:.85s;left:170px;top:1330px;width:440px;height:250px"><use href="#sofa"/></svg>
+      <svg class="it a drop" style="--d:1.1s;left:120px;top:1060px;width:130px;height:320px"><use href="#lamp"/></svg>
+      <svg class="it a drop" style="--d:1.3s;left:280px;top:1180px;width:190px;height:166px"><use href="#box"/></svg>
+      <svg class="it a drop" style="--d:1.46s;left:470px;top:1220px;width:160px;height:140px"><use href="#box"/></svg>
+      <svg class="it a drop" style="--d:1.58s;left:320px;top:1040px;width:150px;height:131px"><use href="#box"/></svg>
+      <svg class="it a drop" style="--d:1.68s;left:660px;top:1010px;width:170px;height:149px"><use href="#box"/></svg>
+      <svg class="it a drop" style="--d:1.76s;left:860px;top:1440px;width:120px;height:105px"><use href="#box"/></svg>
+      <svg class="it a drop" style="--d:1.82s;left:470px;top:1100px;width:130px;height:114px"><use href="#box"/></svg>
+    </div>
+   </div>
+  </div>
+</section>
+
+<!-- S2 PROBLEM 3.5–8 -->
+<section class="scene" id="s2" data-in="3.5" data-out="8"><div class="grain"></div>
+  <div class="abs center ax8" dir="rtl" style="top:210px;font-size:80px">
+    <span class="w a up" style="--d:3.6s">أثاث</span> <span class="w a up" style="--d:3.72s"><span class="mk" style="--md:4.1s">زايد</span></span> <span class="w a up" style="--d:3.84s">ما</span> <span class="w a up" style="--d:3.96s">تستخدمه</span><br>
+    <span class="w a up" style="--d:4.9s">وكراتين</span> <span class="w a up" style="--d:5.02s"><span class="mk" style="--md:5.4s">بكل زاوية</span></span>
+  </div>
+  <svg class="it a pop" style="--d:3.75s;left:130px;top:1200px;width:440px;height:250px;transform-origin:50% 100%"><use href="#sofa"/></svg>
+  <svg class="it a pop" style="--d:3.95s;left:660px;top:1030px;width:240px;height:420px;transform-origin:50% 100%"><use href="#wardrobe"/></svg>
+  <div class="abs" style="left:60px;right:60px;top:1450px;height:8px;border-radius:4px;background:rgba(21,34,73,.15)"></div>
+  <svg class="it a pop" style="--d:5.0s;left:210px;top:1088px;width:140px;height:122px"><use href="#box"/></svg>
+  <svg class="it a pop" style="--d:5.22s;left:370px;top:1105px;width:120px;height:105px"><use href="#box"/></svg>
+  <svg class="it a pop" style="--d:5.4s;left:690px;top:900px;width:150px;height:131px"><use href="#box"/></svg>
+  <svg class="it a pop" style="--d:5.55s;left:40px;top:560px;width:130px;height:114px"><use href="#box"/></svg>
+  <svg class="it a pop" style="--d:5.67s;left:910px;top:560px;width:130px;height:114px"><use href="#box"/></svg>
+  <svg class="it a pop" style="--d:5.77s;left:900px;top:1335px;width:130px;height:114px"><use href="#box"/></svg>
+  <svg class="it a pop" style="--d:5.85s;left:20px;top:1335px;width:120px;height:105px"><use href="#box"/></svg>
+  <svg class="it a pop" style="--d:5.91s;left:740px;top:790px;width:120px;height:105px"><use href="#box"/></svg>
+  <svg class="it a pop" style="--d:5.96s;left:285px;top:990px;width:115px;height:100px"><use href="#box"/></svg>
+  <div class="abs center a pop" style="--d:6.4s;top:1560px"><span class="ax8" dir="rtl" style="display:inline-block;background:var(--navy);color:#fff;font-size:78px;padding:22px 60px 30px;border-radius:999px">وما تبي تتخلّى عنها</span></div>
+</section>
+
+<!-- S3 BRAND 8–12 -->
+<section class="scene" id="s3" data-in="8" data-out="12"><div class="grain"></div>
+  <div class="sweepLight" style="--d:8.3s"></div>
+  <div class="abs center tj a up" dir="rtl" style="--d:8.1s;top:500px;font-size:84px">خزّنها عند</div>
+  <div class="logo" style="top:700px;width:860px">
+    <svg viewBox="0 0 2100 1000" class="a reveal" style="--d:8.45s"><use href="#lg-script"/></svg>
+    <svg viewBox="0 0 2100 230" class="a stor" style="--d:9.15s;margin-top:86px"><use href="#lg-storage"/></svg>
+  </div>
+  <div class="abs center tj a up gold" dir="rtl" style="--d:10.1s;top:1430px;font-size:70px">وحدات تخزين للإيجار</div>
+</section>
+
+<!-- S4 SIZES 12–21 -->
+<section class="scene" id="s4" data-in="12" data-out="21"><div class="grain"></div>
+  <div class="abs center ax" dir="rtl" style="top:215px;font-size:86px;white-space:nowrap">
+    <span class="w a up" style="--d:12.05s">مساحات</span> <span class="w a up" style="--d:12.17s">تناسب</span> <span class="w a up" style="--d:12.29s"><span class="mk" style="--md:12.6s">الكل</span></span>
+  </div>
+  <div id="roll" class="a fade" style="--d:12.5s" dir="rtl">
+    <div>تكفي عدة كراتين</div><div>تكفي استوديو</div><div>تكفي شقة</div><div>تكفي فيلا</div><div>ومساحات خاصة للشركات</div>
+  </div>
+  <div class="abs a pop" style="--d:12.25s;inset:0;transform-origin:540px 1480px">
+    <div class="abs" id="shadow" style="height:40px;border-radius:50%;background:rgba(21,34,73,.18);filter:blur(10px)"></div>
+    <div id="unit">
+      <div class="floor"></div><div class="rolled"></div>
+      <div class="anchor">
+        <div class="grp" data-k="0">
+          <svg class="it a pop" style="--d:12.85s;left:-150px;width:140px;height:122px;transform-origin:50% 100%"><use href="#box"/></svg>
+          <svg class="it a pop" style="--d:13.0s;left:-5px;width:130px;height:113px;transform-origin:50% 100%"><use href="#box"/></svg>
+          <svg class="it a pop" style="--d:13.12s;left:-110px;bottom:122px;width:115px;height:100px;transform-origin:50% 100%"><use href="#box"/></svg>
+        </div>
+        <div class="grp" data-k="1">
+          <svg class="it a pop" style="--d:14.1s;left:-245px;width:300px;height:170px;transform-origin:50% 100%"><use href="#sofa"/></svg>
+          <svg class="it a pop" style="--d:14.25s;left:65px;width:70px;height:200px;transform-origin:50% 100%"><use href="#lamp"/></svg>
+          <svg class="it a pop" style="--d:14.36s;left:140px;width:110px;height:96px;transform-origin:50% 100%"><use href="#box"/></svg>
+          <svg class="it a pop" style="--d:14.44s;left:148px;bottom:96px;width:95px;height:83px;transform-origin:50% 100%"><use href="#box"/></svg>
+        </div>
+        <div class="grp" data-k="2">
+          <svg class="it a pop" style="--d:15.6s;left:-330px;width:155px;height:275px;transform-origin:50% 100%"><use href="#wardrobe"/></svg>
+          <svg class="it a pop" style="--d:15.74s;left:-165px;width:290px;height:165px;transform-origin:50% 100%"><use href="#sofa"/></svg>
+          <svg class="it a pop" style="--d:15.85s;left:135px;width:150px;height:165px;transform-origin:50% 100%"><use href="#chair"/></svg>
+          <svg class="it a pop" style="--d:15.93s;left:-322px;bottom:275px;width:135px;height:118px;transform-origin:50% 100%"><use href="#box"/></svg>
+          <svg class="it a pop" style="--d:15.99s;left:290px;width:45px;height:160px;transform-origin:50% 100%"><use href="#lamp"/></svg>
+        </div>
+        <div class="grp" data-k="3">
+          <svg class="it a pop" style="--d:17.1s;left:-410px;width:155px;height:275px;transform-origin:50% 100%"><use href="#wardrobe"/></svg>
+          <svg class="it a pop" style="--d:17.22s;left:-250px;width:155px;height:275px;transform-origin:50% 100%"><use href="#wardrobe"/></svg>
+          <svg class="it a pop" style="--d:17.32s;left:-88px;width:300px;height:170px;transform-origin:50% 100%"><use href="#sofa"/></svg>
+          <svg class="it a pop" style="--d:17.4s;left:222px;width:150px;height:165px;transform-origin:50% 100%"><use href="#chair"/></svg>
+          <svg class="it a pop" style="--d:17.46s;left:376px;width:38px;height:150px;transform-origin:50% 100%"><use href="#lamp"/></svg>
+          <svg class="it a pop" style="--d:17.51s;left:-400px;bottom:275px;width:130px;height:113px;transform-origin:50% 100%"><use href="#box"/></svg>
+          <svg class="it a pop" style="--d:17.55s;left:-238px;bottom:275px;width:130px;height:113px;transform-origin:50% 100%"><use href="#box"/></svg>
+          <svg class="it a pop" style="--d:17.58s;left:-40px;bottom:170px;width:110px;height:96px;transform-origin:50% 100%"><use href="#plant"/></svg>
+        </div>
+        <div class="grp" data-k="4">
+          <svg class="it a pop" style="--d:18.6s;left:-465px;width:300px;height:700px;transform-origin:50% 100%"><use href="#rack"/></svg>
+          <svg class="it a pop" style="--d:18.75s;left:-150px;width:300px;height:700px;transform-origin:50% 100%"><use href="#rack"/></svg>
+          <svg class="it a pop" style="--d:18.86s;left:165px;width:300px;height:700px;transform-origin:50% 100%"><use href="#rack"/></svg>
+        </div>
+      </div>
+      <div class="door" style="--d:12.55s"></div>
+    </div>
+  </div>
+  <div class="dots" id="dots"><i></i><i></i><i></i><i></i><i></i></div>
+</section>
+
+<!-- S5 FEATURES 21–28 -->
+<section class="scene" id="s5" data-in="21" data-out="28"><div class="grain"></div>
+  <div class="abs center ax a up" dir="rtl" style="--d:21.05s;top:200px;font-size:130px">وحداتنا</div>
+  <div class="abs a fade" style="--d:21.3s;left:440px;width:200px;top:390px;height:10px;border-radius:5px;background:var(--gold)"></div>
+  <div class="card" style="--d:21.4s;left:560px;top:480px;--dx:-245px;--dy:315px"><div class="ib"><svg width="84" height="84"><use href="#i-snow"/></svg></div><h3>مكيّفة<br>وغير مكيّفة</h3></div>
+  <div class="card" style="--d:22.35s;left:70px;top:480px;--dx:245px;--dy:315px"><div class="ib"><svg width="84" height="84"><use href="#i-cam"/></svg></div><h3>كاميرات مراقبة<br><span class="ltr goldD">24/7</span></h3></div>
+  <div class="card" style="--d:23.3s;left:560px;top:850px;--dx:-245px;--dy:-55px"><div class="ib"><svg width="84" height="84"><use href="#i-guard"/></svg></div><h3>حارس أمن<br><span class="ltr goldD">24/7</span></h3></div>
+  <div class="card" style="--d:24.25s;left:70px;top:850px;--dx:245px;--dy:-55px"><div class="ib"><svg width="84" height="84"><use href="#i-key"/></svg></div><h3>دخول لوحدتك<br><span class="ltr goldD">24/7</span></h3></div>
+  <div class="card" style="--d:25.2s;left:560px;top:1220px;--dx:-245px;--dy:-425px"><div class="ib"><svg width="84" height="84"><use href="#i-clean"/></svg></div><h3>نظيفة<br>ومعقّمة</h3></div>
+  <div class="card" style="--d:26.15s;left:70px;top:1220px;--dx:245px;--dy:-425px"><div class="ib"><svg width="84" height="84"><use href="#i-tag"/></svg></div><h3>بأفضل<br>الأسعار</h3></div>
+</section>
+
+<!-- S6 TIDY HOME 28–30 -->
+<section class="scene" id="s6" data-in="28" data-out="30"><div class="grain"></div>
+  <div class="abs center ax" dir="rtl" style="top:230px;font-size:120px">
+    <span class="w a up" style="--d:28.05s">رجّع</span> <span class="w a up" style="--d:28.17s">لبيتك</span><br><span class="w a up" style="--d:28.29s;font-size:160px"><span class="mk" style="--md:28.6s">مساحته</span></span>
+  </div>
+  <div class="abs" style="inset:0;color:var(--navy)">
+    <svg class="abs" style="left:60px;top:760px;width:960px;height:150px" viewBox="0 0 960 150"><path d="M20 145L480 12L940 145" stroke="currentColor" stroke-width="12" fill="none" stroke-linejoin="round" stroke-linecap="round"/></svg>
+    <div class="room" style="left:90px;top:880px;width:900px;height:700px"></div>
+    <svg class="it a slideR" style="--d:28.3s;left:300px;top:1330px;width:440px;height:250px"><use href="#sofa"/></svg>
+    <svg class="it a pop" style="--d:28.55s;left:790px;top:1260px;width:120px;height:300px;transform-origin:50% 100%"><use href="#lamp"/></svg>
+    <svg class="it a pop" style="--d:28.7s;left:150px;top:1360px;width:110px;height:200px;transform-origin:50% 100%"><use href="#plant"/></svg>
+  </div>
+</section>
+
+<!-- S7 CTA 30–33.5 -->
+<section class="scene" id="s7" data-in="30" data-out="34"><div class="grain"></div>
+  <div class="sweepLight" style="--d:30.4s"></div>
+  <div class="logo" style="top:380px;width:700px">
+    <svg viewBox="0 0 2100 1000" class="a reveal" style="--d:30.1s;animation-duration:.7s"><use href="#lg-script"/></svg>
+    <svg viewBox="0 0 2100 230" class="a stor" style="--d:30.65s;margin-top:70px"><use href="#lg-storage"/></svg>
+  </div>
+  <div class="abs center" style="top:1060px"><div class="a pop" style="--d:31.0s;display:inline-block"><div class="cta pulse" style="--d:31.7s" dir="rtl">احجز وحدتك الآن</div></div></div>
+  <div class="abs center a up" style="--d:31.35s;top:1320px"><div class="wa"><svg width="96" height="96"><use href="#i-wa"/></svg><span class="ltr">{{WA}}</span></div></div>
+  <div class="abs center tj a fade" dir="rtl" style="--d:31.6s;top:1490px;font-size:46px;font-weight:500;opacity:.85">تواصل معنا عبر واتساب</div>
+</section>
+
+<div id="panel"></div>
+
+<script>
+const scenes=[...document.querySelectorAll('.scene')];
+const cuts=[3.5,8,12,21,28,30];
+const clamp=x=>Math.max(0,Math.min(1,x));
+const seg=(t,a,b)=>clamp((t-a)/(b-a));
+const ioC=x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2;
+const oQuint=x=>1-Math.pow(1-x,5);
+const oBack=x=>{const c1=1.70158,c3=c1+1;return 1+c3*Math.pow(x-1,3)+c1*Math.pow(x-1,2)};
+const mixE=x=>.7*oQuint(x)+.3*oBack(x);
+const lerp=(a,b,f)=>a+(b-a)*f;
+// scene 4 data
+const STEPS=[12.5,14,15.5,17,18.5];
+const DIMS=[[360,300],[540,420],[700,540],[860,650],[1000,780]];
+const unit=document.getElementById('unit'),shadow=document.getElementById('shadow');
+const grps=[...document.querySelectorAll('.grp')];
+const rolls=[...document.querySelectorAll('#roll div')];
+const dots=[...document.querySelectorAll('#dots i')];
+const ROW=120;
+window.setTime=function(t){
+  scenes.forEach(s=>{s.style.display=(t>=+s.dataset.in&&t<+s.dataset.out)?'block':'none'});
+  // panel sweep transition on every cut
+  let x=110;
+  for(const c of cuts){
+    if(t>=c-.3&&t<c) x=lerp(110,0,ioC(seg(t,c-.3,c)));
+    else if(t>=c&&t<c+.3) x=lerp(0,-110,ioC(seg(t,c,c+.3)));
+  }
+  document.getElementById('panel').style.transform=`translateX(${x}%)`;
+  // scene 4: unit grows step by step, words roll
+  let p=0;for(let k=1;k<STEPS.length;k++)p+=mixE(seg(t,STEPS[k],STEPS[k]+.5));
+  const i=Math.min(3,Math.floor(p)),f=p-i;
+  const w=lerp(DIMS[i][0],DIMS[i+1][0],f),h=lerp(DIMS[i][1],DIMS[i+1][1],f);
+  Object.assign(unit.style,{width:w+'px',height:h+'px',left:(540-w/2)+'px',top:(1500-h)+'px'});
+  Object.assign(shadow.style,{width:(w+80)+'px',left:(540-w/2-40)+'px',top:'1480px'});
+  grps.forEach((g,k)=>{const nx=STEPS[k+1];g.style.opacity=nx?1-seg(t,nx-.05,nx+.12):1;g.style.display=(t<STEPS[k]-.05)?'none':'block'});
+  rolls.forEach((r,k)=>{const d=k-p,ad=Math.abs(d);
+    r.style.transform=`translateY(${d*ROW}px)`;
+    r.style.opacity=ad<1?1-.75*ad:Math.max(0,.25-.2*(ad-1));
+    r.style.filter=`blur(${Math.min(8,ad*6)}px)`;
+    r.style.color=ad<.42?(k==4?'#152249':'#b07f2c'):'#b9ad97';});
+  const act=Math.round(p);dots.forEach((d,k)=>{d.style.background=k<=act?'#d6aa5a':'#d9ccb3';d.style.width=k==act?'70px':'26px'});
+  document.getAnimations().forEach(a=>{a.pause();a.currentTime=t*1000});
+};
+window.setTime(0);
+</script>
+</body>
+</html>
