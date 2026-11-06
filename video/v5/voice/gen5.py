@@ -1,0 +1,16 @@
+import subprocess, wave, json
+from lines5 import L
+M='vits-piper-ar_JO-kareem-medium/ar_JO-kareem-medium.onnx'
+def dur(f):
+    with wave.open(f) as w: return w.getnframes()/w.getframerate()
+res=[]
+for id,a,b,t in L:
+    subprocess.run(['python3','-m','piper','-m',M,'-f',f'r5_{id}.wav','--length-scale','0.88','--sentence-silence','0'],input=t.encode(),check=True,capture_output=True)
+    # trim silence at both ends
+    subprocess.run(['ffmpeg','-loglevel','error','-y','-i',f'r5_{id}.wav','-af','silenceremove=start_periods=1:start_threshold=-45dB,areverse,silenceremove=start_periods=1:start_threshold=-45dB,areverse',f't5_{id}.wav'],check=True)
+    d=dur(f't5_{id}.wav'); room=b-a; tempo=1.0
+    if d>room: tempo=min(1.3,d/room)
+    subprocess.run(['ffmpeg','-loglevel','error','-y','-i',f't5_{id}.wav','-af',f'atempo={tempo:.3f}',f'v5_{id}.wav'],check=True)
+    nd=dur(f'v5_{id}.wav'); res.append([id,a,nd])
+    print(f"{id} room {room:.2f} dur {d:.2f} tempo {tempo:.2f} -> {nd:.2f} {'OVER' if nd>room+0.05 else ''}")
+json.dump(res,open('fit5.json','w'))

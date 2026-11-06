@@ -1,0 +1,115 @@
+<style>
+.ticks{position:absolute;left:0;right:0;bottom:-2px;height:46px;background:repeating-linear-gradient(270deg,#fff 0 4px,transparent 4px 40px);-webkit-mask-image:linear-gradient(#000,#000)}
+.ticks::after{content:"";position:absolute;left:0;right:0;bottom:0;height:22px;background:repeating-linear-gradient(270deg,transparent 0 20px,#fff 20px 23px,transparent 23px 40px)}
+.dr{position:absolute;bottom:420px;border:14px solid var(--navy);border-radius:20px;background:linear-gradient(#22346e,#1a2754);overflow:hidden;box-shadow:0 30px 60px rgba(21,34,73,.25)}
+.dr .roll{position:absolute;inset:0;background:repeating-linear-gradient(#e3e8f0 0 34px,#b9c3d3 34px 40px);z-index:5}
+.dr .roll::after{content:"";position:absolute;left:50%;bottom:20px;width:90px;height:18px;margin-left:-45px;background:#8a94ab;border-radius:9px}
+.dr .flr{position:absolute;left:0;right:0;bottom:0;height:12px;background:#2f4488}
+.anchor{position:absolute;left:50%;bottom:12px;width:0;height:0}
+.anchor .it{bottom:0}
+.dl{position:absolute;text-align:center;white-space:nowrap}
+.dl .sz{display:inline-block;background:var(--navy);color:#fff;font-family:'Alexandria';font-weight:900;font-size:60px;padding:6px 34px 14px;border-radius:999px}
+.dl .us{display:block;font-family:'Alexandria';font-weight:800;font-size:52px;color:var(--navy);margin-top:10px}
+.bub{position:absolute;max-width:760px;font-family:'Alexandria';font-weight:800;font-size:50px;line-height:1.4;padding:26px 40px 32px;border-radius:44px;box-shadow:0 14px 30px rgba(21,34,73,.15)}
+@keyframes dots{0%,100%{opacity:.25}50%{opacity:1}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute"><defs>
+{{SYMBOLS}}
+</defs></svg>
+
+<!-- S1 HOOK 0–3.5 -->
+<section class="scene navybg" id="s1" data-in="0" data-out="3.5"><div class="grain"></div>
+  <div class="abs center ax" dir="rtl" style="top:620px;font-size:130px">
+    <span class="w a up" style="--d:.05s">كم</span> <span class="w a up" style="--d:.2s">مساحة</span>
+  </div>
+  <div class="abs center" dir="rtl" style="top:900px">
+    <span class="w ax blue a up" style="--d:.38s;font-size:175px;white-space:nowrap"><span>تحتـ</span><span class="kbar" data-w="500" data-fit="1050" data-t0=".75" data-t1="1.6"><span class="kg">ـ</span><span class="kitems"><span class="ticks"></span></span></span><span>ـاج؟</span></span>
+  </div>
+</section>
+
+<!-- S2 UNIT TOUR 3.5–17 -->
+<section class="scene greybg" id="s2" data-in="3.5" data-out="17"><div class="grain"></div>
+  <div class="abs center ax" dir="rtl" id="h2" style="top:200px;font-size:104px;z-index:5">
+    <span class="w a up" style="--d:3.6s">وحدتك</span> <span class="w a up" style="--d:3.72s">على</span> <span class="w a up" style="--d:3.84s"><span class="mk" style="--md:4.2s">مقاسك</span></span>
+  </div>
+  <div class="abs" style="left:0;right:0;top:1500px;bottom:0;background:#dfe4ec"></div>
+  <div class="abs" style="left:0;right:0;top:1494px;height:12px;background:#c7cfdb"></div>
+  <div class="abs" id="track" style="left:0;top:0;width:1080px;height:1920px"></div>
+</section>
+
+<!-- S3 HELP CHOOSING 17–21.5 -->
+<section class="scene greybg" id="s3" data-in="17" data-out="21.5"><div class="grain"></div>
+  <div class="abs center ax" dir="rtl" style="top:220px;font-size:96px">
+    <span class="w a up" style="--d:17.1s">مو</span> <span class="w a up" style="--d:17.22s">متأكد</span><br><span class="w a up" style="--d:17.34s">كم</span> <span class="w a up" style="--d:17.46s"><span class="mk" style="--md:17.8s">تحتاج؟</span></span>
+  </div>
+  <div class="bub a pop" dir="rtl" style="--d:18.0s;white-space:nowrap;right:80px;top:760px;background:#fff;color:var(--navy);border-bottom-right-radius:10px;transform-origin:right bottom">كم مقاس أحتاج لأثاث شقة؟</div>
+  <div class="bub a pop" dir="rtl" style="--d:18.7s;left:80px;top:960px;background:var(--navy);color:#fff;border-bottom-left-radius:10px;transform-origin:left bottom;font-size:60px;padding:16px 40px 26px" id="typing"><span style="animation:dots .6s ease-in-out 18.7s infinite">•</span> <span style="animation:dots .6s ease-in-out 18.9s infinite">•</span> <span style="animation:dots .6s ease-in-out 19.1s infinite">•</span></div>
+  <div class="bub a pop" dir="rtl" style="--d:19.35s;left:80px;top:960px;background:var(--navy);color:#fff;border-bottom-left-radius:10px;transform-origin:left bottom">قول لنا وش عندك،<br>ونختار لك <span class="blue">المقاس المناسب</span></div>
+  <div class="abs center a fade" style="--d:19.8s;top:1420px"><div class="wa" style="font-size:52px;background:var(--navy);color:#fff"><svg width="80" height="80"><use href="#i-wa"/></svg><span dir="rtl">ردّنا سريع على الواتساب</span></div></div>
+</section>
+
+<!-- S4 CTA 21.5–25.5 -->
+<section class="scene navybg" id="s4" data-in="21.5" data-out="26"><div class="grain"></div>
+  <div class="sweepLight" style="--d:21.9s"></div>
+  <div class="logo" style="top:360px;width:700px">
+    <svg viewBox="0 0 2100 1000" class="a reveal" style="--d:21.6s;animation-duration:.7s"><use href="#lg-script"/></svg>
+    <svg viewBox="0 0 2100 230" class="a stor" style="--d:22.15s;margin-top:70px"><use href="#lg-storage"/></svg>
+  </div>
+  <div class="abs center" style="top:1040px"><div class="a pop" style="--d:22.5s;display:inline-block"><div class="cta pulse" style="--d:23.2s" dir="rtl">اختر وحدتك الحين</div></div></div>
+  <div class="abs center a up" style="--d:22.85s;top:1300px"><div class="wa"><svg width="92" height="92"><use href="#i-wa"/></svg><span class="ltr">0503250551</span></div></div>
+  <div class="abs center a fade" style="--d:23.1s;top:1470px;font:700 50px Alexandria;letter-spacing:2px;opacity:.9">ravelstorage.com</div>
+</section>
+
+<div id="panel"></div>
+
+<script>
+const scenes=[...document.querySelectorAll('.scene')];
+const cuts=[3.5,17,21.5];
+const clamp=x=>Math.max(0,Math.min(1,x));
+const seg=(t,a,b)=>clamp((t-a)/(b-a));
+const ioC=x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2;
+const oBack=x=>{const c1=1.70158,c3=c1+1;return 1+c3*Math.pow(x-1,3)+c1*Math.pow(x-1,2)};
+const lerp=(a,b,f)=>a+(b-a)*f;
+
+// unit tour: five units, each bigger; only the end sizes carry dimensions (from Ravel's brand file)
+const STOPS=[5.0,7.2,9.4,11.6,13.8];
+const D=[
+ {w:240,h:280,sz:'من <span class="ltr">1×1</span> م',us:'كراتين وشنط',items:[['box',-95,0,95,83],['box',5,0,88,77],['box',-60,83,84,73]]},
+ {w:360,h:410,sz:'',us:'أثاث استوديو',items:[['sofa',-160,0,215,122],['box',62,0,95,83],['box',68,83,84,73],['lamp',-150,122,0,0]]},
+ {w:480,h:530,sz:'',us:'أثاث شقة',items:[['wardrobe',-212,0,115,204],['sofa',-90,0,215,122],['chair',130,0,95,105],['box',-205,204,100,87]]},
+ {w:620,h:650,sz:'',us:'أثاث فيلا',items:[['wardrobe',-283,0,118,209],['wardrobe',-160,0,118,209],['sofa',-35,0,225,128],['chair',196,0,90,100],['box',-276,209,104,91],['box',-153,209,104,91],['plant',90,128,70,128]]},
+ {w:780,h:780,sz:'إلى <span class="ltr">6×5</span> م',us:'مخزون الشركات',items:[['rack',-365,0,230,537],['rack',-115,0,230,537],['rack',135,0,230,537]]}];
+const GAP=180,FLOOR=1500;let cx=540;D.forEach((d,i)=>{if(i>0)cx-=D[i-1].w/2+GAP+d.w/2;d.cx=cx;});
+const L=D[4].cx-D[4].w/2,R=D[0].cx+D[0].w/2,CM=(L+R)/2,SC=1000/(R-L);
+const track=document.getElementById('track');track.style.transformOrigin=`${CM}px ${FLOOR}px`;
+D.forEach((d,i)=>{const s=STOPS[i];
+  const el=document.createElement('div');el.className='dr';Object.assign(el.style,{left:(d.cx-d.w/2)+'px',width:d.w+'px',height:d.h+'px',bottom:(1920-FLOOR)+'px'});
+  let h='<div class="flr"></div><div class="anchor">';
+  d.items.forEach((it,k)=>{if(!it[3])return;h+=`<svg class="it a pop" style="--d:${(s+.45+k*.08).toFixed(2)}s;left:${it[1]}px;bottom:${it[2]}px;width:${it[3]}px;height:${it[4]}px;transform-origin:50% 100%"><use href="#${it[0]}"/></svg>`;});
+  h+='</div><div class="roll"></div>';el.innerHTML=h;track.appendChild(el);d.roll=el.querySelector('.roll');
+  const lb=document.createElement('div');lb.className='dl a pop';lb.dir='rtl';lb.style.cssText=`--d:${(s+.3).toFixed(2)}s;left:${d.cx-400}px;width:800px;top:${FLOOR-d.h-(d.sz?250:120)}px;transform-origin:50% 100%`;
+  lb.innerHTML=(d.sz?`<span class="sz">${d.sz}</span>`:'')+`<span class="us">${d.us}</span>`;track.appendChild(lb);d.lb=lb;});
+
+const kbars=[...document.querySelectorAll('.kbar')];
+{{KBAR_INIT}}
+
+window.setTime=function(t){
+  scenes.forEach(s=>{s.style.display=(t>=+s.dataset.in&&t<+s.dataset.out)?'block':'none'});
+  let x=110;for(const c of cuts){if(t>=c-.3&&t<c)x=lerp(110,0,ioC(seg(t,c-.3,c)));else if(t>=c&&t<c+.3)x=lerp(0,-110,ioC(seg(t,c,c+.3)));}
+  document.getElementById('panel').style.transform=`translateX(${x}%)`;
+  kbars.forEach(k=>{if(!k._w0)return;const W=+k.dataset.w*ioC(seg(t,+k.dataset.t0,+k.dataset.t1));k.style.width=W+'px';k.firstElementChild.style.transform=`scaleX(${(W+10)/k._w0})`;});
+  // camera pans from unit to unit, then pulls back to show the whole range
+  const B=1.2,txFor=i=>540-CM-B*(D[i].cx-CM);let tx=txFor(0);
+  for(let i=1;i<5;i++){const f=ioC(seg(t,STOPS[i]-.7,STOPS[i]-.05));tx=lerp(tx,txFor(i),f);}
+  const z=ioC(seg(t,15.4,16.4));tx=lerp(tx,540-CM,z);const sc=lerp(B,SC,z);
+  track.style.transform=`translateX(${tx}px) scale(${sc})`;
+  D.forEach((d,i)=>{d.roll.style.transform=`translateY(${-100*ioC(seg(t,STOPS[i]+.05,STOPS[i]+.5))}%)`;d.lb.style.opacity=1-.0*z;});
+  const h2=document.getElementById('h2');h2.style.opacity=1-seg(t,12.9,13.25);
+  document.getElementById('typing').style.display=t<19.35?'block':'none';
+  document.getAnimations().forEach(a=>{a.pause();a.currentTime=t*1000});
+};
+</script>
+</body>
+</html>
