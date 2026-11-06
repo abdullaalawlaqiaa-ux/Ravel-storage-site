@@ -1,6 +1,6 @@
 const {chromium}=require('playwright');const {spawn}=require('child_process');
 (async()=>{const FPS=30,DUR=33.5;const b=await chromium.launch();const p=await b.newPage({viewport:{width:1080,height:1920}});
-await p.goto('file://'+__dirname+'/v2.html');
+await p.goto('file://'+__dirname+'/v2.html');await p.evaluate(()=>window.ready);
 for(const t of [1,6,10,14,22,26,28])await p.evaluate(t=>setTime(t),t);
 await p.evaluate(()=>document.fonts.ready);await p.waitForTimeout(500);
 const ff=spawn('ffmpeg',['-loglevel','error','-y','-f','image2pipe','-framerate',''+FPS,'-i','-','-c:v','libx264','-preset','medium','-crf','18','-pix_fmt','yuv420p','silent2.mp4'],{stdio:['pipe','inherit','inherit']});
