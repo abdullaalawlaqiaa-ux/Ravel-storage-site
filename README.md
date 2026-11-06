@@ -7,6 +7,9 @@
 - `assets/styles.css` – التنسيقات (متجاوب مع الجوال، اتجاه RTL)
 - `assets/script.js` – القائمة، نموذج الحجز عبر واتساب، وحركات الظهور
 
+## مركز التحكم (منصة الإدارة)
+مجلد `platform/` يحتوي منصة Next.js موحّدة تربط Zoho Creator و Zoho Books. انظر [`platform/README.md`](platform/README.md).
+
 ## التشغيل محلياً
 افتح `index.html` مباشرة في المتصفح، أو:
 ```bash
