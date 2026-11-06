@@ -1,0 +1,178 @@
+<style>
+.wall{position:absolute;left:0;right:0;top:0;height:1450px}
+.floor{position:absolute;left:0;right:0;top:1450px;bottom:0;background:repeating-linear-gradient(90deg,#c9b08c 0 178px,#bda27c 178px 180px);}
+.floor::before{content:"";position:absolute;left:0;right:0;top:-14px;height:14px;background:#f4f1ea}
+.unit4{position:absolute;border:14px solid var(--navy);border-radius:22px;background:linear-gradient(#22346e,#1a2754);overflow:hidden;box-shadow:0 40px 80px rgba(21,34,73,.28)}
+.unit4 .door{position:absolute;inset:0;background:repeating-linear-gradient(#e3e8f0 0 40px,#b9c3d3 40px 46px);z-index:5}
+.dopen{animation:dopen .55s cubic-bezier(.65,0,.35,1) var(--d) both}
+.dclose{animation:dclose .5s cubic-bezier(.65,0,.35,1) var(--d) both}
+@keyframes dopen{from{transform:translateY(0)}to{transform:translateY(-100%)}}
+@keyframes dclose{from{transform:translateY(-100%)}to{transform:translateY(0)}}
+.fly{animation:fly .7s cubic-bezier(.3,.8,.3,1.05) var(--d) both}
+@keyframes fly{0%{transform:translate(var(--fx),var(--fy)) rotate(var(--fr)) scale(1.3);opacity:0}15%{opacity:1}100%{transform:none;opacity:1}}
+.flyL{animation:flyL .7s cubic-bezier(.3,.8,.3,1.05) var(--d) both}
+@keyframes flyL{0%{transform:translateX(-1100px) rotate(-12deg);opacity:0}20%{opacity:1}100%{transform:none;opacity:1}}
+@keyframes roll{0%,100%{transform:translateY(0)}50%{transform:translateY(-260px)}}
+@keyframes drift{from{transform:translate(0,0)}to{transform:translate(-80px,-160px)}}
+@keyframes blink{0%,49%{opacity:1}50%,100%{opacity:.15}}
+@keyframes glow{0%,100%{box-shadow:0 0 0 0 rgba(143,201,242,.0)}50%{box-shadow:0 0 50px 10px rgba(143,201,242,.55)}}
+.dust{position:absolute;border-radius:50%;background:radial-gradient(rgba(150,140,125,.55),rgba(150,140,125,0) 70%)}
+.drip{position:absolute;width:34px;height:34px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:#5fa9de}
+.lbl{position:absolute;background:#fff;color:var(--navy);font-family:'Alexandria';font-weight:800;font-size:44px;padding:8px 30px 14px;border-radius:999px;box-shadow:0 10px 24px rgba(0,0,0,.15)}
+.pill{display:inline-block;font-family:'Alexandria';font-weight:900;font-size:76px;padding:14px 56px 24px;border-radius:999px}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute"><defs>
+{{SYMBOLS}}
+  <symbol id="ladder" viewBox="0 0 180 570"><g fill="#aeb8c7"><rect x="10" width="18" height="570" rx="6" transform="rotate(4 19 285)"/><rect x="152" width="18" height="570" rx="6" transform="rotate(-4 161 285)"/></g><g fill="#c9d1dc"><rect x="20" y="80" width="140" height="14" rx="5"/><rect x="18" y="190" width="144" height="14" rx="5"/><rect x="16" y="300" width="148" height="14" rx="5"/><rect x="14" y="410" width="152" height="14" rx="5"/></g></symbol>
+  <symbol id="bucket" viewBox="0 0 120 130"><path d="M30 20Q60 -10 90 20" stroke="#6b7590" stroke-width="6" fill="none"/><path d="M12 24H108L98 128H22Z" fill="#e6ebf2"/><rect x="12" y="20" width="96" height="14" rx="5" fill="#5fa9de"/><path d="M40 34V60Q40 70 46 70Q52 70 52 60V34Z" fill="#5fa9de"/><rect x="30" y="74" width="60" height="30" rx="5" fill="#152249"/></symbol>
+  <symbol id="roller" viewBox="0 0 120 260"><rect x="10" y="0" width="100" height="44" rx="18" fill="#5fa9de"/><path d="M60 44V70H20V110H60" stroke="#6b7590" stroke-width="8" fill="none"/><rect x="50" y="108" width="20" height="150" rx="8" fill="#152249"/></symbol>
+  <symbol id="frameOld" viewBox="0 0 320 230"><rect width="320" height="230" rx="10" fill="#8a6a4a"/><rect x="18" y="18" width="284" height="194" fill="#cfc5b3"/><path d="M18 212L110 110L170 170L220 120L302 212Z" fill="#9c9278"/><circle cx="240" cy="70" r="24" fill="#e2d8c4"/></symbol>
+  <symbol id="frameNew" viewBox="0 0 320 230"><rect width="320" height="230" rx="10" fill="#152249"/><rect x="18" y="18" width="284" height="194" fill="#fff"/><circle cx="120" cy="120" r="62" fill="#8fc9f2"/><circle cx="200" cy="100" r="44" fill="#152249" opacity=".85"/><rect x="60" y="170" width="200" height="14" rx="7" fill="#5fa9de"/></symbol>
+  <symbol id="ctable" viewBox="0 0 260 120"><rect width="260" height="26" rx="10" fill="#7c5132"/><rect x="22" y="26" width="16" height="94" rx="6" fill="#9a6640"/><rect x="222" y="26" width="16" height="94" rx="6" fill="#9a6640"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 100 100"><path d="M30 44V32a20 20 0 0 1 40 0v12" stroke="#8fc9f2" stroke-width="10" fill="none"/><rect x="18" y="42" width="64" height="50" rx="12" fill="#8fc9f2"/><circle cx="50" cy="64" r="8" fill="#152249"/></symbol>
+</defs></svg>
+
+<!-- S1 ROOM BEFORE + DURING 0–7 (one continuous shot) -->
+<section class="scene greybg" id="s1" data-in="0" data-out="7">
+  <div class="wall" style="background:#ebe5d9"></div>
+  <div class="wall" id="paint" style="background:#d8ebf8;width:0;right:auto"></div>
+  <div class="floor"></div>
+  <svg class="it" style="left:380px;top:720px;width:320px;height:230px"><use href="#frameOld"/></svg>
+  <svg class="it" style="left:60px;top:1110px;width:110px;height:360px"><use href="#lamp"/></svg>
+  <svg class="it" style="left:170px;top:1204px;width:470px;height:266px"><use href="#sofa"/></svg>
+  <svg class="it" style="left:650px;top:1250px;width:190px;height:220px"><use href="#chair"/></svg>
+  <svg class="it" style="left:300px;top:1480px;width:250px;height:115px"><use href="#ctable"/></svg>
+  <svg class="it a drop" style="--d:1.0s;left:860px;top:900px;width:180px;height:570px"><use href="#ladder"/></svg>
+  <svg class="it a pop" style="--d:1.45s;left:700px;top:1500px;width:130px;height:140px;transform-origin:50% 100%"><use href="#bucket"/></svg>
+  <svg class="it a pop" style="--d:1.75s;left:560px;top:1440px;width:110px;height:240px;transform-origin:50% 100%;rotate:-14deg"><use href="#roller"/></svg>
+  <div class="abs" id="drips">
+    <div class="drip a drop" style="--d:3.6s;left:260px;top:1235px"></div>
+    <div class="drip a drop" style="--d:3.85s;left:430px;top:1222px"></div>
+    <div class="drip a drop" style="--d:4.05s;left:720px;top:1262px"></div>
+    <div class="drip a drop" style="--d:4.2s;left:330px;top:1300px"></div>
+    <div class="drip a drop" style="--d:4.32s;left:540px;top:1290px"></div>
+    <div class="drip a drop" style="--d:4.42s;left:780px;top:1330px"></div>
+    <div class="drip a drop" style="--d:4.5s;left:400px;top:1490px"></div>
+  </div>
+  <div class="dust a fade" style="--d:5.0s;left:120px;top:1080px;width:600px;height:500px"></div>
+  <div class="dust a fade" style="--d:5.3s;left:520px;top:1140px;width:460px;height:420px"></div>
+  <div class="dust a fade" style="--d:5.55s;left:0px;top:1250px;width:420px;height:380px"></div>
+  <div class="abs center ax navy" dir="rtl" id="t1" style="top:230px;font-size:120px">
+    <span class="w a up" style="--d:.1s">ناوي</span> <span class="w a up" style="--d:.24s">تجدد</span><br><span class="w a up" style="--d:.4s"><span class="mk" style="--md:.8s">بيتك؟</span></span>
+  </div>
+  <div class="abs center ax navy" dir="rtl" id="t2" style="top:230px;font-size:110px">
+    <span class="w a up" style="--d:3.15s">والأثاث</span><br><span class="w a up" style="--d:3.3s">وين</span> <span class="w a up" style="--d:3.45s"><span class="mk" style="--md:3.85s">تودّيه؟</span></span>
+  </div>
+</section>
+
+<!-- S2 INTO THE UNIT 7–10 -->
+<section class="scene greybg" id="s2" data-in="7" data-out="10"><div class="grain"></div>
+  <div class="abs center tj navy a up" dir="rtl" style="--d:7.05s;top:200px;font-size:84px">خزّنه عند</div>
+  <div class="logo a fade" style="--d:7.2s;top:340px;width:560px;color:var(--navy)">
+    <svg viewBox="0 0 2100 1000" class="a reveal" style="--d:7.2s;animation-duration:.7s"><use href="#lg-script"/></svg>
+    <svg viewBox="0 0 2100 230" class="a stor" style="--d:7.7s;margin-top:56px"><use href="#lg-storage"/></svg>
+  </div>
+  <div class="unit4" style="left:170px;top:820px;width:740px;height:620px">
+    <svg class="it fly" style="--d:7.5s;--fx:900px;--fy:-100px;--fr:20deg;left:40px;top:330px;width:420px;height:238px"><use href="#sofa"/></svg>
+    <svg class="it fly" style="--d:7.75s;--fx:900px;--fy:200px;--fr:30deg;left:480px;top:360px;width:190px;height:210px"><use href="#chair"/></svg>
+    <svg class="it fly" style="--d:7.95s;--fx:800px;--fy:-400px;--fr:-25deg;left:600px;top:150px;width:80px;height:220px"><use href="#lamp"/></svg>
+    <svg class="it fly" style="--d:8.1s;--fx:900px;--fy:-300px;--fr:35deg;left:120px;top:110px;width:250px;height:115px"><use href="#ctable"/></svg>
+    <svg class="it fly" style="--d:8.22s;--fx:800px;--fy:-500px;--fr:-30deg;left:390px;top:80px;width:200px;height:144px"><use href="#frameOld"/></svg>
+    <div class="door dopen" style="--d:7.15s"></div>
+    <div class="door dclose" style="--d:8.75s"></div>
+  </div>
+  <svg class="abs a pop" style="--d:9.15s;left:440px;top:1020px;width:200px;height:200px;z-index:10;filter:drop-shadow(0 20px 30px rgba(0,0,0,.3))"><use href="#i-lock"/></svg>
+</section>
+
+<!-- S3 SPLIT 10–16 -->
+<section class="scene" id="s3" data-in="10" data-out="16">
+  <div class="abs a fade" style="--d:10.0s;left:0;right:0;top:0;height:955px;overflow:hidden">
+    <div class="wall" style="background:#ebe5d9;height:760px"></div>
+    <div class="wall" id="paint2" style="background:#d8ebf8;height:760px;width:420px;right:auto"></div>
+    <div class="floor" style="top:760px"></div>
+    <svg class="it" style="left:640px;top:200px;width:180px;height:570px"><use href="#ladder"/></svg>
+    <svg class="it" style="left:350px;top:420px;width:120px;height:260px;animation:roll 1.4s ease-in-out 10s infinite"><use href="#roller"/></svg>
+    <svg class="it" style="left:860px;top:640px;width:130px;height:140px"><use href="#bucket"/></svg>
+    <div class="dust" style="left:60px;top:500px;width:420px;height:360px;animation:drift 6s linear 10s both"></div>
+    <div class="dust" style="left:600px;top:560px;width:380px;height:320px;animation:drift 6s linear 10s both"></div>
+    <div class="lbl" style="right:40px;top:40px">البيت</div>
+    <div class="lbl" style="left:40px;top:40px" dir="rtl">يوم <span class="ltr" id="day">1</span></div>
+  </div>
+  <div class="abs a fade" style="--d:10.0s;left:0;right:0;top:965px;bottom:0;background:linear-gradient(#22346e,#141f45);overflow:hidden">
+    <div class="abs" style="left:0;right:0;bottom:0;height:120px;background:#2f4488"></div>
+    <svg class="it" style="left:110px;top:560px;width:460px;height:260px"><use href="#sofa"/></svg>
+    <svg class="it" style="left:600px;top:600px;width:200px;height:220px"><use href="#chair"/></svg>
+    <svg class="it" style="left:830px;top:540px;width:90px;height:280px"><use href="#lamp"/></svg>
+    <svg class="it" style="left:200px;top:440px;width:260px;height:120px"><use href="#ctable"/></svg>
+    <svg class="it" style="left:620px;top:420px;width:220px;height:158px"><use href="#frameOld"/></svg>
+    <div class="abs" style="right:50px;top:150px;width:120px;height:120px;border-radius:30px;background:#0c1533;display:grid;place-items:center"><svg width="80" height="80"><use href="#i-cam"/></svg></div>
+    <div class="abs" style="right:66px;top:166px;width:18px;height:18px;border-radius:9px;background:#f87171;animation:blink 1s steps(1) 10s infinite"></div>
+    <div class="abs ltr ax a pop" style="--d:13.6s;right:200px;top:162px;font-size:70px;color:var(--blue);padding:0 24px;border-radius:24px;animation-name:pop,glow;animation-duration:.5s,1.2s;animation-delay:13.6s,14.1s;animation-iteration-count:1,infinite">24/7</div>
+    <div class="lbl" style="right:40px;top:40px">وحدتك في Ravel</div>
+  </div>
+  <div class="abs center a pop" dir="rtl" style="--d:10.6s;top:770px;z-index:5"><span class="pill" style="background:var(--navy);color:#fff">بيتك يتجدد…</span></div>
+  <div class="abs center a pop" dir="rtl" style="--d:12.5s;top:1150px;z-index:5"><span class="pill" style="background:var(--blue);color:var(--navy)">وأثاثك بأمان</span></div>
+</section>
+
+<!-- S4 ROOM AFTER 16–21 -->
+<section class="scene greybg" id="s4" data-in="16" data-out="21">
+  <div class="wall" style="background:#d8ebf8"></div>
+  <div class="floor"></div>
+  <svg class="it flyL" style="--d:16.45s;left:380px;top:720px;width:320px;height:230px"><use href="#frameNew"/></svg>
+  <svg class="it flyL" style="--d:16.7s;left:170px;top:1204px;width:470px;height:266px"><use href="#sofa"/></svg>
+  <svg class="it flyL" style="--d:16.9s;left:650px;top:1250px;width:190px;height:220px"><use href="#chair"/></svg>
+  <svg class="it flyL" style="--d:17.05s;left:60px;top:1110px;width:110px;height:360px"><use href="#lamp"/></svg>
+  <svg class="it flyL" style="--d:17.17s;left:300px;top:1480px;width:250px;height:115px"><use href="#ctable"/></svg>
+  <svg class="it a pop" style="--d:17.4s;left:880px;top:1290px;width:120px;height:220px;transform-origin:50% 100%"><use href="#plant"/></svg>
+  <svg class="it a pop" style="--d:17.6s;left:150px;top:1120px;width:70px;height:70px"><use href="#i-clean"/></svg>
+  <svg class="it a pop" style="--d:17.7s;left:600px;top:1160px;width:56px;height:56px"><use href="#i-clean"/></svg>
+  <svg class="it a pop" style="--d:17.78s;left:820px;top:1200px;width:64px;height:64px"><use href="#i-clean"/></svg>
+  <div class="abs center ax navy" dir="rtl" style="top:230px;font-size:120px">
+    <span class="w a up" style="--d:16.1s">رجع</span> <span class="w a up" style="--d:16.22s">بيتك</span>
+  </div>
+  <div class="abs center" dir="rtl" style="top:400px">
+    <span class="w ax blueD a up" style="--d:16.4s;font-size:160px;white-space:nowrap"><span>أحـ</span><span class="kbar" data-w="380" data-fit="1000" data-t0="16.75" data-t1="17.4"><span class="kg">ـ</span></span><span>ـلى</span></span>
+  </div>
+</section>
+
+<!-- S5 CTA 21–25.5 -->
+<section class="scene navybg" id="s5" data-in="21" data-out="26"><div class="grain"></div>
+  <div class="sweepLight" style="--d:21.4s"></div>
+  <div class="logo" style="top:360px;width:700px">
+    <svg viewBox="0 0 2100 1000" class="a reveal" style="--d:21.1s;animation-duration:.7s"><use href="#lg-script"/></svg>
+    <svg viewBox="0 0 2100 230" class="a stor" style="--d:21.65s;margin-top:70px"><use href="#lg-storage"/></svg>
+  </div>
+  <div class="abs center" style="top:1040px"><div class="a pop" style="--d:22.0s;display:inline-block"><div class="cta pulse" style="--d:22.7s" dir="rtl">احجز وحدتك الحين</div></div></div>
+  <div class="abs center a up" style="--d:22.35s;top:1300px"><div class="wa"><svg width="92" height="92"><use href="#i-wa"/></svg><span class="ltr">050 32 50 55 1</span></div></div>
+  <div class="abs center a fade" style="--d:22.6s;top:1470px;font:700 50px Alexandria;letter-spacing:2px;opacity:.9">ravelstorage.com</div>
+</section>
+
+<div id="panel"></div>
+
+<script>
+const scenes=[...document.querySelectorAll('.scene')];
+const cuts=[7,10,16,21];
+const clamp=x=>Math.max(0,Math.min(1,x));
+const seg=(t,a,b)=>clamp((t-a)/(b-a));
+const ioC=x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2;
+const lerp=(a,b,f)=>a+(b-a)*f;
+{{KBAR_JS}}
+window.setTime=function(t){
+  scenes.forEach(s=>{s.style.display=(t>=+s.dataset.in&&t<+s.dataset.out)?'block':'none'});
+  let x=110;for(const c of cuts){if(t>=c-.3&&t<c)x=lerp(110,0,ioC(seg(t,c-.3,c)));else if(t>=c&&t<c+.3)x=lerp(0,-110,ioC(seg(t,c,c+.3)));}
+  document.getElementById('panel').style.transform=`translateX(${x}%)`;
+  kbars.forEach(k=>{if(!k._w0)return;const W=+k.dataset.w*ioC(seg(t,+k.dataset.t0,+k.dataset.t1));k.style.width=W+'px';k.firstElementChild.style.transform=`scaleX(${(W+10)/k._w0})`;});
+  // headline swap in the continuous room shot
+  const o1=1-seg(t,2.75,3.05);const t1=document.getElementById('t1');t1.style.opacity=o1;t1.style.transform=`translateY(${-60*seg(t,2.75,3.05)}px)`;
+  document.getElementById('t2').style.display=t<3.05?'none':'block';
+  // wall gets painted during renovation
+  document.getElementById('paint').style.width=(1080*ioC(seg(t,3.3,6.8)))+'px';
+  document.getElementById('paint2').style.width=(420+660*seg(t,10,15.8))+'px';
+  document.getElementById('day').textContent=Math.max(1,Math.round(30*seg(t,10.4,15.6)));
+  document.getAnimations().forEach(a=>{a.pause();a.currentTime=t*1000});
+};
+</script>
+</body>
+</html>
