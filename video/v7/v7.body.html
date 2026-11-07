@@ -1,0 +1,124 @@
+<style>
+.night{background:radial-gradient(900px 700px at 70% 10%,#1b2b5e 0%,#0d1638 55%,#070d24 100%)}
+.stars{position:absolute;inset:0 0 40% 0;background-image:radial-gradient(#fff 1.6px,transparent 2px),radial-gradient(rgba(255,255,255,.6) 1.2px,transparent 1.6px);background-size:170px 190px,110px 130px;background-position:20px 30px,70px 90px;opacity:.7}
+.moon{position:absolute;width:150px;height:150px;border-radius:50%;box-shadow:-34px 18px 0 0 #f3f6fb}
+.dr7{position:absolute;bottom:420px;width:210px;height:300px;border:12px solid #2a3c75;border-radius:16px;background:repeating-linear-gradient(#3a4f8f 0 30px,#30447e 30px 36px)}
+.cone{position:absolute;width:900px;height:260px;transform-origin:0 50%;background:linear-gradient(90deg,rgba(143,201,242,.55),rgba(143,201,242,0));clip-path:polygon(0 45%,100% 0,100% 100%,0 55%)}
+@keyframes sweepCam{from{transform:rotate(110deg)}to{transform:rotate(160deg)}}
+@keyframes blink{0%,49%{opacity:1}50%,100%{opacity:.15}}
+.clock{display:inline-block;background:#0a1230;border:4px solid #2a3c75;border-radius:28px;padding:6px 40px 10px;font-family:'Alexandria';font-weight:900;font-size:110px;color:var(--blue);letter-spacing:4px}
+.beam{position:absolute;width:420px;height:200px;background:linear-gradient(270deg,rgba(255,240,190,.5),rgba(255,240,190,0));clip-path:polygon(100% 45%,0 0,0 100%,100% 55%)}
+.pill{display:inline-block;font-family:'Alexandria';font-weight:900;font-size:78px;padding:14px 56px 24px;border-radius:999px}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute"><defs>
+{{SYMBOLS}}
+  <symbol id="guard" viewBox="0 0 120 300"><circle cx="60" cy="52" r="30" fill="#f1c9a5"/><path d="M26 40Q60 4 94 40L92 30Q60 8 28 30Z" fill="#152249"/><rect x="24" y="30" width="72" height="16" rx="6" fill="#152249"/><rect x="22" y="86" width="76" height="120" rx="26" fill="#2e78b8"/><rect x="30" y="200" width="24" height="96" rx="10" fill="#152249"/><rect x="66" y="200" width="24" height="96" rx="10" fill="#152249"/><rect x="2" y="110" width="22" height="74" rx="10" fill="#2e78b8"/><rect x="92" y="96" width="44" height="18" rx="7" fill="#8a94ab"/><rect x="38" y="104" width="44" height="16" rx="4" fill="#8fc9f2"/></symbol>
+  <symbol id="car" viewBox="0 0 360 160"><path d="M20 100Q20 70 50 66L100 30Q116 18 140 18H240Q262 18 278 34L312 66Q344 70 344 100V122H20Z" fill="#e6ebf2"/><path d="M112 40H178V70H82Z" fill="#8fc9f2"/><path d="M192 40H252Q262 40 270 48L290 70H192Z" fill="#8fc9f2"/><circle cx="92" cy="124" r="30" fill="#1c2333"/><circle cx="92" cy="124" r="12" fill="#c9d1dc"/><circle cx="272" cy="124" r="30" fill="#1c2333"/><circle cx="272" cy="124" r="12" fill="#c9d1dc"/><rect x="24" y="84" width="22" height="12" rx="4" fill="#ffe7a3"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 100 100"><path d="M30 44V32a20 20 0 0 1 40 0v12" stroke="#8fc9f2" stroke-width="10" fill="none"/><rect x="18" y="42" width="64" height="50" rx="12" fill="#8fc9f2"/><circle cx="50" cy="64" r="8" fill="#152249"/></symbol>
+</defs></svg>
+
+<!-- S1 HOOK 0–3.5 -->
+<section class="scene night" id="s1" data-in="0" data-out="3.5"><div class="stars"></div>
+  <div class="moon a fade" style="--d:.2s;right:140px;top:220px"></div>
+  <div class="abs center ax" dir="rtl" style="top:470px;font-size:112px"><span class="w a up" style="--d:.05s">مطمّن</span> <span class="w a up" style="--d:.2s">على</span></div>
+  <div class="abs center" dir="rtl" style="top:900px">
+    <span class="w ax blue a up" style="--d:.35s;font-size:112px;white-space:nowrap"><span>أغـ</span><span class="kbar" data-w="500" data-fit="1050" data-base="500" data-t0=".7" data-t1="1.35"><span class="kg">ـ</span><span class="kitems">
+      <svg class="it a drop" style="--d:1.45s;right:20px;bottom:0;width:270px;height:153px"><use href="#sofa"/></svg>
+      <svg class="it a drop" style="--d:1.65s;right:300px;bottom:0;width:110px;height:96px"><use href="#box"/></svg>
+      <svg class="it a drop" style="--d:1.8s;right:410px;bottom:0;width:80px;height:70px"><use href="#box"/></svg>
+      <svg class="it a drop" style="--d:1.92s;right:310px;bottom:96px;width:90px;height:79px"><use href="#box"/></svg>
+      <svg class="it a pop" style="--d:2.4s;right:110px;bottom:165px;width:90px;height:90px"><use href="#i-lock"/></svg>
+    </span></span><span>ـراضك؟</span></span>
+  </div>
+</section>
+
+<!-- S2 3AM INSIDE 3.5–9 -->
+<section class="scene night" id="s2" data-in="3.5" data-out="9">
+  <div class="abs" style="left:0;right:0;top:1500px;bottom:0;background:#0a1230"></div>
+  <div class="abs" style="left:0;right:0;top:1494px;height:10px;background:#22346e"></div>
+  <div class="dr7" style="left:40px"></div><div class="dr7" style="left:300px"></div><div class="dr7" style="left:560px"></div><div class="dr7" style="left:820px"></div>
+  <svg class="abs" style="left:110px;top:1300px;width:70px;height:70px"><use href="#i-lock"/></svg>
+  <svg class="abs" style="left:370px;top:1300px;width:70px;height:70px"><use href="#i-lock"/></svg>
+  <svg class="abs" style="left:630px;top:1300px;width:70px;height:70px"><use href="#i-lock"/></svg>
+  <svg class="abs" style="left:890px;top:1300px;width:70px;height:70px"><use href="#i-lock"/></svg>
+  <div class="cone" style="left:960px;top:760px;animation:sweepCam 1.6s ease-in-out 3.5s infinite alternate"></div>
+  <div class="abs" style="left:900px;top:820px;width:120px;height:120px;border-radius:30px;background:#0a1230;border:3px solid #2a3c75;display:grid;place-items:center"><svg width="80" height="80"><use href="#i-cam"/></svg></div>
+  <div class="abs" style="left:986px;top:832px;width:18px;height:18px;border-radius:9px;background:#f87171;animation:blink 1s steps(1) 3.5s infinite"></div>
+  <div class="abs" id="guardWrap" style="top:1180px;width:120px;height:300px">
+    <div class="beam" style="right:100px;top:40px"></div>
+    <svg style="position:absolute;inset:0;width:120px;height:300px;transform:scaleX(-1)"><use href="#guard"/></svg>
+  </div>
+  <div class="abs center ax" dir="rtl" style="top:170px;font-size:96px"><span class="w a up" style="--d:3.6s">الساعة</span> <span class="w a up" style="--d:3.72s"><span class="ltr">3</span></span> <span class="w a up" style="--d:3.84s">الفجر…</span></div>
+  <div class="abs center a pop" style="--d:4.0s;top:340px"><span class="clock ltr" id="clock">03:00</span></div>
+  <div class="abs center ax" dir="rtl" style="top:560px;font-size:84px">
+    <span class="w a up" style="--d:5.6s">والكاميرات</span> <span class="w a up" style="--d:5.74s"><span class="mk" style="--md:6.0s">صاحية</span></span><br>
+    <span class="w a up" style="--d:7.2s">والحارس</span> <span class="w a up" style="--d:7.34s">بعد</span>
+  </div>
+</section>
+
+<!-- S3 COME ANY TIME 9–14.5 -->
+<section class="scene night" id="s3" data-in="9" data-out="14.5"><div class="stars"></div>
+  <div class="moon" style="right:70px;top:40px"></div>
+  <div class="abs center ax" dir="rtl" style="top:250px;font-size:100px"><span class="w a up" style="--d:9.1s">تبي</span> <span class="w a up" style="--d:9.22s">غرض</span> <span class="w a up" style="--d:9.34s">من</span> <span class="w a up" style="--d:9.46s">وحدتك؟</span></div>
+  <div class="abs" style="left:-40px;width:760px;top:860px;height:640px;background:#1a2754;border:12px solid #2a3c75;border-radius:20px 20px 0 0"></div>
+  <div class="logo" style="left:30px;right:auto;margin:0;top:900px;width:420px"><svg viewBox="0 0 2100 1000"><use href="#lg-script"/></svg><svg viewBox="0 0 2100 230" style="margin-top:40px"><use href="#lg-storage"/></svg></div>
+  <div class="abs" style="left:480px;top:1180px;width:230px;height:320px;background:#ffe7a3;opacity:.85;border-radius:10px 10px 0 0"></div>
+  <div class="abs" style="left:0;right:0;top:1500px;bottom:0;background:#0a1230"></div>
+  <div class="abs" style="left:0;right:0;top:1494px;height:10px;background:#22346e"></div>
+  <div class="abs" style="left:300px;top:1310px;width:30px;height:190px;background:#c9d1dc;border-radius:8px;z-index:3"></div>
+  <div class="abs" id="arm" style="left:0px;top:1316px;width:316px;z-index:3;height:26px;border-radius:13px;background:repeating-linear-gradient(90deg,#e05a5a 0 50px,#fff 50px 100px);transform-origin:100% 50%"></div>
+  <svg class="abs" id="carEl" style="top:1360px;width:360px;height:160px"><use href="#car"/></svg>
+  <div class="abs center a pop" dir="rtl" style="--d:11.6s;top:560px"><span class="pill" style="background:var(--blue);color:var(--navy)">تعال أي وقت <span class="ltr">24/7</span></span></div>
+</section>
+
+<!-- S4 FEATURES 14.5–20 -->
+<section class="scene navybg" id="s4" data-in="14.5" data-out="20"><div class="grain"></div>
+  <div class="feat a slideR" style="--d:14.65s;top:420px"><div class="ib"><svg width="70" height="70"><use href="#i-cam"/></svg></div><span>كاميرات مراقبة <span class="ltr blueD">24/7</span></span></div>
+  <div class="feat a slideR" style="--d:15.15s;top:610px"><div class="ib"><svg width="70" height="70"><use href="#i-guard"/></svg></div><span>حارس أمن <span class="ltr blueD">24/7</span></span></div>
+  <div class="feat a slideR" style="--d:15.55s;top:800px"><div class="ib"><svg width="70" height="70"><use href="#i-key"/></svg></div><span>دخول لوحدتك <span class="ltr blueD">24/7</span></span></div>
+  <div class="feat a slideR" style="--d:15.85s;top:990px"><div class="ib"><svg width="70" height="70"><use href="#i-clean"/></svg></div><span>نظيفة ومعقّمة</span></div>
+  <div class="abs center ax a up" dir="rtl" style="--d:18.2s;top:1330px;font-size:110px">نام وانت<br><span class="blue">مطمّن</span></div>
+</section>
+
+<!-- S5 CTA 20–25.5 -->
+<section class="scene navybg" id="s5" data-in="20" data-out="26"><div class="grain"></div>
+  <div class="sweepLight" style="--d:20.4s"></div>
+  <div class="logo" style="top:360px;width:700px">
+    <svg viewBox="0 0 2100 1000" class="a reveal" style="--d:20.1s;animation-duration:.7s"><use href="#lg-script"/></svg>
+    <svg viewBox="0 0 2100 230" class="a stor" style="--d:20.65s;margin-top:70px"><use href="#lg-storage"/></svg>
+  </div>
+  <div class="abs center" style="top:1040px"><div class="a pop" style="--d:21.0s;display:inline-block"><div class="cta pulse" style="--d:21.7s" dir="rtl">احجز وحدتك الحين</div></div></div>
+  <div class="abs center a up" style="--d:21.35s;top:1300px"><div class="wa"><svg width="92" height="92"><use href="#i-wa"/></svg><span class="ltr">050 32 50 55 1</span></div></div>
+  <div class="abs center a fade" style="--d:21.6s;top:1470px;font:700 50px Alexandria;letter-spacing:2px;opacity:.9">ravelstorage.com</div>
+</section>
+
+<div id="panel"></div>
+
+<script>
+const scenes=[...document.querySelectorAll('.scene')];
+const cuts=[3.5,9,14.5,20];
+const clamp=x=>Math.max(0,Math.min(1,x));
+const seg=(t,a,b)=>clamp((t-a)/(b-a));
+const ioC=x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2;
+const lerp=(a,b,f)=>a+(b-a)*f;
+const kbars=[...document.querySelectorAll('.kbar')];
+{{KBAR_INIT}}
+window.setTime=function(t){
+  scenes.forEach(s=>{s.style.display=(t>=+s.dataset.in&&t<+s.dataset.out)?'block':'none'});
+  let x=110;for(const c of cuts){if(t>=c-.3&&t<c)x=lerp(110,0,ioC(seg(t,c-.3,c)));else if(t>=c&&t<c+.3)x=lerp(0,-110,ioC(seg(t,c,c+.3)));}
+  document.getElementById('panel').style.transform=`translateX(${x}%)`;
+  kbars.forEach(k=>{if(!k._w0)return;const W=+k.dataset.w*ioC(seg(t,+k.dataset.t0,+k.dataset.t1));k.style.width=W+'px';k.firstElementChild.style.transform=`scaleX(${(W+10)/k._w0})`;});
+  // 3 a.m. clock ticks forward, guard patrols past the locked units
+  const mins=Math.floor(12*seg(t,4.0,8.9));document.getElementById('clock').textContent='03:'+String(mins).padStart(2,'0');
+  document.getElementById('guardWrap').style.left=lerp(1150,-200,seg(t,6.4,9.0))+'px';
+  // car drives up, barrier lifts, car drives in
+  const c1=ioC(seg(t,9.4,10.5)),c2=ioC(seg(t,11.2,12.4));
+  document.getElementById('carEl').style.left=(lerp(1150,345,c1)+lerp(0,-760,c2))+'px';
+  document.getElementById('arm').style.transform=`rotate(${80*ioC(seg(t,10.6,11.1))}deg)`;
+  document.getAnimations().forEach(a=>{a.pause();a.currentTime=t*1000});
+};
+</script>
+</body>
+</html>
