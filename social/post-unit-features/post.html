@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@500;700;800;900&family=Great+Vibes&family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{--navy:#0B1F3A;--blue:#2EC5FF;}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{width:1080px;height:1350px;overflow:hidden;background:var(--navy);font-family:'Tajawal',sans-serif;color:#fff}
+  .post{position:relative;width:1080px;height:1350px;overflow:hidden;
+    background:radial-gradient(900px 700px at 85% 0%,#1B3C6B 0%,rgba(27,60,107,0) 60%),
+               radial-gradient(700px 600px at 0% 100%,#12305A 0%,rgba(18,48,90,0) 60%),var(--navy);}
+  .grid{position:absolute;inset:0;opacity:.07;
+    background-image:linear-gradient(#fff 1px,transparent 1px),linear-gradient(90deg,#fff 1px,transparent 1px);background-size:60px 60px;
+    -webkit-mask-image:linear-gradient(180deg,#000 0%,transparent 45%);mask-image:linear-gradient(180deg,#000 0%,transparent 45%)}
+
+  .top{position:absolute;top:62px;right:90px;left:90px;display:flex;justify-content:space-between;align-items:flex-start}
+  .logo{direction:ltr;text-align:center;line-height:1}
+  .logo .r{font-family:'Great Vibes',cursive;font-size:80px;color:#fff;display:block;margin-bottom:-6px}
+  .logo .s{font-family:'Montserrat',sans-serif;font-weight:600;font-size:14px;letter-spacing:11px;color:#BFD0E6;padding-left:11px}
+  .tag{margin-top:20px;border:2px solid rgba(255,255,255,.22);border-radius:40px;padding:12px 26px 10px;font-size:26px;font-weight:700;color:#DCE6F3;display:flex;gap:10px;align-items:center}
+  .tag i{width:12px;height:12px;border-radius:50%;background:var(--blue);box-shadow:0 0 14px var(--blue)}
+
+  .head{position:absolute;top:205px;right:90px;left:90px}
+  .head h1{font-weight:900;font-size:112px;line-height:1.1;letter-spacing:-1px}
+  .head h1 span{color:var(--blue)}
+  .head p{margin-top:10px;font-size:40px;font-weight:500;color:#C9D6E8}
+  .head p b{color:#fff;font-weight:800}
+
+  .body{position:absolute;top:440px;right:90px;left:90px;height:705px;display:flex;gap:30px}
+
+  .photo{position:relative;width:470px;height:705px;border-radius:34px;overflow:hidden;flex:none;
+    box-shadow:0 30px 60px rgba(0,0,0,.4);border:3px solid rgba(255,255,255,.12)}
+  .photo img{width:100%;height:100%;object-fit:cover;object-position:50% 40%;display:block}
+  .photo::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(11,31,58,0) 60%,rgba(11,31,58,.85) 100%)}
+  .real{position:absolute;bottom:22px;right:22px;left:22px;z-index:2;display:flex;align-items:center;gap:10px;font-size:25px;font-weight:700;color:#fff}
+  .real i{width:10px;height:10px;border-radius:50%;background:#3BE38A;box-shadow:0 0 10px #3BE38A}
+  .price{position:absolute;top:22px;right:22px;z-index:2;background:var(--blue);color:var(--navy);font-weight:900;font-size:30px;
+    padding:12px 22px 9px;border-radius:18px;box-shadow:0 10px 30px rgba(46,197,255,.45);display:flex;gap:10px;align-items:center}
+
+  .list{flex:1;display:flex;flex-direction:column;gap:12px}
+  .it{flex:1;display:flex;align-items:center;gap:16px;background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.11);
+      border-radius:20px;padding:0 20px;font-size:30px;font-weight:700;white-space:nowrap}
+  .ic{flex:none;width:50px;height:50px;border-radius:14px;background:rgba(46,197,255,.14);display:grid;place-items:center}
+  .ltr{direction:ltr;unicode-bidi:isolate;font-family:'Montserrat',sans-serif;font-weight:700}
+
+  .foot{position:absolute;bottom:0;right:0;left:0;height:150px;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 90px}
+  .cta{background:var(--navy);color:#fff;border-radius:22px;padding:22px 34px 18px;font-size:36px;font-weight:800;display:flex;align-items:center;gap:14px}
+  .cta i{display:inline-block;width:14px;height:14px;border-radius:50%;background:var(--blue)}
+  .contact{direction:ltr;text-align:left;font-family:'Montserrat',sans-serif;color:var(--navy)}
+  .contact .ph{font-size:40px;font-weight:700;letter-spacing:1px;display:flex;align-items:center;gap:12px}
+  .contact .web{font-size:24px;font-weight:500;color:#5B6B82;margin-top:4px;padding-left:2px}
+</style>
+</head>
+<body>
+<div class="post">
+  <div class="grid"></div>
+  <div class="top">
+    <div class="logo"><span class="r">Ravel</span><span class="s">STORAGE</span></div>
+    <div class="tag"><i></i>أبوظبي</div>
+  </div>
+
+  <div class="head">
+    <h1>مساحتك <span>الخاصة</span></h1>
+    <p>وحدة نظيفة، آمنة… <b>وجاهزة تستلمها</b></p>
+  </div>
+
+  <div class="body">
+    <div class="photo">
+      <img src="unit-enhanced.jpg" alt="">
+      <div class="price">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#0B1F3A" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8z"/><circle cx="8" cy="8" r="1.6" fill="#0B1F3A"/></svg>
+        أفضل الأسعار
+      </div>
+      <div class="real"><i></i>صورة حقيقية لإحدى وحداتنا</div>
+    </div>
+
+    <div class="list">
+      <div class="it"><span class="ic"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#2EC5FF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M17 6l3 3M15 8l2 2"/></svg></span>وحدة خاصة لك</div>
+      <div class="it"><span class="ic"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#2EC5FF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>دخول <span class="ltr">24/7</span></div>
+      <div class="it"><span class="ic"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#2EC5FF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/><path d="M4 4l16 16"/></svg></span>معزولة من التسريب</div>
+      <div class="it"><span class="ic"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#2EC5FF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2 5.5L19.5 10 14 12l-2 5.5L10 12 4.5 10 10 8.5z"/><path d="M19 16l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z"/></svg></span>نظيفة ومعقّمة</div>
+      <div class="it"><span class="ic"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#2EC5FF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M4.5 6.5l15 11M19.5 6.5l-15 11M9 4l3 2 3-2M9 20l3-2 3 2"/></svg></span>بمكيّف أو بدون</div>
+      <div class="it"><span class="ic"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#2EC5FF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="14" height="10" rx="2"/><path d="M16 11l6-3v8l-6-3"/></svg></span>مراقبة بالكاميرات</div>
+      <div class="it"><span class="ic"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#2EC5FF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg></span>حارس أمن</div>
+    </div>
+  </div>
+
+  <div class="foot">
+    <div class="cta"><i></i>احجز وحدتك الحين</div>
+    <div class="contact">
+      <div class="ph">
+        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#0B1F3A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.5 8.5 0 0 1-12.6 7.4L3 20.5l1.6-5.2A8.5 8.5 0 1 1 21 11.5z"/></svg>
+        050 325 0551
+      </div>
+      <div class="web">ravelstorage.com</div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
