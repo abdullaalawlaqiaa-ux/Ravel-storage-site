@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@500;700;800;900&family=Great+Vibes&family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{--navy:#0B1F3A;--navy2:#132D52;--grey:#EEF1F5;--blue:#2EC5FF;--kraft:#D2A26B;--kraft2:#B9864F;--kraft3:#E4BC8A;}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{width:1080px;height:1350px;overflow:hidden;background:var(--navy);font-family:'Tajawal',sans-serif;color:#fff}
+  .post{position:relative;width:1080px;height:1350px;overflow:hidden;
+    background:radial-gradient(900px 700px at 85% 0%,#1B3C6B 0%,rgba(27,60,107,0) 60%),
+               radial-gradient(700px 600px at 0% 100%,#12305A 0%,rgba(18,48,90,0) 60%),var(--navy);}
+  .grid{position:absolute;inset:0;opacity:.07;
+    background-image:linear-gradient(#fff 1px,transparent 1px),linear-gradient(90deg,#fff 1px,transparent 1px);background-size:60px 60px;
+    -webkit-mask-image:linear-gradient(180deg,#000 0%,transparent 55%);mask-image:linear-gradient(180deg,#000 0%,transparent 55%)}
+
+  /* header */
+  .top{position:absolute;top:70px;right:90px;left:90px;display:flex;justify-content:space-between;align-items:flex-start}
+  .logo{direction:ltr;text-align:center;line-height:1}
+  .logo .r{font-family:'Great Vibes',cursive;font-size:84px;color:#fff;display:block;margin-bottom:-6px}
+  .logo .s{font-family:'Montserrat',sans-serif;font-weight:600;font-size:15px;letter-spacing:11px;color:#BFD0E6;padding-left:11px}
+  .tag{margin-top:22px;border:2px solid rgba(255,255,255,.22);border-radius:40px;padding:12px 26px 10px;font-size:26px;font-weight:700;color:#DCE6F3;display:flex;gap:10px;align-items:center}
+  .tag i{width:12px;height:12px;border-radius:50%;background:var(--blue);box-shadow:0 0 14px var(--blue)}
+
+  /* headline */
+  .head{position:absolute;top:235px;right:90px;left:90px}
+  .head h1{font-weight:900;font-size:138px;line-height:1.08;letter-spacing:-1px}
+  .head h1 span{color:var(--blue)}
+  .head p{margin-top:16px;font-size:44px;font-weight:500;color:#C9D6E8}
+  .head p b{color:#fff;font-weight:800}
+
+  /* before / after */
+  .ba{position:absolute;top:505px;right:90px;left:90px;height:520px;display:flex;gap:28px;direction:rtl}
+  .card{position:relative;flex:1;border-radius:34px;overflow:hidden;box-shadow:0 30px 60px rgba(0,0,0,.35)}
+  .card svg{display:block;width:100%;height:100%}
+  .label{position:absolute;top:22px;right:22px;padding:9px 22px 7px;border-radius:30px;font-size:27px;font-weight:800}
+  .before .label{background:#fff;color:#8A4B2A}
+  .after  .label{background:var(--navy);color:#fff}
+  .arrow{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:96px;height:96px;border-radius:50%;
+    background:var(--blue);border:8px solid var(--navy);display:grid;place-items:center;z-index:3;box-shadow:0 0 40px rgba(46,197,255,.55)}
+
+  /* features */
+  .feats{position:absolute;top:1058px;right:90px;left:90px;display:flex;gap:16px}
+  .f{flex:1;display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.12);border-radius:22px;padding:18px 18px 16px;font-size:29px;font-weight:700;color:#fff;white-space:nowrap}
+  .f svg{flex:none}
+  .f .ltr{direction:ltr;unicode-bidi:isolate}
+
+  /* footer */
+  .foot{position:absolute;bottom:0;right:0;left:0;height:150px;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 90px}
+  .cta{background:var(--navy);color:#fff;border-radius:22px;padding:22px 34px 18px;font-size:36px;font-weight:800;display:flex;align-items:center;gap:14px}
+  .cta i{display:inline-block;width:14px;height:14px;border-radius:50%;background:var(--blue)}
+  .contact{direction:ltr;text-align:left;font-family:'Montserrat',sans-serif;color:var(--navy)}
+  .contact .ph{font-size:40px;font-weight:700;letter-spacing:1px;display:flex;align-items:center;gap:12px}
+  .contact .web{font-size:24px;font-weight:500;color:#5B6B82;margin-top:4px;padding-left:2px}
+</style>
+</head>
+<body>
+<div class="post">
+  <div class="grid"></div>
+
+  <div class="top">
+    <div class="logo"><span class="r">Ravel</span><span class="s">STORAGE</span></div>
+    <div class="tag"><i></i>أبوظبي</div>
+  </div>
+
+  <div class="head">
+    <h1>رجّع غرفتك <span>لك</span></h1>
+    <p>والكراكيب؟ <b>خلّها علينا</b></p>
+  </div>
+
+  <div class="ba">
+    <!-- BEFORE (right, read first) -->
+    <div class="card before">
+      <div class="label">غرفتك اليوم</div>
+      <svg viewBox="0 -70 440 520" preserveAspectRatio="xMidYMid slice">
+        <rect y="-70" width="440" height="520" fill="#F3E9DC"/>
+        <rect y="318" width="440" height="140" fill="#E2D2BD"/>
+        <line x1="0" y1="318" x2="440" y2="318" stroke="#CDB89E" stroke-width="3"/>
+        <!-- window half blocked -->
+        <rect x="270" y="80" width="120" height="120" rx="6" fill="#CFE3F2" stroke="#fff" stroke-width="8"/>
+        <line x1="330" y1="80" x2="330" y2="200" stroke="#fff" stroke-width="6"/>
+        <g id="boxes"></g>
+      </svg>
+    </div>
+
+    <div class="arrow">
+      <svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="#0B1F3A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
+    </div>
+
+    <!-- AFTER -->
+    <div class="card after">
+      <div class="label">بعد رافل</div>
+      <svg viewBox="0 -70 440 520" preserveAspectRatio="xMidYMid slice">
+        <rect y="-70" width="440" height="520" fill="#F5F7FA"/>
+        <rect y="318" width="440" height="140" fill="#E6EBF1"/>
+        <line x1="0" y1="318" x2="440" y2="318" stroke="#D3DBE5" stroke-width="3"/>
+        <!-- window with light -->
+        <rect x="40" y="70" width="140" height="150" rx="6" fill="#BFE6FA" stroke="#fff" stroke-width="8"/>
+        <circle cx="140" cy="112" r="16" fill="#FFE7A3"/>
+        <line x1="110" y1="70" x2="110" y2="220" stroke="#fff" stroke-width="6"/>
+        <polygon points="40,220 180,220 230,330 0,330" fill="#fff" opacity=".45"/>
+        <!-- frame -->
+        <rect x="236" y="110" width="110" height="78" rx="4" fill="#fff" stroke="#0B1F3A" stroke-width="5"/>
+        <path d="M248 176 L276 144 L296 162 L311 147 L334 176Z" fill="#2EC5FF"/>
+        <!-- rug -->
+        <ellipse cx="250" cy="374" rx="175" ry="30" fill="#D5E4F2"/>
+        <!-- sofa -->
+        <g transform="translate(64,0)">
+        <rect x="60" y="232" width="250" height="70" rx="22" fill="#1E4E8C"/>
+        <rect x="44" y="262" width="282" height="64" rx="20" fill="#2A63AD"/>
+        <rect x="36" y="250" width="40" height="84" rx="18" fill="#1E4E8C"/>
+        <rect x="294" y="250" width="40" height="84" rx="18" fill="#1E4E8C"/>
+        <rect x="200" y="252" width="66" height="44" rx="12" fill="#EEF1F5"/>
+        <rect x="76" y="334" width="10" height="16" rx="3" fill="#0B1F3A"/>
+        <rect x="286" y="334" width="10" height="16" rx="3" fill="#0B1F3A"/>
+        </g>
+        <!-- plant -->
+        <g transform="translate(-358,0)">
+        <path d="M392 330 h36 l-6 40 h-24z" fill="#0B1F3A"/>
+        <path d="M410 330 C395 290 370 280 372 250 C392 262 405 285 410 330Z" fill="#3BAA6E"/>
+        <path d="M410 330 C420 285 440 268 446 240 C428 252 414 280 410 330Z" fill="#2E9460"/>
+        <path d="M410 330 C408 290 412 260 410 225 C402 260 400 300 410 330Z" fill="#46BE7C"/>
+        </g>
+        <!-- sparkles -->
+        <g fill="#2EC5FF">
+          <path d="M380 70 l6 16 16 6 -16 6 -6 16 -6-16 -16-6 16-6z"/>
+          <path d="M215 50 l4 10 10 4 -10 4 -4 10 -4-10 -10-4 10-4z" opacity=".8"/>
+        </g>
+      </svg>
+    </div>
+  </div>
+
+  <div class="feats">
+    <div class="f">
+      <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#2EC5FF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+      وحدة مقفلة لك
+    </div>
+    <div class="f">
+      <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#2EC5FF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2 5.5L19.5 10 14 12l-2 5.5L10 12 4.5 10 10 8.5z"/><path d="M19 17l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z"/></svg>
+      نظيفة ومرتبة
+    </div>
+    <div class="f">
+      <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#2EC5FF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 16.5 16.5 3 21 7.5 7.5 21z"/><path d="M7 12.5l2 2M10 9.5l2 2M13 6.5l2 2"/></svg>
+      مقاسات من <span class="ltr">1×1</span> م
+    </div>
+  </div>
+
+  <div class="foot">
+    <div class="cta"><i></i>احجز وحدتك الحين</div>
+    <div class="contact">
+      <div class="ph">
+        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#0B1F3A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.5 8.5 0 0 1-12.6 7.4L3 20.5l1.6-5.2A8.5 8.5 0 1 1 21 11.5z"/></svg>
+        050 325 0551
+      </div>
+      <div class="web">ravelstorage.com</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // messy pile of boxes in the "before" card
+  const NS='http://www.w3.org/2000/svg';
+  const g=document.getElementById('boxes');
+  function box(x,y,w,h,rot,shade){
+    const d=Math.round(w*0.28);
+    const grp=document.createElementNS(NS,'g');
+    grp.setAttribute('transform',`rotate(${rot} ${x+w/2} ${y+h/2})`);
+    const c=shade?['#C58F57','#A87443','#DDB27E']:['#D2A26B','#B9864F','#E4BC8A'];
+    grp.innerHTML=
+      `<polygon points="${x},${y} ${x+d},${y-d*0.55} ${x+w+d},${y-d*0.55} ${x+w},${y}" fill="${c[2]}"/>`+
+      `<polygon points="${x+w},${y} ${x+w+d},${y-d*0.55} ${x+w+d},${y+h-d*0.55} ${x+w},${y+h}" fill="${c[1]}"/>`+
+      `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${c[0]}"/>`+
+      `<rect x="${x+w/2-6}" y="${y}" width="12" height="${h*0.45}" fill="#EBD3AE" opacity=".9"/>`+
+      `<line x1="${x}" y1="${y}" x2="${x+w}" y2="${y}" stroke="#9C6B3C" stroke-width="2"/>`;
+    g.appendChild(grp);
+  }
+  // rolled rug leaning
+  g.innerHTML+=`<rect x="384" y="150" width="34" height="200" rx="16" fill="#8E3B46" transform="rotate(12 400 250)"/>
+                <ellipse cx="380" cy="152" rx="17" ry="9" fill="#B5545F" transform="rotate(12 400 250)"/>`;
+  box(20,250,130,90,0,0);   box(160,262,110,78,0,1); box(285,272,85,68,0,0);
+  box(30,175,105,75,-4,1);  box(150,190,120,72,3,0);  box(282,214,78,58,-6,1);
+  box(55,112,90,64,6,0);    box(170,130,88,62,-8,1);  box(260,160,66,52,10,0);
+  box(120,62,74,54,-14,1);
+  // floor clutter
+  g.innerHTML+=`<rect x="40" y="350" width="70" height="44" rx="8" fill="#3D4E66"/><rect x="62" y="342" width="26" height="10" rx="4" fill="none" stroke="#3D4E66" stroke-width="5"/>
+    <rect x="300" y="365" width="90" height="10" rx="4" fill="#7A8699" transform="rotate(-18 345 370)"/>
+    <circle cx="180" cy="378" r="16" fill="#E86A4A"/><path d="M168 372 q12 10 24 0" stroke="#fff" stroke-width="3" fill="none"/>`;
+</script>
+</body>
+</html>
