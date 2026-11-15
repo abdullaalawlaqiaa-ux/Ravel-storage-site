@@ -1,4 +1,4 @@
-# Ravel Storage — cinematic AI clip (17 s, 9:16) — v2 (after review)
+# Ravel Storage — cinematic AI clip (17 s, 9:16) — v3 (after 2 reviews)
 
 **One-line idea:** Your things go into a clean, warm, secure unit, and stay there safely.
 
@@ -52,15 +52,15 @@ Montage clips (2a–2d) are trimmed to their best 2 s. Shot 1 is used from its v
 
 **2b-FIRST:** [Style sentence]. Vertical. Camera at waist height just outside an open storage unit (steel-blue shutter rolled up, plate "108" on the door frame at the left edge). A chrome rolling clothes rail stands in the doorway, its top bar cut by the top edge of the frame; five garments on wooden hangers: beige coat, white shirt, grey blazer, camel coat, olive jacket. One bare forearm with medium-brown South Asian skin enters from the right frame edge, on the camera side of the rail, hand on the rail's side bar; the short navy t-shirt sleeve is just visible at the frame edge. Beige floor, warm-white interior.
 
-**2c-FIRST:** [Style sentence]. Vertical. Medium-wide view from the open doorway of a storage unit; brushed-steel plate "115" on the door frame at the left edge of the frame. A plain grey city bicycle stands side-on about 30 cm in front of the warm-white back wall, front wheel to the left. One bare forearm with medium-brown South Asian skin reaches in from the right frame edge, hand on the saddle; the short navy sleeve is just visible at the edge. A black gym bag with the handles of two tennis rackets sticking out rests on the beige floor at the lower left.
+**2c-FIRST:** [Style sentence]. Vertical. Medium-wide view from the open doorway of a storage unit; brushed-steel plate "115" on the door frame at the left edge of the frame. A plain grey city bicycle stands side-on about 30 cm in front of the warm-white back wall, slightly left of center so its saddle is near the right third of the frame, front wheel to the left. One bare forearm with medium-brown South Asian skin reaches in from the right frame edge, hand on the saddle; the short navy sleeve is just visible at the edge. A black gym bag with the handles of two tennis rackets sticking out rests on the beige floor at the lower left.
 
 **2d-FIRST:** [Style sentence]. Vertical. Close shot of a row of three open white cubbies at waist height. A clear plastic box with a lid, filled with colorful children's toys (wooden blocks, a small plush bear, a toy car), rests at the front edge of the center cubby, in the middle of the frame. Two hands with medium-brown South Asian skin come from the bottom of the frame (camera side) and rest on the box's lower corners; short navy sleeves just visible at the bottom edge. A brushed-steel plate "120" above the center cubby. Warm soft light.
 
-**3a-FIRST:** [Style sentence]. Vertical. High-angle view looking down a long spotless storage corridor. Both sides lined with closed muted steel-blue ribbed roller shutters; each has a brushed-steel plate with a large 3-digit number above it ("201", "202", "203" on the right side, nearest first). Warm-white walls and ceiling, light beige polished concrete floor, a row of warm soft ceiling lights. An empty corridor.
+**3a-FIRST:** [Style sentence]. Vertical. High-angle view looking down a long spotless storage corridor. Both sides lined with closed muted steel-blue ribbed roller shutters; each has a brushed-steel plate with a large 3-digit number above it (right side: "201", "202", "203"; left side: "211", "212", "213"; nearest first). Warm-white walls and ceiling, light beige polished concrete floor, a row of warm soft ceiling lights. An empty corridor.
 
-**3b-FIRST:** [Style sentence]. Vertical. Medium close-up of the lower half of one closed muted steel-blue ribbed roller shutter, plate "203" visible at the upper edge of the frame; at the bottom of the door a steel latch with a solid brass padlock closed through it; light beige floor below. Warm side light.
+**3b-FIRST:** [Style sentence]. Vertical. Medium close-up of the lower half of one closed muted steel-blue ribbed roller shutter (door 203 from shot 3a); at the bottom of the door a steel latch with a solid brass padlock closed through it; light beige floor below. Warm side light.
 
-**3b-LAST (crop/zoom from 3b-FIRST in code if possible):** Extreme close-up of the same brass padlock on the same latch, filling the center of the frame, steel-blue ribs softly out of focus behind it, a sliver of beige floor at the bottom. Same light.
+**3b-LAST (image edit of 3b-FIRST at full resolution, not a crop):** Extreme close-up of the same brass padlock on the same latch, filling the center of the frame, steel-blue ribs softly out of focus behind it, a sliver of beige floor at the bottom. Same light.
 
 ---
 
@@ -74,8 +74,9 @@ Montage clips (2a–2d) are trimmed to their best 2 s. Shot 1 is used from its v
 [Characters] An empty scene: only the door, the room and the corridor.
 [Second by second]
 0–0.2s: Already in motion: the shutter is rising and the camera is tilting down.
-0.2–4.2s: The roller shutter rolls smoothly upward into its housing at a steady speed; warm light spreads across the beige floor as the empty room is revealed; the camera tilts down in step with the door.
-4.2–5.0s: The shutter is fully up and the camera settles; the picture matches the last frame exactly.
+0.2–3.4s: The roller shutter rolls smoothly upward into its housing at a steady speed; warm light spreads across the beige floor as the empty room is revealed; the camera tilts down in step with the door.
+3.4–4.0s: The shutter is fully up and the camera settles on the last frame.
+4.0–5.0s: Completely still; the picture matches the last frame exactly.
 [Sound] Only the soft metallic rattle of the roller shutter rising.
 [Constraints] The room stays empty with bare walls and floor; the ceiling light level and color stay constant (only the doorway light spill changes as the door opens); one continuous take; clean picture, no subtitles, logos or watermarks.
 ```
@@ -98,13 +99,14 @@ Last 0.4s: Two boxes side by side on the shelf; the frame shows only the shelf, 
 ### Shot 2b: Clothes rail (4 s; first = 2b-FIRST)
 ```
 [Art style] Photorealistic cinematic commercial footage, full-frame cinema camera, 35 mm lens, warm soft key light around 3200 K mixed with soft daylight, calm warm-white and beige palette with muted steel-blue roller doors, shallow depth of field, fine film grain, premium and quiet mood. Fully consistent with the first frame throughout.
-[Camera] The whole clip is 4 seconds, medium shot from waist height; the camera drifts slightly downward; the top edge of the frame keeps cutting across the rail's top bar. One continuous take.
+[Camera] The whole clip is 4 seconds, medium shot; the camera stays at waist height and drifts slightly downward. One continuous take.
 [Composition and color] Open unit with the steel-blue shutter rolled up, plate "108" on the door frame at the left edge, chrome rail with five garments (beige coat, white shirt, grey blazer, camel coat, olive jacket), beige floor, warm-white interior.
 [Characters] One bare forearm with medium-brown South Asian skin, from the right frame edge, on the camera side of the rail; the short navy t-shirt sleeve stays at the frame edge.
 [Second by second]
 0–0.2s: The picture matches the first frame.
-0.2–3.0s: The hand pushes the rail steadily away from the camera, deeper into the unit; the arm extends as the rail rolls; the garments sway gently.
-3.0–3.6s: The rail stops inside the unit; the hand releases the bar and withdraws to the right edge.
+0.2–1.2s: The hand gives the rail one firm push away from the camera and lets go; the arm withdraws to the right frame edge.
+1.2–3.2s: The rail coasts on its casters about one meter deeper into the unit, garments swaying gently, and rolls to a stop.
+3.2–3.6s: Everything settles.
 Last 0.4s: Still frame: the rail stands neatly inside the unit with the same five garments.
 [Sound] Only quiet caster wheels rolling and hangers clinking softly.
 [Constraints] One rail, five garments; light level and color stay constant; clean picture, no subtitles, logos or watermarks.
@@ -113,7 +115,7 @@ Last 0.4s: Still frame: the rail stands neatly inside the unit with the same fiv
 ### Shot 2c: Bicycle (4 s; first = 2c-FIRST)
 ```
 [Art style] Photorealistic cinematic commercial footage, full-frame cinema camera, 35 mm lens, warm soft key light around 3200 K mixed with soft daylight, calm warm-white and beige palette with muted steel-blue roller doors, shallow depth of field, fine film grain, premium and quiet mood. Fully consistent with the first frame throughout.
-[Camera] The whole clip is 4 seconds, medium-wide from the open doorway; the camera drifts slightly downward, keeping the bicycle centered. One continuous take.
+[Camera] The whole clip is 4 seconds, medium-wide from the open doorway; the camera drifts slightly downward, keeping the bicycle slightly left of center. One continuous take.
 [Composition and color] Grey bicycle side-on in front of the warm-white back wall, front wheel to the left; black gym bag with two tennis rackets at the lower left; plate "115" on the door frame at the left edge.
 [Characters] One bare forearm with medium-brown South Asian skin from the right frame edge, hand on the saddle; the short navy sleeve stays at the frame edge.
 [Second by second]
@@ -121,7 +123,7 @@ Last 0.4s: Still frame: the rail stands neatly inside the unit with the same fiv
 0.2–2.6s: Holding the saddle, the hand tilts the bicycle gently back until its handlebar and saddle rest against the wall; the wheels stay on the floor.
 2.6–3.6s: The hand lets go and the arm withdraws to the right frame edge.
 Last 0.4s: The bicycle rests against the wall; the gym bag and rackets are unchanged at the lower left.
-[Sound] Only a soft tick of the bicycle freewheel.
+[Sound] Only a soft tap of the handlebar grip against the wall.
 [Constraints] The rackets and gym bag stay still at the lower left the whole time; one bicycle, one bag, two rackets; light level and color stay constant; clean picture, no subtitles, logos or watermarks.
 ```
 
@@ -143,8 +145,8 @@ Last 0.4s: The box sits inside the center cubby, toys visible through the clear 
 ### Shot 3a: Corridor (4 s; first = 3a-FIRST)
 ```
 [Art style] Photorealistic cinematic commercial footage, full-frame cinema camera, 35 mm lens, warm soft key light around 3200 K mixed with soft daylight, calm warm-white and beige palette with muted steel-blue roller doors, shallow depth of field, fine film grain, premium and quiet mood. Fully consistent with the first frame throughout.
-[Camera] The whole clip is 4 seconds; smooth gimbal glide forward down the corridor while slowly tilting down and lowering toward knee height, drifting toward the doors on the right side of the frame. One continuous take.
-[Composition and color] Long spotless corridor; closed muted steel-blue ribbed shutters on both sides with brushed-steel number plates ("201", "202", "203" on the right, nearest first); warm-white walls and ceiling; beige floor; row of warm ceiling lights.
+[Camera] The whole clip is 4 seconds; one smooth crane-glide forward and down toward door "203" on the right. One continuous take.
+[Composition and color] Long spotless corridor; closed muted steel-blue ribbed shutters on both sides with brushed-steel number plates (right: "201", "202", "203"; left: "211", "212", "213"; nearest first); warm-white walls and ceiling; beige floor; row of warm ceiling lights.
 [Characters] An empty corridor.
 [Second by second]
 0–0.2s: The picture matches the first frame.
@@ -158,7 +160,7 @@ Last 0.4s: The camera slows, low and close to door "203" on the right.
 ```
 [Art style] Photorealistic cinematic commercial footage, full-frame cinema camera, 35 mm lens, warm soft key light around 3200 K mixed with soft daylight, calm warm-white and beige palette with muted steel-blue roller doors, shallow depth of field, fine film grain, premium and quiet mood. Fully consistent with the first and last frames throughout.
 [Camera] The whole clip is 4 seconds; a slow push-in with a slight downward tilt from the lower half of the door to an extreme close-up of the padlock. One continuous take.
-[Composition and color] Steel-blue ribbed shutter, plate "203" at the top edge at the start, steel latch with a closed brass padlock at the bottom of the door, beige floor below.
+[Composition and color] Lower half of a steel-blue ribbed shutter, steel latch with a closed brass padlock at the bottom of the door, beige floor below.
 [Characters] An empty scene.
 [Second by second]
 0–0.2s: The picture matches the first frame.
