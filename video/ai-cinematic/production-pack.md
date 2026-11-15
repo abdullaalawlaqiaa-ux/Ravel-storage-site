@@ -28,13 +28,13 @@ No logos or captions in the generated footage. The only lettering is the short u
 | 2b Clothes rail | 6.0–8.0 | 4 s | Medium, waist height | Slight downward drift | One arm pushes rail away from camera | first |
 | 2c Bicycle | 8.0–10.0 | 4 s | Medium-wide | Slight downward drift | Arm tilts bike against wall | first |
 | 2d Toys | 10.0–12.0 | 4 s | Close | Slight downward drift, box stays centered | Hands slide box into center cubby | first |
-| 3a Corridor | 12.0–15.0 | 4 s | Wide | Glides forward and tilts down | Camera only | first |
+| 3a Corridor | 12.0–15.0 | 4 s | Wide | One crane-glide forward and down | Camera only | first |
 | 3b Padlock | 15.0–17.0 | 4 s | Medium close → extreme close | Slow push-in and slight tilt down | Camera only | first + last |
 
 Montage clips (2a–2d) are trimmed to their best 2 s. Shot 1 is used from its very first frame (door already moving). 3a → 3b joins with a hard cut.
 
 ## Risk notes
-1. **Unit numbers are lettering.** The brief wants clear number plates and no other text. Plates use large, simple 3-digit numbers ("101", "102", …) on brushed-steel plates; run 2 takes of shots 3a/3b and keep the cleanest. Fallback: regenerate with blank plates and I add the numbers in the edit (easy on 3b, possible on 3a).
+1. **Unit numbers are lettering.** The brief wants clear number plates and no other text. Plates use large, simple 3-digit numbers (104, 108, 112, 115, 120, 201–203, 211–213) on brushed-steel plates; run 2 takes of shots 3a/3b and keep the cleanest. Fallback: regenerate with blank plates and I add the numbers in the edit (easy on 3b, possible on 3a).
 2. **Faces:** every montage frame is anchored by where the frame edge cuts the body, so only forearms/hands are ever in frame.
 3. **Small objects in hands:** the rackets stay packed in the gym bag; hands only handle large objects (box, rail, bike saddle, toy box).
 4. **Brief deviation to approve:** in 2c the rackets and gym bag are already placed; the hands place the bicycle. (Optional extra take: a hand sets the gym bag down by its strap.)
