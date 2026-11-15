@@ -1,0 +1,260 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<link rel="stylesheet" href="node_modules/@fontsource/alexandria/800.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:1080px;height:1920px;overflow:hidden;background:#000}
+.scene{position:absolute;inset:0;overflow:hidden;display:none}
+.cam{position:absolute;inset:0;transform-origin:540px 960px}
+svg.full{position:absolute;left:0;top:0;width:1080px;height:1920px;overflow:visible}
+.plate{font-family:'Alexandria';font-weight:800}
+#grain{position:absolute;inset:0;z-index:50;pointer-events:none;opacity:.07;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)'/%3E%3C/svg%3E")}
+#vig{position:absolute;inset:0;z-index:49;pointer-events:none;background:radial-gradient(ellipse 75% 60% at 50% 48%,transparent 55%,rgba(60,40,20,.28) 100%)}
+#flash{position:absolute;inset:0;z-index:48;background:#fff6ea;opacity:0;pointer-events:none}
+</style></head><body>
+<svg width="0" height="0" style="position:absolute"><defs>
+ <linearGradient id="ribs" x1="0" y1="0" x2="0" y2="1" gradientUnits="userSpaceOnUse" spreadMethod="repeat" gradientTransform="scale(1,46)">
+  <stop offset="0" stop-color="#5a88b8"/><stop offset=".45" stop-color="#4a78a8"/><stop offset=".8" stop-color="#3d6894"/><stop offset="1" stop-color="#2f557c"/></linearGradient>
+ <pattern id="ribP" width="40" height="46" patternUnits="userSpaceOnUse"><rect width="40" height="46" fill="#4a78a8"/><rect width="40" height="16" fill="#5886b5"/><rect y="40" width="40" height="6" fill="#33597f"/></pattern>
+ <radialGradient id="warmGlow" cx=".5" cy=".3" r=".8"><stop offset="0" stop-color="#ffe2b8" stop-opacity=".95"/><stop offset="1" stop-color="#ffd9a8" stop-opacity="0"/></radialGradient>
+ <linearGradient id="floorG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d2c2a6"/><stop offset="1" stop-color="#e1d4bd"/></linearGradient>
+ <linearGradient id="wallG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f6f2ea"/><stop offset="1" stop-color="#ede6da"/></linearGradient>
+ <linearGradient id="brass" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e8c77e"/><stop offset=".5" stop-color="#c49a4c"/><stop offset="1" stop-color="#9c7432"/></linearGradient>
+ <linearGradient id="steel" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#b9c0ca"/><stop offset=".5" stop-color="#e3e7ec"/><stop offset="1" stop-color="#a6aeb9"/></linearGradient>
+ <linearGradient id="skin" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a7765a"/><stop offset="1" stop-color="#8d6046"/></linearGradient>
+ <filter id="soft" x="-20%" y="-20%" width="140%" height="160%"><feGaussianBlur in="SourceAlpha" stdDeviation="14"/><feOffset dy="16"/><feComponentTransfer><feFuncA type="linear" slope=".22"/></feComponentTransfer><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+ <g id="box"><rect x="0" y="0" width="240" height="200" rx="8" fill="#c9a27a"/><rect x="0" y="0" width="240" height="34" rx="8" fill="#b88f66"/><rect x="104" y="0" width="32" height="200" fill="#e9d6b4"/><rect x="18" y="130" width="62" height="40" rx="4" fill="#fff" opacity=".75"/></g>
+ <g id="plateG"><rect x="-58" y="-26" width="116" height="52" rx="8" fill="url(#steel)" stroke="#8d96a3" stroke-width="2"/></g>
+</defs></svg>
+
+<!-- S1 door reveal 0–4 -->
+<section class="scene" id="s1" data-in="0" data-out="4"><div class="cam" id="cam1">
+ <svg class="full" viewBox="0 0 1080 1920">
+  <rect x="-800" y="-1500" width="2680" height="3000" fill="#f3eee5"/><rect x="-800" y="1500" width="2680" height="1600" fill="#e1d4bd"/><rect width="1080" height="1500" fill="url(#wallG)"/>
+  <g stroke="#e4ddd0" stroke-width="3"><line x1="120" y1="0" x2="120" y2="1500"/><line x1="960" y1="0" x2="960" y2="1500"/></g>
+  <rect y="1500" width="1080" height="420" fill="url(#floorG)"/>
+  <rect y="1494" width="1080" height="14" fill="#f8f5ef"/>
+  <!-- interior (perspective room) -->
+  <g id="room">
+   <polygon points="190,520 890,520 750,700 330,700" fill="#fbf8f2"/>
+   <polygon points="190,520 330,700 330,1260 190,1500" fill="#ece4d6"/>
+   <polygon points="890,520 750,700 750,1260 890,1500" fill="#e6ddcd"/>
+   <rect x="330" y="700" width="420" height="560" fill="#f7f2e9"/>
+   <polygon points="190,1500 330,1260 750,1260 890,1500" fill="#d8c9ae"/>
+   <ellipse cx="540" cy="612" rx="90" ry="16" fill="#fff1d6"/>
+   <rect x="190" y="520" width="700" height="980" fill="url(#warmGlow)" opacity=".75"/>
+  </g>
+  <!-- light spill on corridor floor -->
+  <polygon id="spill" points="190,1508 890,1508 1080,1920 0,1920" fill="#ffd9a8" opacity="0"/>
+  <!-- shutter -->
+  <clipPath id="doorClip"><rect x="190" y="520" width="700" height="980"/></clipPath>
+  <g clip-path="url(#doorClip)"><g id="shutter"><rect x="190" y="520" width="700" height="980" fill="url(#ribP)"/><rect x="190" y="1470" width="700" height="30" fill="#2b4f74"/><rect x="500" y="1440" width="80" height="18" rx="9" fill="#9aa6b6"/></g></g>
+  <!-- frame and housing -->
+  <rect x="172" y="508" width="18" height="1000" fill="#d4ccbf"/><rect x="890" y="508" width="18" height="1000" fill="#d4ccbf"/>
+  <rect x="160" y="420" width="760" height="110" rx="10" fill="#3f6896"/><rect x="160" y="420" width="760" height="22" rx="10" fill="#5682b0"/>
+  <g transform="translate(985,900)"><use href="#plateG"/><text class="plate" y="13" text-anchor="middle" font-size="36" fill="#1f2a44">104</text></g>
+ </svg>
+</div></section>
+
+<!-- S2a box 4–6 -->
+<section class="scene" id="s2a" data-in="4" data-out="6"><div class="cam" id="cam2a">
+ <svg class="full" viewBox="0 0 1080 1920">
+  <rect x="-800" y="-1500" width="2680" height="4900" fill="#efe9df"/>
+  <rect x="90" y="300" width="900" height="1400" rx="14" fill="#d9d1c3"/>
+  <rect x="120" y="330" width="840" height="1340" fill="#f8f4ec"/>
+  <polygon points="120,330 960,330 900,390 180,390" fill="#efe8dc"/><polygon points="120,330 180,390 180,1610 120,1670" fill="#ebe3d5"/><polygon points="960,330 900,390 900,1610 960,1670" fill="#e5dccc"/>
+  <rect x="120" y="330" width="840" height="1340" fill="url(#warmGlow)" opacity=".45"/>
+  <polygon points="150,1000 930,1000 900,960 180,960" fill="#d5dae1"/><rect x="150" y="1000" width="780" height="26" fill="#9ca3ad"/>
+  <rect x="190" y="1026" width="16" height="640" fill="#aab1bb"/><rect x="874" y="1026" width="16" height="640" fill="#aab1bb"/>
+  <g filter="url(#soft)"><use href="#box" transform="translate(230,800)"/></g>
+  <g transform="translate(205,365)"><use href="#plateG"/><text class="plate" y="13" text-anchor="middle" font-size="36" fill="#1f2a44">112</text></g>
+  <g id="carry2a">
+   <g filter="url(#soft)"><use href="#box" x="0" y="0"/></g>
+   <rect x="200" y="40" width="520" height="62" rx="31" fill="url(#skin)"/>
+   <rect x="215" y="150" width="520" height="62" rx="31" fill="url(#skin)"/>
+   <rect x="196" y="36" width="34" height="70" rx="17" fill="#8d6046"/><rect x="211" y="146" width="34" height="70" rx="17" fill="#8d6046"/>
+   <rect x="560" y="18" width="260" height="106" rx="22" fill="#1f2a44"/><rect x="575" y="128" width="260" height="106" rx="22" fill="#1f2a44"/>
+  </g>
+ </svg>
+</div></section>
+
+<!-- S2b clothes rail 6–8 -->
+<section class="scene" id="s2b" data-in="6" data-out="8"><div class="cam" id="cam2b">
+ <svg class="full" viewBox="0 0 1080 1920">
+  <rect x="-800" y="-1500" width="2680" height="3060" fill="#f3eee5"/><rect x="-800" y="1560" width="2680" height="1600" fill="#e1d4bd"/><rect width="1080" height="1560" fill="url(#wallG)"/><rect y="1560" width="1080" height="360" fill="url(#floorG)"/>
+  <polygon points="140,300 940,300 780,520 300,520" fill="#fbf8f2"/>
+  <polygon points="140,300 300,520 300,1260 140,1560" fill="#ece4d6"/><polygon points="940,300 780,520 780,1260 940,1560" fill="#e6ddcd"/>
+  <rect x="300" y="520" width="480" height="740" fill="#f7f2e9"/><polygon points="140,1560 300,1260 780,1260 940,1560" fill="#d8c9ae"/>
+  <rect x="140" y="300" width="800" height="1260" fill="url(#warmGlow)" opacity=".7"/>
+  <rect x="120" y="210" width="840" height="100" rx="10" fill="#3f6896"/><rect x="120" y="290" width="840" height="34" fill="url(#ribP)"/>
+  <g transform="translate(70,760)"><use href="#plateG"/><text class="plate" y="13" text-anchor="middle" font-size="36" fill="#1f2a44">108</text></g>
+  <g id="rail">
+   <ellipse cx="0" cy="8" rx="300" ry="26" fill="#000" opacity=".12"/>
+   <rect x="-260" y="-760" width="14" height="740" fill="#c6ccd4"/><rect x="246" y="-760" width="14" height="740" fill="#c6ccd4"/>
+   <rect x="-280" y="-770" width="560" height="16" rx="8" fill="#dfe3e8"/><rect x="-290" y="-30" width="580" height="16" rx="8" fill="#c6ccd4"/>
+   <circle cx="-270" cy="-6" r="14" fill="#3a3f48"/><circle cx="270" cy="-6" r="14" fill="#3a3f48"/>
+   <g id="garments"></g>
+  </g>
+  <g id="arm2b"><rect x="0" y="0" width="560" height="64" rx="32" fill="url(#skin)"/><rect x="-6" y="-6" width="40" height="76" rx="20" fill="#8d6046"/><rect x="420" y="-26" width="300" height="116" rx="22" fill="#1f2a44"/></g>
+ </svg>
+</div></section>
+
+<!-- S2c bicycle 8–10 -->
+<section class="scene" id="s2c" data-in="8" data-out="10"><div class="cam" id="cam2c">
+ <svg class="full" viewBox="0 0 1080 1920">
+  <rect x="-800" y="-1500" width="2680" height="3060" fill="#f6f2ea"/><rect x="-800" y="1560" width="2680" height="1600" fill="#e1d4bd"/><rect y="1560" width="1080" height="360" fill="url(#floorG)"/>
+  <rect width="1080" height="1560" fill="url(#warmGlow)" opacity=".5"/>
+  <rect x="0" y="0" width="70" height="1920" fill="#d4ccbf"/>
+  <g transform="translate(150,520)"><use href="#plateG"/><text class="plate" y="13" text-anchor="middle" font-size="36" fill="#1f2a44">115</text></g>
+  <ellipse id="bikeShadow" cx="560" cy="1585" rx="360" ry="22" fill="#000" opacity=".12"/>
+  <g id="bike" transform="translate(560,1560)">
+   <g fill="none" stroke="#3a4250" stroke-width="18"><circle cx="-210" cy="-170" r="160"/><circle cx="210" cy="-170" r="160"/></g>
+   <g fill="none" stroke="#c7ccd4" stroke-width="4"><circle cx="-210" cy="-170" r="140"/><circle cx="210" cy="-170" r="140"/></g>
+   <g stroke="#8d96a3" stroke-width="16" stroke-linecap="round" fill="none"><path d="M-210 -170 L-120 -420 L130 -420 L210 -170 M-120 -420 L20 -170 L210 -170 M20 -170 L130 -420 M130 -420 L150 -480 M-120 -420 L-140 -500"/></g>
+   <path d="M-190 -505 L-90 -505" stroke="#3a4250" stroke-width="18" stroke-linecap="round"/>
+   <path d="M100 -488 Q150 -506 210 -488 L200 -470 L110 -470 Z" fill="#2b313b"/>
+   <circle cx="20" cy="-170" r="26" fill="#3a4250"/>
+  </g>
+  <g id="arm2c"><rect x="0" y="0" width="520" height="62" rx="31" fill="url(#skin)"/><rect x="-6" y="-6" width="40" height="74" rx="20" fill="#8d6046"/><rect x="380" y="-26" width="300" height="114" rx="22" fill="#1f2a44"/></g>
+  <g transform="translate(110,1560)">
+   <ellipse cx="190" cy="20" rx="210" ry="18" fill="#000" opacity=".12"/>
+   <g transform="rotate(-12 120 -300)"><ellipse cx="120" cy="-420" rx="70" ry="95" fill="none" stroke="#e8edf2" stroke-width="12"/><rect x="112" y="-330" width="16" height="140" rx="6" fill="#d8dee6"/></g>
+   <g transform="rotate(10 250 -300)"><ellipse cx="250" cy="-430" rx="70" ry="95" fill="none" stroke="#9fd0f5" stroke-width="12"/><rect x="242" y="-340" width="16" height="140" rx="6" fill="#8fc9f2"/></g>
+   <rect x="0" y="-220" width="380" height="210" rx="70" fill="#22262e"/><rect x="40" y="-180" width="300" height="16" rx="8" fill="#3b414c"/>
+   <path d="M90 -220 Q190 -320 290 -220" fill="none" stroke="#22262e" stroke-width="18"/>
+  </g>
+ </svg>
+</div></section>
+
+<!-- S2d toys 10–12 -->
+<section class="scene" id="s2d" data-in="10" data-out="12"><div class="cam" id="cam2d">
+ <svg class="full" viewBox="0 0 1080 1920">
+  <rect x="-800" y="-1500" width="2680" height="4900" fill="#efe9df"/>
+  <rect x="60" y="520" width="960" height="1100" rx="16" fill="#fbfaf7"/>
+  <g id="cubbies"></g>
+  <g transform="translate(540,640)"><use href="#plateG"/><text class="plate" y="13" text-anchor="middle" font-size="36" fill="#1f2a44">120</text></g>
+  <g id="toybox">
+   <rect x="-200" y="-150" width="400" height="300" rx="22" fill="#ffffff" opacity=".35" stroke="#cfd8e2" stroke-width="6"/>
+   <rect x="-160" y="20" width="80" height="80" rx="8" fill="#e5674f"/><rect x="-90" y="40" width="70" height="60" rx="8" fill="#f2c14e"/><rect x="-140" y="-50" width="64" height="64" rx="8" fill="#5aa86a"/>
+   <circle cx="60" cy="-10" r="44" fill="#a8774f"/><circle cx="28" cy="-46" r="18" fill="#a8774f"/><circle cx="92" cy="-46" r="18" fill="#a8774f"/><ellipse cx="60" cy="70" rx="56" ry="44" fill="#a8774f"/><circle cx="46" cy="-14" r="5" fill="#2b2b2b"/><circle cx="74" cy="-14" r="5" fill="#2b2b2b"/>
+   <rect x="100" y="60" width="90" height="40" rx="12" fill="#4a78a8"/><circle cx="120" cy="104" r="12" fill="#2b2b2b"/><circle cx="170" cy="104" r="12" fill="#2b2b2b"/>
+   <rect x="-200" y="-150" width="400" height="44" rx="22" fill="#ffffff" opacity=".55"/>
+   <rect x="-200" y="-150" width="400" height="300" rx="22" fill="none" stroke="#e8eef4" stroke-width="3"/>
+  </g>
+  <g id="hands2d"><rect x="-250" y="0" width="64" height="520" rx="32" fill="url(#skin)"/><rect x="186" y="0" width="64" height="520" rx="32" fill="url(#skin)"/><rect x="-272" y="300" width="108" height="300" rx="22" fill="#1f2a44"/><rect x="164" y="300" width="108" height="300" rx="22" fill="#1f2a44"/></g>
+ </svg>
+</div></section>
+
+<!-- S3a corridor 12–15 -->
+<section class="scene" id="s3a" data-in="12" data-out="15"><svg class="full" id="corr" viewBox="0 0 1080 1920"></svg></section>
+
+<!-- S3b padlock 15–17 -->
+<section class="scene" id="s3b" data-in="15" data-out="17.2"><div class="cam" id="cam3b">
+ <svg class="full" viewBox="0 0 1080 1920">
+  <rect width="1080" height="1920" fill="url(#ribP)" transform="scale(1)"/>
+  <rect width="1080" height="1920" fill="url(#warmGlow)" opacity=".25"/>
+  <rect y="1560" width="1080" height="360" fill="url(#floorG)"/><rect y="1530" width="1080" height="32" fill="#2b4f74"/>
+  <rect x="300" y="1180" width="480" height="120" rx="14" fill="url(#steel)" stroke="#8d96a3" stroke-width="3"/>
+  <rect x="490" y="1150" width="100" height="180" rx="12" fill="url(#steel)" stroke="#8d96a3" stroke-width="3"/>
+  <circle cx="330" cy="1240" r="10" fill="#8d96a3"/><circle cx="750" cy="1240" r="10" fill="#8d96a3"/>
+  <g id="lock">
+   <path id="shackle" d="M470 1250 L470 1150 A70 70 0 0 1 610 1150 L610 1250" fill="none" stroke="#cfd5dd" stroke-width="30" stroke-linecap="round"/>
+   <rect x="420" y="1230" width="240" height="250" rx="34" fill="url(#brass)" filter="url(#soft)"/>
+   <rect x="420" y="1230" width="240" height="40" rx="20" fill="#f0d394" opacity=".6"/>
+   <circle cx="540" cy="1360" r="20" fill="#5a3f17"/><rect x="532" y="1360" width="16" height="50" rx="6" fill="#5a3f17"/>
+   <clipPath id="lockClip"><rect x="420" y="1230" width="240" height="250" rx="34"/></clipPath>
+   <g clip-path="url(#lockClip)"><rect id="glint" x="300" y="1150" width="70" height="420" fill="#fff" opacity=".55" transform="rotate(20 540 1360)"/></g>
+  </g>
+ </svg>
+</div></section>
+
+<div id="flash"></div><div id="vig"></div><div id="grain"></div>
+<script>
+const clamp=x=>Math.max(0,Math.min(1,x)),seg=(t,a,b)=>clamp((t-a)/(b-a)),lerp=(a,b,f)=>a+(b-a)*f;
+const ioC=x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2, oC=x=>1-Math.pow(1-x,3), iC=x=>x*x*x;
+const $=id=>document.getElementById(id);
+const scenes=[...document.querySelectorAll('.scene')];
+const NS='http://www.w3.org/2000/svg';
+// garments on the rail
+const GC=['#d9c7a5','#f4f2ee','#9aa0a8','#c49a6c','#7d8457'];const gm=$('garments');
+GC.forEach((c,i)=>{const x=-200+i*100;const g=document.createElementNS(NS,'g');g.setAttribute('id','gm'+i);
+ g.innerHTML=`<path d="M${x} -752 q0 -22 14 -22" fill="none" stroke="#8d6b47" stroke-width="5"/><path d="M${x-50} -700 L${x} -740 L${x+50} -700 Z" fill="#8d6b47"/><path d="M${x-58} -702 L${x+58} -702 L${x+52} ${-330-(i%2)*80} L${x-52} ${-330-(i%2)*80} Z" fill="${c}"/>`;gm.appendChild(g);});
+// cubbies
+const cb=$('cubbies');[0,1,2].forEach(i=>{const x=100+i*300;cb.insertAdjacentHTML('beforeend',`<rect x="${x}" y="700" width="280" height="520" rx="10" fill="#e9e3d8"/><polygon points="${x},700 ${x+280},700 ${x+250},740 ${x+30},740" fill="#dcd4c6"/><rect x="${x+30}" y="740" width="220" height="440" fill="#f3eee5"/><rect x="${x}" y="1220" width="280" height="22" fill="#e2dccf"/>`)});
+cb.insertAdjacentHTML('beforeend','<rect x="60" y="1300" width="960" height="320" rx="12" fill="#f4f0e8"/>');
+
+// corridor projection
+const corr=$('corr');
+function quad(pts,fill,extra=''){return `<polygon points="${pts.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join(' ')}" fill="${fill}" ${extra}/>`;}
+function drawCorridor(t){
+ const k=ioC(seg(t,12,15));
+ const cam={x:lerp(0,.55,k),y:lerp(2.3,1.05,k),z:lerp(0,6.2,k)},pitch=lerp(.32,.12,k),f=1000,cx=540,cy=960-pitch*f;
+ const P=(X,Y,Z)=>{const dz=Math.max(.35,Z-cam.z);return[cx+f*(X-cam.x)/dz,cy-f*(Y-cam.y)/dz]};
+ const W=2,H=3,ZF=40;let s='';
+ s+=`<rect width="1080" height="1920" fill="#f3efe7"/>`;
+ s+=quad([P(-W,H,cam.z+.35),P(W,H,cam.z+.35),P(W,H,ZF),P(-W,H,ZF)],'#faf7f1');
+ s+=quad([P(-W,0,cam.z+.35),P(W,0,cam.z+.35),P(W,0,ZF),P(-W,0,ZF)],'url(#floorG)');
+ s+=quad([P(-W,0,cam.z+.35),P(-W,H,cam.z+.35),P(-W,H,ZF),P(-W,0,ZF)],'#ece5d8');
+ s+=quad([P(W,0,cam.z+.35),P(W,H,cam.z+.35),P(W,H,ZF),P(W,0,ZF)],'#e7dfd1');
+ s+=quad([P(-W,0,ZF),P(W,0,ZF),P(W,H,ZF),P(-W,H,ZF)],'#f7f3ec');
+ // ceiling lights + floor pools
+ for(let z=2;z<ZF;z+=2.4){if(z<cam.z+.5)continue;const a=P(-.35,H,z),b=P(.35,H,z),c=P(0,0,z);const dz=z-cam.z;
+  s+=`<ellipse cx="${((a[0]+b[0])/2).toFixed(1)}" cy="${a[1].toFixed(1)}" rx="${(Math.abs(b[0]-a[0])/2).toFixed(1)}" ry="${(60/dz).toFixed(1)}" fill="#fff4dc"/>`;
+  s+=`<ellipse cx="${c[0].toFixed(1)}" cy="${c[1].toFixed(1)}" rx="${(900/dz).toFixed(1)}" ry="${(200/dz).toFixed(1)}" fill="#ffe2b8" opacity=".35"/>`;}
+ // doors on both walls, far to near
+ const doors=[];for(let i=0;i<9;i++){const z0=2.2+i*2.0;doors.push({X:W,z0,z1:z0+1.5,n:201+i},{X:-W,z0,z1:z0+1.5,n:211+i});}
+ doors.sort((a,b)=>b.z0-a.z0).forEach(d=>{if(d.z1<cam.z+.4)return;const z0=Math.max(d.z0,cam.z+.4),X=d.X,dh=2.4;
+  s+=quad([P(X,0,z0),P(X,0,d.z1),P(X,dh,d.z1),P(X,dh,z0)],'#4a78a8');
+  for(let r=1;r<10;r++){const y=dh*r/10;const a=P(X,y,z0),b=P(X,y,d.z1);s+=`<line x1="${a[0].toFixed(1)}" y1="${a[1].toFixed(1)}" x2="${b[0].toFixed(1)}" y2="${b[1].toFixed(1)}" stroke="#35608c" stroke-width="${Math.max(1,6/(z0-cam.z)).toFixed(2)}"/>`;}
+  s+=quad([P(X,dh,z0),P(X,dh,d.z1),P(X,dh+.28,d.z1),P(X,dh+.28,z0)],'#3f6896');
+  // plate above the door
+  const zm=(d.z0+d.z1)/2;if(zm>cam.z+.5){const pa=P(X,dh+.45,zm-.22),pb=P(X,dh+.45,zm+.22),pc=P(X,dh+.7,zm);
+   const pts=[P(X,dh+.36,zm-.25),P(X,dh+.36,zm+.25),P(X,dh+.62,zm+.25),P(X,dh+.62,zm-.25)];s+=quad(pts,'url(#steel)','stroke="#8d96a3" stroke-width="1"');
+   const cxp=(pts[0][0]+pts[1][0]+pts[2][0]+pts[3][0])/4,cyp=(pts[0][1]+pts[1][1]+pts[2][1]+pts[3][1])/4,h=Math.abs(pts[0][1]-pts[3][1]),w=Math.abs(pts[1][0]-pts[0][0]);
+   if(h>6)s+=`<text class="plate" x="${cxp.toFixed(1)}" y="${(cyp+h*.28).toFixed(1)}" text-anchor="middle" font-size="${(h*.78).toFixed(1)}" fill="#1f2a44" transform="translate(${cxp.toFixed(1)} 0) scale(${Math.min(1,Math.max(.25,w/(h*2.2))).toFixed(3)} 1) translate(${(-cxp).toFixed(1)} 0)">${d.n}</text>`;}
+ });
+ s+=`<rect width="1080" height="1920" fill="url(#warmGlow)" opacity=".18"/>`;
+ corr.innerHTML=s;
+}
+
+window.setTime=function(t){
+ scenes.forEach(s=>s.style.display=(t>=+s.dataset.in&&t<+s.dataset.out)?'block':'none');
+ // S1: already moving at frame 1; shutter rises, camera tilts down from the housing
+ const p=ioC(seg(t,-.35,3.3));$('shutter').setAttribute('transform',`translate(0 ${(-980*p).toFixed(1)})`);
+ $('spill').setAttribute('opacity',(.55*seg(t,.6,3.3)).toFixed(3));
+ const c1=ioC(seg(t,-.35,3.5));$('cam1').style.transform=`translateY(${lerp(470,0,c1)}px) scale(${lerp(1.18,1,c1)})`;
+ // S2a: box carried in from the right and set on the shelf
+ const a1=oC(seg(t,4.0,4.9)),a2=ioC(seg(t,4.95,5.15)),a3=iC(seg(t,5.25,5.8));
+ const bx=lerp(1100,560,a1)+lerp(0,-14,a2)+lerp(0,700,a3)*0,by=lerp(690,800,oC(seg(t,4.5,4.95)));
+ $('carry2a').setAttribute('transform',`translate(${bx.toFixed(1)} ${by.toFixed(1)})`);
+ // after placing, only the arms leave: split by moving the arm layers
+ const armsOut=lerp(0,640,a3);[...$('carry2a').children].forEach((el,i)=>{if(i>0)el.setAttribute('transform',`translate(${armsOut} 0)`)});
+ $('cam2a').style.transform=`translateY(${lerp(70,-50,ioC(seg(t,4,6)))}px)`;
+ // S2b: one push, rail coasts deeper into the unit
+ const push=oC(seg(t,6.05,6.45)),coast=oC(seg(t,6.3,7.6));
+ const rs=lerp(1,.66,coast),rx=lerp(600,530,coast),ry=lerp(1800,1360,coast);
+ $('rail').setAttribute('transform',`translate(${rx} ${ry}) scale(${rs})`);
+ for(let i=0;i<5;i++){const sw=Math.sin((t-6.3)*9+i)*6*Math.exp(-Math.max(0,t-6.3)*1.6)*(t>6.3?1:0);$('gm'+i).setAttribute('transform',`rotate(${sw.toFixed(2)} ${-200+i*100} -752)`);}
+ const ax=lerp(1080,846,oC(seg(t,6.0,6.15)))+lerp(0,640,iC(seg(t,6.45,7.0)));
+ $('arm2b').setAttribute('transform',`translate(${ax.toFixed(1)} ${lerp(1420,1395,push).toFixed(1)})`);
+ $('cam2b').style.transform=`translateY(${lerp(60,-40,ioC(seg(t,6,8)))}px)`;
+ // S2c: hand on saddle tilts the bike back against the wall, then leaves
+ const tl=ioC(seg(t,8.15,9.2));$('bike').setAttribute('transform',`translate(${560} ${lerp(1560,1530,tl)}) scale(${lerp(1,.96,tl)}) rotate(${lerp(0,-3,tl)})`);
+ const bs=$('bikeShadow');bs.setAttribute('cy',lerp(1585,1556,tl));
+ $('arm2c').setAttribute('transform',`translate(${(lerp(700,1100,iC(seg(t,9.3,9.85)))+lerp(0,0,tl)).toFixed(1)} ${lerp(1040,1012,tl).toFixed(1)})`);
+ $('cam2c').style.transform=`translateY(${lerp(60,-40,ioC(seg(t,8,10)))}px)`;
+ // S2d: toy box slides into the centre cubby, hands withdraw down
+ const sl=ioC(seg(t,10.1,11.1));$('toybox').setAttribute('transform',`translate(540 ${lerp(1330,1010,sl).toFixed(1)}) scale(${lerp(1.12,.86,sl).toFixed(3)})`);
+ const hw=iC(seg(t,11.15,11.7));$('hands2d').setAttribute('transform',`translate(540 ${(lerp(1430,1130,sl)+lerp(0,800,hw)).toFixed(1)}) scale(${lerp(1.12,.9,sl).toFixed(3)})`);
+ $('cam2d').style.transform=`translateY(${lerp(60,-40,ioC(seg(t,10,12)))}px)`;
+ // S3a corridor glide
+ if(t>=12&&t<15)drawCorridor(t);
+ // S3b padlock: shackle clicks shut, glint, slow push-in
+ const sh=seg(t,15.35,15.5);$('shackle').setAttribute('transform',`translate(0 ${lerp(-34,0,iC(sh)).toFixed(1)})`);
+ $('glint').setAttribute('x',lerp(220,860,ioC(seg(t,15.9,16.6))).toFixed(1));
+ const pz=ioC(seg(t,15,16.9));$('cam3b').style.transformOrigin='540px 1330px';$('cam3b').style.transform=`scale(${lerp(1,1.32,pz)})`;
+ // soft flash on hard cuts
+ let fl=0;for(const c of [4,6,8,10,12,15]){if(t>=c&&t<c+.12)fl=.35*(1-(t-c)/.12);}$('flash').style.opacity=fl;
+};
+window.ready=document.fonts.ready.then(()=>window.setTime(0));
+</script></body></html>
