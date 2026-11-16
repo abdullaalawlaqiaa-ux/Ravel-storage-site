@@ -71,8 +71,8 @@ h3 { font: 700 34px/1.4 "Kufi"; }
 .who-card { background: var(--white); border-radius: 26px; padding: 30px 36px; }
 .who-title { display: flex; align-items: center; gap: 18px; margin-bottom: 14px; }
 .who-title .ic { font-size: 54px; }
-.who-card li { font-size: 31px; line-height: 1.6; padding: 7px 34px 7px 0; position: relative; color: var(--muted); }
-.who-card li::before { content: ""; position: absolute; right: 4px; top: 27px; width: 12px; height: 12px; border-radius: 50%; background: var(--navy); }
+.who-card li { font-size: 31px; line-height: 1.6; padding-block: 7px; padding-inline: 34px 0; position: relative; color: var(--muted); }
+.who-card li::before { content: ""; position: absolute; inset-inline-start: 4px; top: 27px; width: 12px; height: 12px; border-radius: 50%; background: var(--navy); }
 
 /* 4 units */
 .units { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-bottom: 20px; }
@@ -81,7 +81,7 @@ h3 { font: 700 34px/1.4 "Kufi"; }
 table { width: 100%; border-collapse: separate; border-spacing: 0; background: var(--white); border-radius: 24px; overflow: hidden; }
 th { background: var(--navy); color: #fff; font: 700 27px "Kufi"; padding: 11px 24px; }
 th small { font: 600 22px "Plex"; color: var(--grey-300); margin-inline-start: 6px; }
-.guide th, .guide td { text-align: right; }
+.guide th, .guide td { text-align: start; }
 .guide td { font-size: 28px; padding: 8px 24px; border-top: 2px solid var(--grey-100); color: var(--muted); }
 .guide td:first-child { color: var(--navy); font-weight: 700; white-space: nowrap; width: 300px; }
 
@@ -122,3 +122,12 @@ th small { font: 600 22px "Plex"; color: var(--grey-300); margin-inline-start: 6
 .links .ic { font-size: 36px; color: var(--cyan); }
 
 @media screen { body { display: grid; gap: 24px; justify-content: center; padding: 24px 0; } }
+
+/* English edition (index-en.html) */
+html[lang="en"] body, html[lang="en"] body * { font-family: "Mont", sans-serif; }
+html[lang="en"] .cover-panel h1 { font-size: 70px; line-height: 1.2; }
+html[lang="en"] h2 { font-size: 52px; line-height: 1.25; }
+html[lang="en"] .lead { line-height: 1.55; font-weight: 500; }
+html[lang="en"] p, html[lang="en"] li, html[lang="en"] td { font-weight: 500; }
+html[lang="en"] .n, html[lang="en"] .prices td:last-child { font-weight: 800; }
+html[lang="en"] .links > * { font-size: 23px; text-align: start; white-space: nowrap; }
