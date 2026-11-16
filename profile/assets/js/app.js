@@ -453,7 +453,7 @@
         ? '<a class="btn btn--sm btn--navy" target="_blank" rel="noopener" href="' + b.map + '">' + icon('i-pin') + '<span>' + t('b.dir') + '</span></a>'
         : '<a class="btn btn--sm btn--navy" target="_blank" rel="noopener" href="' + wa([plain('wa.hello'), plain('wa.loc', { b: nm })]) + '">' + icon('i-pin') + '<span>' + t('b.loc') + '</span></a>';
       return '<li class="card branch' + (chosen ? ' is-chosen' : '') + (b.id === view ? ' is-active' : '') + '" data-b="' + b.id + '"><h3 class="branch__name"><span>' + t(b.name) + '</span>' + (chosen ? '<span class="plate">' + t('b.chosen') + '</span>' : '') + '</h3>' +
-        '<p class="branch__row">' + icon('i-pin') + '<span>' + t(b.area) + '</span></p><p class="branch__row">' + icon('i-clock') + '<span>' + t('b.access') + '</span></p>' +
+        '<p class="branch__row">' + icon('i-pin') + '<span>' + t(b.area) + '</span></p>' +
         (b.map ? '' : '<p class="tiny">' + t('b.note') + '</p>') +
         '<div class="branch__actions">' + first +
         '<a class="btn btn--sm btn--ghost" target="_blank" rel="noopener" href="' + wa([plain('wa.hello'), plain('wa.visit', { b: nm })]) + '">' + t('b.visit') + '</a>' +

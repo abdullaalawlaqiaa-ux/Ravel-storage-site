@@ -56,8 +56,8 @@ def main():
                    % (s["a"], s["a"], s["a"] * D["height"], format(s["price"], ","))
                    for s in D["sizes"] if s["price"])
     branches = "".join('<li class="card branch"><h3 class="branch__name"><span>%s</span></h3>'
-                       '<p class="branch__row"><span>%s</span></p><p class="branch__row"><span>%s</span></p></li>'
-                       % (T(b["name"]), T(b["area"]), T("b.access")) for b in D["branches"])
+                       '<p class="branch__row"><span>%s</span></p></li>'
+                       % (T(b["name"]), T(b["area"])) for b in D["branches"])
     tpl = tpl.replace("<!--PRICEROWS-->", rows).replace("<!--BRANCHES-->", branches)
     tpl = tpl.replace("<!--SIZES-->", "").replace("<!--UNITINFO-->", "")
 

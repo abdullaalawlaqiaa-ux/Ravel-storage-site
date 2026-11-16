@@ -35,6 +35,6 @@
   "branches": [
     {"id": "m1", "name": "b.m1", "area": "b.aM",  "map": null},
     {"id": "m2", "name": "b.m2", "area": "b.aM",  "map": null},
-    {"id": "mu", "name": "b.mu", "area": "b.aMu", "map": "https://www.google.com/maps/search/?api=1&query=Ravel+Storage+M-34+Mussafah+Abu+Dhabi"}
+    {"id": "mu", "name": "b.mu", "area": "b.aMu", "map": null}
   ]
 }
