@@ -171,6 +171,9 @@
       if (!reduced) p.style.setProperty('--o', ((c - mid) / Math.max(1, r.width)).toFixed(3));   // drives the depth: the numeral lags behind the panel
       if (Math.abs(c - mid) < bd) { bd = Math.abs(c - mid); best = i; }
     });
+    // on a wide screen the first and last panels cannot reach the middle: the ends of the strip count as them
+    var sl = Math.abs(story.scrollLeft), max = story.scrollWidth - story.clientWidth;
+    if (max > 4) { if (sl < 4) best = 0; else if (sl > max - 4) best = panels.length - 1; }
     if (best !== storyIdx) {
       storyIdx = best;
       var bar = $('#storyBar'), cnt = $('#storyCount');
@@ -213,7 +216,7 @@
 
   /* ---------- size helper: a box that fills with small blocks; they move away from a finger ---------- */
   var fillBox = $('#fillBox'), fc = $('#fillCanvas'), fctx = fc && fc.getContext ? fc.getContext('2d') : null;
-  var FILL_COLORS = { furniture: '#2EC5FF', boxes: '#C69D70', appliances: '#FFFFFF', business: '#8FA0B8', personal: '#FFC83D', office: '#C9D1DC' };
+  var FILL_COLORS = { home: '#2EC5FF', boxes: '#C69D70', appliances: '#FFFFFF', business: '#8FA0B8', personal: '#FFC83D', office: '#C9D1DC' };
   var fl = { blocks: [], w: 0, h: 0, dpr: 1, raf: 0, cols: 0, rows: 0, s: 9, gap: 2, ox: 0, oy: 0, rtl: false, ptr: null };
   function fillResize() {
     if (!fctx) return; var w = fc.clientWidth, h = fc.clientHeight; if (!w || !h) return;

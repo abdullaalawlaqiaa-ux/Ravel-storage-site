@@ -351,60 +351,84 @@
   });
 
   /* ---------------- size helper ---------------- */
+  // An item is [id, volume in m3, floor area in m2 for things that cannot be stacked]. A category lists its items in groups;
+  // the home category ends with the appliances, so one list covers the whole house. Every category ends with a free "Other" field.
   var HC = [
-    { id: 'furniture', ic: 'i-sofa', items: [['sofa', 2], ['armchair', .8], ['bedD', 2.2], ['bedS', 1.3], ['wardrobe', 2], ['dresser', .7], ['dining', 2], ['tableS', .3], ['shelf', .9]] },
-    { id: 'boxes', ic: 'i-box', items: [['boxS', .06], ['boxM', .1], ['boxL', .2]] },
-    { id: 'appliances', ic: 'i-fridge', items: [['fridge', 1.2], ['washer', .5], ['cooker', .5], ['tv', .3], ['ac', .3]] },
-    { id: 'business', ic: 'i-pallet', items: [['pallet', 0, 1.5], ['rack', 0, 1.8], ['equip', 0, 1.2], ['stock', .1]] },
-    { id: 'personal', ic: 'i-suitcase', items: [['suitcase', .15], ['bag', .1], ['bike', .6], ['sports', .3]] },
-    { id: 'office', ic: 'i-desk', items: [['desk', .9], ['chair', .35], ['cabinet', .5], ['archive', .05], ['printer', .2], ['meeting', 1.5]] }
+    { id: 'home', ic: 'i-sofa', groups: [
+      { id: 'living', items: [['sofa1', .8], ['sofa2', 1.4], ['sofa3', 2], ['sofa4', 2.6], ['sofa5', 3.3], ['sofaL', 3.6], ['tableC', .4], ['tableS', .15], ['tvUnit', .6], ['bookcase', .9], ['buffet', 1.2], ['carpet', .2], ['majlis', .5]] },
+      { id: 'bed', items: [['bedS', 1.3], ['bedD', 2.2], ['bedBunk', 2], ['bedBaby', .8], ['mattress', .6], ['wardrobe2', 1.3], ['wardrobe4', 2.2], ['wardrobe6', 3.3], ['dresser', .8], ['nightstand', .15], ['drawers', .7], ['mirror', .1]] },
+      { id: 'dining', items: [['dining4', 1.4], ['dining6', 2], ['dining8', 2.6], ['chair', .25], ['kitchenCab', .6]] },
+      { id: 'homeOther', items: [['deskH', .9], ['chairDesk', .35], ['shoe', .4], ['outdoor', 1.2], ['kids', .3]] },
+      { id: 'appl', items: [['fridge', 1.2], ['fridge2', 1.8], ['freezer', 1], ['washer', .5], ['dryer', .5], ['dishwasher', .5], ['cooker', .5], ['microwave', .1], ['tv', .3], ['ac', .3], ['waterCooler', .25], ['vacuum', .1]] }
+    ] },
+    { id: 'boxes', ic: 'i-box', groups: [{ items: [['boxS', .06], ['boxM', .1], ['boxL', .2]] }] },
+    { id: 'business', ic: 'i-pallet', groups: [{ items: [['pallet', 0, 1.5], ['rack', 0, 1.8], ['equip', 0, 1.2], ['stock', .1]] }] },
+    { id: 'personal', ic: 'i-suitcase', groups: [{ items: [['suitcase', .15], ['bag', .1], ['bike', .6], ['sports', .3]] }] },
+    { id: 'office', ic: 'i-desk', groups: [{ items: [['desk', .9], ['chairO', .35], ['cabinet', .5], ['archive', .05], ['printer', .2], ['meeting', 1.5]] }] }
   ];
+  function catItems(c) { var out = []; c.groups.forEach(function (g) { g.items.forEach(function (it) { out.push(it); }); }); return out; }
   var PRESETS = {
-    room: { bedD: 1, wardrobe: 1, dresser: 1, tableS: 1, tv: 1, boxM: 10 },
-    '1br': { sofa: 1, armchair: 1, bedD: 1, wardrobe: 1, dresser: 1, dining: 1, tableS: 1, fridge: 1, washer: 1, cooker: 1, tv: 1, boxM: 20 },
-    '2br': { sofa: 1, armchair: 1, bedD: 1, bedS: 2, wardrobe: 2, dresser: 1, dining: 1, tableS: 1, shelf: 1, fridge: 1, washer: 1, cooker: 1, tv: 1, boxM: 30 },
-    '3br': { sofa: 2, armchair: 2, bedD: 2, bedS: 2, wardrobe: 3, dresser: 2, dining: 1, tableS: 2, shelf: 2, fridge: 1, washer: 1, cooker: 1, tv: 2, ac: 2, boxM: 45, suitcase: 4, bike: 2 }
+    room: { bedD: 1, wardrobe2: 1, dresser: 1, nightstand: 2, tv: 1, boxM: 10 },
+    '1br': { sofa3: 1, sofa1: 1, tableC: 1, tvUnit: 1, bedD: 1, wardrobe4: 1, dresser: 1, nightstand: 2, dining4: 1, fridge: 1, washer: 1, cooker: 1, tv: 1, boxM: 20 },
+    '2br': { sofa3: 1, sofa2: 1, tableC: 1, tvUnit: 1, bedD: 1, bedS: 2, wardrobe4: 1, wardrobe2: 1, dresser: 1, nightstand: 2, dining6: 1, bookcase: 1, fridge: 1, washer: 1, cooker: 1, tv: 1, boxM: 30 },
+    '3br': { sofa3: 1, sofa2: 1, sofa1: 2, tableC: 1, tableS: 2, tvUnit: 1, bedD: 2, bedS: 2, wardrobe6: 1, wardrobe4: 1, wardrobe2: 1, dresser: 2, nightstand: 4, dining6: 1, bookcase: 2, fridge: 1, washer: 1, cooker: 1, tv: 2, ac: 2, boxM: 45, suitcase: 4, bike: 2 }
   };
   var REC = D.sizes.filter(function (s) { return s.price || s.a >= 50; }).map(function (s) { return s.a; });
   var H = state.helper, hBody = $('#helperBody');
+  H.other = H.other || {}; H.sub = H.sub || {};
+  function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
   function helperCalc() {
-    var vol = 0, foot = 0, lines = [];
+    var vol = 0, foot = 0, lines = [], others = [];
     HC.forEach(function (c) {
       if (!H.cats[c.id]) return;
-      c.items.forEach(function (it) { var q = H.qty[it[0]] || 0; if (!q) return; vol += q * it[1]; foot += q * (it[2] || 0); lines.push({ k: 'h.i.' + it[0], q: q }); });
+      catItems(c).forEach(function (it) { var q = H.qty[it[0]] || 0; if (!q) return; vol += q * it[1]; foot += q * (it[2] || 0); lines.push({ k: 'h.i.' + it[0], q: q }); });
+      var o = (H.other[c.id] || '').replace(/\s+/g, ' ').trim(); if (o) others.push({ c: c.id, t: o });
     });
     // items stack to roughly 2.2 m and fill about three quarters of the floor: 1 m2 holds about 1.65 m3
-    var need = Math.max(.5, vol / 1.65 + foot), rec = REC.filter(function (a) { return a >= need - 1e-9; })[0] || null;
-    return { vol: vol, foot: foot, need: need, rec: rec, alt: rec ? REC[REC.indexOf(rec) + 1] || null : null, lines: lines };
+    var need = Math.max(.5, vol / 1.65 + foot), rec = lines.length ? (REC.filter(function (a) { return a >= need - 1e-9; })[0] || null) : null;
+    return { vol: vol, foot: foot, need: need, rec: rec, alt: rec ? REC[REC.indexOf(rec) + 1] || null : null, lines: lines, others: others };
   }
+  // the message carries what was counted, then anything written under "Other", exactly as the visitor entered it
   function helperLines(r) {
     var L = [plain('wa.hello'), plain('wa.helper')];
     r.lines.forEach(function (l) { L.push('• ' + plain(l.k) + ' × ' + l.q); });
-    L.push(r.rec ? plain('wa.estimate', { a: r.rec }) : plain('wa.estimateBig'));
+    r.others.forEach(function (o) { L.push('• ' + plain('wa.other', { c: plain('h.cat.' + o.c), t: o.t })); });
+    if (r.lines.length) L.push(r.rec ? plain('wa.estimate', { a: r.rec }) : plain('wa.estimateBig'));
     if (state.branch) L.push(plain('wa.branch', { b: branchName(state.branch) }));
     return L;
   }
   // the live box above the list: how full the suggested unit is, with one colour per kind of item
   function fillSync() {
     if (!window.RVFX) return;
-    var r = helperCalc(), cats = [], has = r.lines.length > 0;
+    var r = helperCalc(), vols = {}, order = [], has = r.lines.length > 0;
     HC.forEach(function (c) {
-      if (!H.cats[c.id]) return; var v = 0;
-      c.items.forEach(function (it) { v += (H.qty[it[0]] || 0) * (it[1] + (it[2] || 0) * 1.65); });
-      if (v > 0) cats.push([c.id, v]);
+      if (!H.cats[c.id]) return;
+      c.groups.forEach(function (g) {
+        var key = g.id === 'appl' ? 'appliances' : c.id, v = 0;
+        g.items.forEach(function (it) { v += (H.qty[it[0]] || 0) * (it[1] + (it[2] || 0) * 1.65); });
+        if (v > 0) { if (!(key in vols)) { vols[key] = 0; order.push(key); } vols[key] += v; }
+      });
     });
     var frac = !has ? 0 : r.rec ? Math.min(1, r.need / r.rec) : 1;
-    window.RVFX.fill(H.step >= 2, frac, cats,
+    window.RVFX.fill(H.step === 2 || (H.step === 3 && has), frac, order.map(function (k) { return [k, vols[k]]; }),
       !has ? '' : r.rec ? r.rec + ' ' + plain('m2') : plain('h.fillOver'),
       !has ? plain('h.fillEmpty') : r.rec ? plain('h.fillNote', { p: Math.round(frac * 100) }) : '');
   }
+  function qrow(it) {
+    var q = H.qty[it[0]] || 0, nm = plain('h.i.' + it[0]);
+    return '<div class="qrow"><span class="qrow__name">' + t('h.i.' + it[0]) + '</span><span class="stepper">' +
+      '<button type="button" data-step="-1" data-item="' + it[0] + '" aria-label="' + plain('h.minus') + ': ' + nm + '">' + icon('i-minus') + '</button>' +
+      '<output class="' + (q ? '' : 'is-zero') + '" aria-label="' + plain('h.qty') + ': ' + nm + '">' + q + '</output>' +
+      '<button type="button" data-step="1" data-item="' + it[0] + '" aria-label="' + plain('h.plus') + ': ' + nm + '">' + icon('i-plus') + '</button></span></div>';
+  }
+  function chosenIn(g) { return g.items.filter(function (it) { return H.qty[it[0]]; }).length; }
   function renderHelper() {
-    var h = '', total = 0;
+    var h = '';
     $('#helperStep').textContent = plain('h.step', { n: H.step }); $('#helperBar').style.width = (H.step * 33.34) + '%';
     if (H.step === 1) {
       h += '<h3 class="helper__q">' + t('h.s1') + '</h3><p class="tiny">' + t('h.s1hint') + '</p>';
-      h += '<div class="cats">' + HC.map(function (c) {
-        return '<button class="cat" type="button" aria-pressed="' + !!H.cats[c.id] + '" data-cat="' + c.id + '">' + icon(c.ic) + '<span>' + t('h.cat.' + c.id) + '</span><span class="cat__check">' + icon('i-check') + '</span></button>';
+      h += '<div class="cats">' + HC.map(function (c, i) {
+        return '<button class="cat' + (i === 0 ? ' cat--wide' : '') + '" type="button" aria-pressed="' + !!H.cats[c.id] + '" data-cat="' + c.id + '">' + icon(c.ic) + '<span>' + t('h.cat.' + c.id) + '</span><span class="cat__check">' + icon('i-check') + '</span></button>';
       }).join('') + '</div>';
       h += '<p class="label" style="margin:16px 0 0">' + t('h.preset') + '</p><div class="presets">' + ['room', '1br', '2br', '3br'].map(function (p) {
         return '<button class="preset' + (H.preset === p ? ' is-on' : '') + '" type="button" data-preset="' + p + '">' + t('h.p.' + p) + '</button>';
@@ -413,25 +437,35 @@
       h += '<h3 class="helper__q">' + t('h.s2') + '</h3>';
       HC.forEach(function (c) {
         if (!H.cats[c.id]) return;
-        h += '<div class="qgroup"><h4>' + icon(c.ic) + '<span>' + t('h.cat.' + c.id) + '</span></h4>' + c.items.map(function (it) {
-          var q = H.qty[it[0]] || 0, nm = plain('h.i.' + it[0]); total += q;
-          return '<div class="qrow"><span class="qrow__name">' + t('h.i.' + it[0]) + '</span><span class="stepper">' +
-            '<button type="button" data-step="-1" data-item="' + it[0] + '" aria-label="' + plain('h.minus') + ': ' + nm + '">' + icon('i-minus') + '</button>' +
-            '<output class="' + (q ? '' : 'is-zero') + '" aria-label="' + plain('h.qty') + ': ' + nm + '">' + q + '</output>' +
-            '<button type="button" data-step="1" data-item="' + it[0] + '" aria-label="' + plain('h.plus') + ': ' + nm + '">' + icon('i-plus') + '</button></span></div>';
-        }).join('') + '</div>';
+        h += '<div class="qgroup"><h4>' + icon(c.ic) + '<span>' + t('h.cat.' + c.id) + '</span></h4>';
+        c.groups.forEach(function (g, gi) {
+          var rows = g.items.map(qrow).join('');
+          if (!g.id) { h += rows; return; }
+          // a long list is folded into rooms; the first one, and any that already holds a choice, start open
+          var n = chosenIn(g), open = H.sub[g.id] != null ? H.sub[g.id] : (gi === 0 || n > 0);
+          h += '<div class="qsub' + (open ? ' is-open' : '') + '"><button class="qsub__head" type="button" aria-expanded="' + open + '" data-sub="' + g.id + '"><span>' + t('h.g.' + g.id) + '</span>' +
+            '<span class="qsub__n"' + (n ? '' : ' hidden') + '>' + n + '</span>' + icon('i-chev') + '</button><div class="qsub__body">' + rows + '</div></div>';
+        });
+        h += '<div class="qother"><label for="other-' + c.id + '">' + t('h.other') + '</label>' +
+          '<textarea id="other-' + c.id + '" data-other="' + c.id + '" rows="2" maxlength="300" placeholder="' + esc(plain('h.otherPh')) + '">' + esc(H.other[c.id] || '') + '</textarea></div></div>';
       });
+      h += '<p class="tiny">' + t('h.otherNote') + '</p>';
     } else {
-      var r = H.result, u = r.rec ? sizeObj(r.rec) : null;
-      h += '<div class="result"><span class="tiny">' + t('h.s3') + '</span>';
-      if (u) {
-        h += '<div class="result__size">' + u.a + ' <small>' + t('m2') + '</small></div><p class="result__fits">' + t('u.fits') + ': ' + t(fitsKey(u)) + '</p>';
-        if (u.price) h += '<p><b class="num">' + fmt(u.price) + '</b> ' + t('cur') + ' / ' + t('perMonth') + '</p>';
-        if (r.alt) { var au = sizeObj(r.alt); h += '<p class="tiny">' + (u.price && au.price ? t('h.alt', { a: au.a, d: fmt(au.price - u.price) }) : t('h.altNo', { a: au.a })) + '</p>'; }
-      } else h += '<div class="result__over">' + t('h.over') + '</div><p>' + t('h.big') + '</p>';
-      if (r.vol > 0) h += '<p class="tiny">' + t('h.vol', { v: fmtDim(r.vol) }) + ' · ' + t('h.basis') + '</p>';
-      h += '<p class="disclaimer">' + t('h.disclaimer') + '</p>';
-      h += '<div class="result__actions"><a class="btn btn--wa" target="_blank" rel="noopener" href="' + wa(helperLines(r)) + '">' + icon('i-chat') + '<span>' + t('h.confirm') + '</span></a>';
+      var r = H.result, u = r.rec ? sizeObj(r.rec) : null, counted = r.lines.length > 0;
+      h += '<div class="result">';
+      if (!counted) h += '<div class="result__over">' + t('h.otherOnly') + '</div><p>' + t('h.otherOnlyP') + '</p>';
+      else {
+        h += '<span class="tiny">' + t('h.s3') + '</span>';
+        if (u) {
+          h += '<div class="result__size">' + u.a + ' <small>' + t('m2') + '</small></div><p class="result__fits">' + t('u.fits') + ': ' + t(fitsKey(u)) + '</p>';
+          if (u.price) h += '<p><b class="num">' + fmt(u.price) + '</b> ' + t('cur') + ' / ' + t('perMonth') + '</p>';
+          if (r.alt) { var au = sizeObj(r.alt); h += '<p class="tiny">' + (u.price && au.price ? t('h.alt', { a: au.a, d: fmt(au.price - u.price) }) : t('h.altNo', { a: au.a })) + '</p>'; }
+        } else h += '<div class="result__over">' + t('h.over') + '</div><p>' + t('h.big') + '</p>';
+        if (r.vol > 0) h += '<p class="tiny">' + t('h.vol', { v: fmtDim(r.vol) }) + ' · ' + t('h.basis') + '</p>';
+        if (r.others.length) h += '<p class="tiny">' + t('h.otherIn') + '</p>';
+        h += '<p class="disclaimer">' + t('h.disclaimer') + '</p>';
+      }
+      h += '<div class="result__actions"><a class="btn btn--wa" target="_blank" rel="noopener" href="' + wa(helperLines(r)) + '">' + icon('i-chat') + '<span>' + t(counted ? 'h.confirm' : 'h.sendList') + '</span></a>';
       if (u) h += '<a class="btn btn--navy" href="#units" data-see="' + u.a + '">' + icon('i-cube') + '<span>' + t('h.see') + '</span></a>';
       h += '</div></div>';
     }
@@ -442,28 +476,39 @@
     $('#helperNext').className = 'btn ' + (H.step === 3 ? 'btn--ghost' : 'btn--navy');
     fillSync(); remeasureSoon();
   }
+  function clearErr() { H.err = ''; var er = $('.helper__err', hBody); if (er) er.remove(); }
   hBody.addEventListener('click', function (e) {
-    var el = e.target.closest ? e.target.closest('[data-cat],[data-preset],[data-step],[data-see]') : null; if (!el) return;
+    var el = e.target.closest ? e.target.closest('[data-cat],[data-preset],[data-step],[data-see],[data-sub]') : null; if (!el) return;
     H.err = '';
-    if (el.hasAttribute('data-cat')) { var id = el.getAttribute('data-cat'); H.cats[id] = !H.cats[id]; H.preset = null; el.setAttribute('aria-pressed', !!H.cats[id]); $$('.preset', hBody).forEach(function (p) { p.classList.remove('is-on'); }); var er = $('.helper__err', hBody); if (er) er.remove(); return; }
+    if (el.hasAttribute('data-cat')) { var id = el.getAttribute('data-cat'); H.cats[id] = !H.cats[id]; H.preset = null; el.setAttribute('aria-pressed', !!H.cats[id]); $$('.preset', hBody).forEach(function (p) { p.classList.remove('is-on'); }); clearErr(); return; }
     if (el.hasAttribute('data-preset')) {
-      var p = el.getAttribute('data-preset'); H.preset = p; H.qty = {}; H.cats = {};
+      var p = el.getAttribute('data-preset'); H.preset = p; H.qty = {}; H.cats = {}; H.other = {}; H.sub = {};
       Object.keys(PRESETS[p]).forEach(function (k) { H.qty[k] = PRESETS[p][k]; });
-      HC.forEach(function (c) { if (c.items.some(function (it) { return H.qty[it[0]]; })) H.cats[c.id] = true; });
+      HC.forEach(function (c) { if (catItems(c).some(function (it) { return H.qty[it[0]]; })) H.cats[c.id] = true; });
       H.step = 2; renderHelper(); return;
+    }
+    if (el.hasAttribute('data-sub')) {            // fold or unfold one room of the list
+      var box = el.parentNode, open = !box.classList.contains('is-open');
+      box.classList.toggle('is-open', open); el.setAttribute('aria-expanded', open); H.sub[el.getAttribute('data-sub')] = open; remeasureSoon(); return;
     }
     if (el.hasAttribute('data-step')) {
       var it = el.getAttribute('data-item'), q = clamp((H.qty[it] || 0) + (+el.getAttribute('data-step')), 0, 200); H.qty[it] = q; H.preset = null;
-      var out = el.parentNode.querySelector('output'); out.textContent = q; out.className = q ? '' : 'is-zero'; fillSync();
-      var er2 = $('.helper__err', hBody); if (er2) er2.remove(); return;
+      var out = el.parentNode.querySelector('output'); out.textContent = q; out.className = q ? '' : 'is-zero';
+      var sub = el.closest('.qsub');
+      if (sub) { var n = $$('output', sub).filter(function (o) { return o.textContent !== '0'; }).length, badge = $('.qsub__n', sub); badge.textContent = n; badge.hidden = !n; }
+      fillSync(); clearErr(); return;
     }
     if (el.hasAttribute('data-see')) selectSize(+el.getAttribute('data-see'), true);
+  });
+  hBody.addEventListener('input', function (e) {
+    var id = e.target.getAttribute && e.target.getAttribute('data-other'); if (!id) return;
+    H.other[id] = e.target.value; clearErr();
   });
   $('#helperNext').addEventListener('click', function () {
     H.err = '';
     if (H.step === 1) { if (!HC.some(function (c) { return H.cats[c.id]; })) H.err = 'h.needCat'; else H.step = 2; }
-    else if (H.step === 2) { var r = helperCalc(); if (!r.lines.length) H.err = 'h.needQty'; else { H.result = r; H.step = 3; } }
-    else { H.step = 1; H.cats = {}; H.qty = {}; H.preset = null; H.result = null; }
+    else if (H.step === 2) { var r = helperCalc(); if (!r.lines.length && !r.others.length) H.err = 'h.needQty'; else { H.result = r; H.step = 3; } }
+    else { H.step = 1; H.cats = {}; H.qty = {}; H.other = {}; H.sub = {}; H.preset = null; H.result = null; }
     renderHelper(); $('#helperBox').scrollIntoView({ block: 'nearest', behavior: reduced ? 'auto' : 'smooth' });
   });
   $('#helperBack').addEventListener('click', function () { H.err = ''; if (H.step > 1) H.step--; renderHelper(); });

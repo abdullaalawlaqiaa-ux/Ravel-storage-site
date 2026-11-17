@@ -601,3 +601,29 @@ main{position:relative;z-index:1;overflow-x:clip}
 .card{box-shadow:0 0 0 1px rgba(21,34,73,.06)}
 #prices .card--flush{box-shadow:0 0 0 1.5px var(--grey-200)}
 .option--best{box-shadow:none}
+
+/* ---------- fixes after the first phone review ---------- */
+/* Safari does not count a scroller's end padding as scrollable, so the last sizes could not reach the needle:
+   the room at both ends is made of real flex items instead */
+.ruler__track{padding-inline:0}
+.ruler__track::before,.ruler__track::after{content:"";flex:none;width:calc(50% - 33px)}
+.story{--pw:min(84vw,400px);padding-inline:0}
+.story::before,.story::after{content:"";flex:none;width:calc((100% - var(--pw)) / 2 - 14px);min-width:4px;max-width:var(--gl)}
+.spanel{width:var(--pw)}
+/* the navy button needs an edge only where it sits straight on a dark ground */
+.btn--navy{box-shadow:none}
+[data-tone="dark"] .wrap > .btn--navy{box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.3)}
+/* the home list is long, so it folds into rooms; each category ends with a free "Other" field */
+.cat--wide{grid-column:1/-1;min-height:76px}
+.qsub{border-top:1px solid var(--grey-100)}
+.qsub__head{display:flex;align-items:center;gap:8px;width:100%;padding:13px 0;border:0;background:none;color:var(--navy);font:700 15.5px/1.6 var(--f-display);text-align:start;cursor:pointer}
+.qsub__head > span:first-child{flex:1}
+.qsub__n{display:inline-grid;place-items:center;min-width:24px;height:24px;padding:0 7px;border-radius:999px;background:var(--cyan);color:var(--navy);font:800 13px/1 var(--f-num)}
+.qsub__head .ic{width:20px;height:20px;color:var(--ink-muted);transition:transform .3s var(--ease-out)}
+.qsub.is-open .qsub__head .ic{transform:rotate(180deg)}
+.qsub__body{display:none;padding-bottom:6px}
+.qsub.is-open .qsub__body{display:block;animation:fadeup .35s var(--ease) both}
+.qother{display:grid;gap:5px;margin-top:6px;padding-top:12px;border-top:1px solid var(--grey-100)}
+.qother label{font:700 15.5px/1.6 var(--f-display)}
+.qother textarea{width:100%;min-height:66px;padding:9px 14px;border:1.5px solid var(--grey-200);border-radius:var(--r-ctl);background:#fff;color:var(--navy);font:400 16px/1.6 var(--f-text);resize:vertical;transition:border-color .2s ease,box-shadow .2s ease}
+.qother textarea:focus{outline:0;border-color:var(--cyan);box-shadow:0 0 0 4px rgba(46,197,255,.22)}
