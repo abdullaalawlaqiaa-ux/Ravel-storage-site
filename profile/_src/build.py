@@ -4,8 +4,12 @@
   python3 _src/build.py                      -> writes index.html and assets/js/data.js
   python3 _src/build.py --base https://example.com/profile/   (absolute URL for the share image)
   python3 _src/build.py --artifact OUT_DIR   -> also writes a single-file preview page into OUT_DIR
+
+The preview page is self-contained: images travel inside it as data URIs, the text fonts come
+from Google Fonts and Three.js from cdnjs, so it shows correctly in viewers that cannot load
+files published next to the page.
 """
-import argparse, html, json, os, re
+import argparse, base64, html, json, os, re
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
@@ -73,11 +77,31 @@ def main():
     print("index.html", len(page.encode("utf-8")), "bytes")
 
     if args.artifact:
+        def data_uri(path, mime):
+            with open(os.path.join(ROOT, path), "rb") as f:
+                return "data:%s;base64,%s" % (mime, base64.b64encode(f.read()).decode("ascii"))
+
         body = tpl.split("<!--BODY-->")[1].split("<!--/BODY-->")[0]
-        css = read("assets/css/style.css").replace("url(../", "url(assets/")
+        # images: drop the <source> alternatives; the script fills each <img> from the inlined data
+        body = re.sub(r"<source\b[^>]*>", "", body)
+        names = set()
+
+        def inline_img(m):
+            names.add(m.group(1))
+            return 'data-img="%s"' % m.group(1)
+        body = re.sub(r'src="assets/img/([a-z0-9-]+)\.(?:png|jpg|webp)"', inline_img, body)
+        names.update(s["photo"] for s in D["sizes"] if s["photo"])
+        names.add("logo-white")
+        # fonts: only the digits face is embedded; the text faces come from the same families on Google Fonts
+        css = read("assets/css/style.css")
+        css = re.sub(r'@font-face\{font-family:"RV (?:Kufi|Plex|Mont)";[^}]*\}\n', "", css)
+        css = css.replace("url(../fonts/mont-lat.woff2)", "url(%s)" % data_uri("assets/fonts/mont-lat.woff2", "font/woff2"))
+        assert "url(../" not in css and "assets/img/" not in body
         adata = dict(data)
         adata["keepTitle"] = True
         adata["threeCdn"] = THREE_CDN
+        adata["threeFirst"] = True
+        adata["img"] = dict((n, data_uri("assets/img/%s.webp" % n, "image/webp")) for n in sorted(names))
         out = "\n".join([
             "<title>Ravel Storage Profile</title>",
             '<meta name="claude:viewport-fit-sides" content="cover">',
@@ -91,14 +115,7 @@ def main():
         ])
         p = os.path.join(args.artifact, "ravel-storage-profile.html")
         write(p, out)
-        files = {}
-        for sub in ("img", "fonts", "vendor"):
-            for n in sorted(os.listdir(os.path.join(ROOT, "assets", sub))):
-                if n.endswith(".txt") or n in ("og.jpg", "favicon.png"):
-                    continue
-                files["assets/%s/%s" % (sub, n)] = os.path.join(ROOT, "assets", sub, n)
-        write(os.path.join(args.artifact, "files.json"), json.dumps(files, indent=1))
-        print("artifact page", len(out.encode("utf-8")), "bytes;", len(files), "supporting files")
+        print("artifact page", len(out.encode("utf-8")), "bytes;", len(names), "images inlined")
 
 
 if __name__ == "__main__":

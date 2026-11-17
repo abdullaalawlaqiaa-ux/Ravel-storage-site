@@ -436,7 +436,7 @@
       });
       edges.scale.set(w, st.open ? 0.001 : HH, d); edges.position.y = st.open ? 0.001 : HH / 2;
       door.position.set(0, 0, d / 2 + .035); door.visible = !st.open; sill.position.set(0, .011, d / 2 + .06); sill.visible = !st.open;
-      dimW.scale.x = w; dimD.scale.z = d; dimH.scale.y = HH; dimH.visible = !st.open;
+      dimW.scale.x = w; dimD.scale.z = d; dimH.scale.y = HH; dimW.visible = dimD.visible = dimH.visible = !st.open;
       person.position.set(Math.min(w / 2 - .25, .8) + (w < 1.5 ? .35 : 0), 0, d / 2 + .3);
     }
     function buildItems() {
@@ -480,7 +480,7 @@
       dimW.position.set(0, .02, st.bz); dimD.position.set(st.bx, .02, 0); dimH.position.set(st.hx, HH / 2, -st.d / 2 - .12);
       renderer.render(scene, cam);
       place(labels[0], -st.w * .22, .02, st.bz); place(labels[1], st.bx, .02, 0); place(labels[2], st.hx, HH * .6, -st.d / 2 - .12);
-      labels[2].style.display = st.open ? 'none' : '';
+      labels.forEach(function (el) { el.style.display = st.open ? 'none' : ''; });
     }
     // drag to rotate (horizontal drag only on touch, so the page still scrolls)
     canvasEl.addEventListener('pointerdown', function (e) { st.drag = { x: e.clientX, y: e.clientY, az: st.az, el: st.el, mouse: e.pointerType === 'mouse' }; st.user = performance.now(); try { canvasEl.setPointerCapture(e.pointerId); } catch (_) {} if (opts.onUser) opts.onUser(); });

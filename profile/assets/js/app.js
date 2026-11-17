@@ -16,6 +16,9 @@
   var reduced = mm.matches;
   var params = {}; (location.search || '').replace(/^\?/, '').split('&').forEach(function (p) { var a = p.split('='); if (a[0]) params[a[0]] = decodeURIComponent(a[1] || ''); });
   var ASSET = (D.base || '') + 'assets/';
+  // the single-file preview carries its images inside the page (D.img); a hosted copy loads them from assets/img
+  function imgUrl(name, ext) { return D.img && D.img[name] ? D.img[name] : ASSET + 'img/' + name + '.' + (ext || 'webp'); }
+  $$('img[data-img]').forEach(function (im) { var d = D.img && D.img[im.getAttribute('data-img')]; if (d) im.src = d; });
   function clamp(x, a, b) { return Math.max(a, Math.min(b, x)); }
   function seg(x, a, b) { return clamp((x - a) / (b - a), 0, 1); }
   function ease(x) { return x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; }
@@ -162,19 +165,23 @@
   function renderInfo() {
     var u = currentUnit(), saved = state.saved === state.size, h = '';
     h += '<div class="unitinfo__top"><span class="unitinfo__a">' + u.a + '</span><span class="unitinfo__u">' + t('m2') + '</span>' + (u.open ? '<span class="unitinfo__tag">' + t('u.open') + '</span>' : '') + '</div>';
-    h += '<dl class="facts"><div class="fact"><dt>' + t('u.dims') + '</dt><dd>' + dimsHtml(u) + '</dd></div>';
-    h += '<div class="fact"><dt>' + t('u.height') + '</dt><dd>' + (u.open ? '—' : D.height + ' ' + t('m')) + '</dd></div>';
-    h += '<div class="fact"><dt>' + t('u.volume') + '</dt><dd>' + (u.open ? '—' : fmt(Math.round(u.a * D.height)) + ' ' + t('m3')) + '</dd></div></dl>';
-    h += '<p class="tiny">' + t(u.open ? 'u.openNote' : u.exact ? 'u.dimsExact' : 'u.dimsApprox') + '</p>';
+    if (u.open) h += '<p class="tiny">' + t('u.openNote') + '</p>';
+    else {
+      h += '<dl class="facts"><div class="fact"><dt>' + t('u.dims') + '</dt><dd>' + dimsHtml(u) + '</dd></div>';
+      h += '<div class="fact"><dt>' + t('u.height') + '</dt><dd>' + D.height + ' ' + t('m') + '</dd></div>';
+      h += '<div class="fact"><dt>' + t('u.volume') + '</dt><dd>' + fmt(Math.round(u.a * D.height)) + ' ' + t('m3') + '</dd></div></dl>';
+    }
     h += '<div class="fitsline">' + icon('i-box') + '<div><span class="tiny">' + t('u.fits') + '</span><b>' + t(fitsKey(u)) + '</b></div></div>';
-    h += '<div class="pricebox"><span class="pricebox__l">' + t('u.price') + '</span>';
-    if (u.price) h += '<span class="pricebox__v">' + fmt(u.price) + ' <small>' + t('cur') + ' / ' + t('perMonth') + '</small></span><span class="pricebox__d">' + t('u.perDay', { n: Math.round(u.price / 30) }) + '</span>';
-    else if (u.a === 15) h += '<span class="pricebox__q">' + t('u.askPrice') + '</span>';
+    // sizes without a listed monthly rent are priced on request, by phone or WhatsApp
+    h += '<div class="pricebox"><span class="pricebox__l">' + t(u.price ? 'u.price' : 'u.priceAsk') + '</span>';
+    if (u.price) h += '<span class="pricebox__v">' + fmt(u.price) + ' <small>' + t('cur') + ' / ' + t('perMonth') + '</small></span><span class="pricebox__d">' + t('u.otherTerms') + '</span>';
     else h += '<span class="pricebox__q">' + t('u.quote') + '</span><span class="pricebox__d">' + t('u.quoteNote') + '</span>';
     h += '</div>';
     h += '<p class="tiny">' + (u.price ? t('u.priceNote') + ' ' : '') + t('u.ac') + '</p>';
     h += '<div class="unitinfo__actions"><a class="btn btn--wa" id="unitWa" target="_blank" rel="noopener" href="' + wa(unitLines(u)) + '">' + icon('i-chat') + '<span>' + t('u.cta') + '</span></a>';
-    h += '<button class="btn btn--ghost btn--save" id="saveBtn" type="button" aria-pressed="' + saved + '">' + icon('i-save') + '<span>' + t(saved ? 'u.saved' : 'u.save') + '</span></button></div>';
+    h += '<button class="btn btn--ghost btn--save" id="saveBtn" type="button" aria-pressed="' + saved + '">' + icon('i-save') + '<span>' + t(saved ? 'u.saved' : 'u.save') + '</span></button>';
+    if (!u.price) h += '<a class="btn btn--line unitinfo__call" href="tel:' + D.phone + '">' + icon('i-phone') + '<span>' + t('u.callAsk') + '</span><span class="num" dir="ltr">' + D.phoneDisplay + '</span></a>';
+    h += '</div>';
     h += '<a class="link" href="#helper">' + t('u.unsure') + '</a>';
     infoEl.innerHTML = h;
   }
@@ -193,33 +200,56 @@
     return { s: best, exact: false };
   }
   function updatePhoto() {
-    var p = nearestPhoto(currentUnit()), img = $('#unitPhotoImg'), src = ASSET + 'img/' + p.s.photo + '.webp';
-    if (img.getAttribute('data-src') !== src) {
-      img.setAttribute('data-src', src); img.onerror = function () { img.onerror = null; img.src = src.replace('.webp', '.jpg'); }; img.src = src;
+    var p = nearestPhoto(currentUnit()), img = $('#unitPhotoImg'), name = p.s.photo, src = imgUrl(name);
+    if (img.getAttribute('data-photo') !== name) {
+      img.setAttribute('data-photo', name);
+      img.onerror = src.indexOf('data:') === 0 ? null : function () { img.onerror = null; img.src = imgUrl(name, 'jpg'); };
+      img.src = src;
     }
     var cap = plain(p.exact ? 'u.photoCap' : 'u.photoNear', { a: p.s.a }); img.alt = cap; $('#unitPhotoCap').textContent = cap;
   }
+  // every size drawn as its real floor shape (width across, length up) on one scale, nested from the door corner
   function compareSvg(u) {
     var set = (u.open || u.a > 30) ? [1, 6, 16, 30, 50, 100] : [1, 2, 4, 6, 9, 12, 16, 20, 25, 30];
     if (!u.open && set.indexOf(u.a) < 0) set.push(u.a);
     set.sort(function (a, b) { return a - b; });
-    var P = 300, pad = 14, side = Math.sqrt(set[set.length - 1]), k = (P - pad * 2) / side, rtl = state.lang === 'ar', parts = [];
-    set.slice().reverse().forEach(function (a) {
-      var s = Math.sqrt(a) * k, x = rtl ? P - pad - s : pad, y = P - pad - s, on = !u.open && a === u.a;
-      parts.push('<rect class="cmp' + (on ? ' is-on' : '') + '" data-a="' + a + '" x="' + x.toFixed(1) + '" y="' + y.toFixed(1) + '" width="' + s.toFixed(1) + '" height="' + s.toFixed(1) + '" rx="3" tabindex="0" role="button" aria-label="' + a + ' ' + plain('m2') + '"/>');
+    var units = set.map(sizeObj), maxW = 0, maxL = 0;
+    units.forEach(function (s) { maxW = Math.max(maxW, s.w); maxL = Math.max(maxL, s.d); });
+    var P = 300, rtl = state.lang === 'ar', carW = 1.8, carL = 4.5, gap = maxW > 6 ? 1 : .5;
+    var padA = 30, padB = 8, padTop = 36, padBot = 30;   // padA: the side the shapes grow from, with the length scale
+    var k = Math.min((P - padA - padB) / (maxW + gap + carW), (P - padTop - padBot) / Math.max(maxL, carL));
+    var baseY = P - padBot - ((P - padTop - padBot) - Math.max(maxL, carL) * k) / 2, x0 = rtl ? P - padA : padA, dir = rtl ? -1 : 1, parts = [];
+    function X(m) { return x0 + dir * m * k; }
+    function rectAttrs(s) { var w = s.w * k, h = s.d * k; return 'x="' + (rtl ? x0 - w : x0).toFixed(1) + '" y="' + (baseY - h).toFixed(1) + '" width="' + w.toFixed(1) + '" height="' + h.toFixed(1) + '"'; }
+    units.slice().reverse().forEach(function (s) {
+      var on = !u.open && s.a === u.a;
+      parts.push('<rect class="cmp' + (on ? ' is-on' : '') + '" data-a="' + s.a + '" ' + rectAttrs(s) + ' tabindex="0" role="button" aria-label="' + s.a + ' ' + plain('m2') + ': ' + fmtDim(s.w) + ' × ' + fmtDim(s.d) + ' ' + plain('m') + '"/>');
     });
-    set.forEach(function (a) {
-      var s = Math.sqrt(a) * k, x = rtl ? P - pad - s : pad, y = P - pad - s, on = !u.open && a === u.a;
-      if (s < 20 && !on) return;
-      parts.push('<text class="cmp__t' + (on ? ' is-on' : '') + '" x="' + (rtl ? x + 5 : x + s - 5).toFixed(1) + '" y="' + (y + 14).toFixed(1) + '" text-anchor="' + (rtl ? 'start' : 'end') + '">' + a + '</text>');
+    // one square of the grid is one square metre
+    var step = maxL > 6 ? 2 : 1, i;
+    for (i = 0; i <= maxW; i++) parts.push('<line class="cmp__g" x1="' + X(i).toFixed(1) + '" y1="' + baseY.toFixed(1) + '" x2="' + X(i).toFixed(1) + '" y2="' + (baseY - maxL * k).toFixed(1) + '"/>');
+    for (i = 0; i <= maxL; i++) parts.push('<line class="cmp__g" x1="' + x0 + '" y1="' + (baseY - i * k).toFixed(1) + '" x2="' + X(maxW).toFixed(1) + '" y2="' + (baseY - i * k).toFixed(1) + '"/>');
+    for (i = step; i <= maxW; i += step) parts.push('<text class="cmp__ax" x="' + X(i).toFixed(1) + '" y="' + (baseY + 11).toFixed(1) + '" text-anchor="middle">' + i + '</text>');
+    for (i = step; i <= maxL; i += step) parts.push('<text class="cmp__ax" x="' + (x0 - dir * 8).toFixed(1) + '" y="' + (baseY - i * k + 3).toFixed(1) + '" text-anchor="middle">' + i + '</text>');
+    parts.push('<text class="cmp__axt" x="' + X(maxW / 2).toFixed(1) + '" y="' + (baseY + 23).toFixed(1) + '" text-anchor="middle">' + plain('cmp.w') + ' (' + plain('m') + ')</text>');
+    var lx = x0 - dir * 21, ly = baseY - maxL * k / 2;
+    parts.push('<text class="cmp__axt" x="' + lx.toFixed(1) + '" y="' + ly.toFixed(1) + '" text-anchor="middle" transform="rotate(' + (rtl ? 90 : -90) + ' ' + lx.toFixed(1) + ' ' + ly.toFixed(1) + ')">' + plain('cmp.l') + ' (' + plain('m') + ')</text>');
+    units.forEach(function (s) {
+      var on = !u.open && s.a === u.a, w = s.w * k, h = s.d * k;
+      if (on) parts.push('<rect class="cmp__sel" ' + rectAttrs(s) + ' rx="2"/>');
+      if (w < 15 && !on) return;
+      parts.push('<text class="cmp__t' + (on ? ' is-on' : '') + '" x="' + X(s.w - 5 / k).toFixed(1) + '" y="' + (baseY - h + 13).toFixed(1) + '" text-anchor="' + (rtl ? 'start' : 'end') + '">' + s.a + '</text>');
     });
-    // a car (4.5 x 1.8 m) and a person (0.5 m) at the same scale
-    if (side >= 5.2) {
-      var cwd = 4.5 * k, chh = 1.8 * k, cx = rtl ? P - pad - cwd - .35 * k : pad + .35 * k, cy = P - pad - chh - .35 * k;
-      parts.push('<rect class="cmp__ref" x="' + cx.toFixed(1) + '" y="' + cy.toFixed(1) + '" width="' + cwd.toFixed(1) + '" height="' + chh.toFixed(1) + '" rx="' + (chh * .3).toFixed(1) + '"/>');
-      parts.push('<text class="cmp__r" x="' + (cx + cwd / 2).toFixed(1) + '" y="' + (cy + chh / 2 + 4).toFixed(1) + '" text-anchor="middle">' + plain('cmp.car') + '</text>');
-    }
+    // a parked car (1.8 x 4.5 m) beside the shapes, at the same scale
+    var cx = rtl ? X(maxW + gap + carW) : X(maxW + gap), cy = baseY - carL * k;
+    parts.push('<rect class="cmp__ref" x="' + cx.toFixed(1) + '" y="' + cy.toFixed(1) + '" width="' + (carW * k).toFixed(1) + '" height="' + (carL * k).toFixed(1) + '" rx="' + (carW * k * .28).toFixed(1) + '"/>');
+    parts.push('<text class="cmp__r" x="' + (cx + carW * k / 2).toFixed(1) + '" y="' + (cy + carL * k / 2 + 3).toFixed(1) + '" text-anchor="middle">' + plain('cmp.car') + '</text>');
     return '<svg viewBox="0 0 300 300" role="group" aria-label="' + plain('cmp.title') + '">' + parts.join('') + '</svg>';
+  }
+  function renderCompare() {
+    var u = currentUnit();
+    $('#compareSvg').innerHTML = compareSvg(u);
+    $('#compareCap').innerHTML = u.open ? t('u.open') : u.a + ' ' + t('m2') + ' = ' + dimsHtml(u);
   }
   function planSvg(u, layout) {
     var P = 300, pad = 30, k = Math.min((P - pad * 2) / u.w, (P - pad * 2 - 16) / u.d), W = u.w * k, H = u.d * k, x0 = (P - W) / 2, y0 = (P - H) / 2 - 8, p = [], i;
@@ -235,9 +265,11 @@
       var dw = Math.min(.9, u.w * .8) * k; p.push('<line class="plan__d" x1="' + (P / 2 - dw / 2) + '" y1="' + (y0 + H) + '" x2="' + (P / 2 + dw / 2) + '" y2="' + (y0 + H) + '"/>');
       p.push('<circle cx="' + (P / 2 + Math.min(dw / 2, .5 * k)) + '" cy="' + (y0 + H + Math.max(7, .32 * k)) + '" r="' + Math.max(3.5, .22 * k) + '" fill="#152249"/>');
     }
-    var tx = unitTexts(u);
-    p.push('<text class="plan__t" x="' + (P / 2) + '" y="' + (y0 - 9) + '" text-anchor="middle">' + tx.w + '</text>');
-    p.push('<text class="plan__t" x="' + (x0 - 9) + '" y="' + (y0 + H / 2) + '" text-anchor="middle" transform="rotate(-90 ' + (x0 - 9) + ' ' + (y0 + H / 2) + ')">' + tx.d + '</text>');
+    if (!u.open) {
+      var tx = unitTexts(u);
+      p.push('<text class="plan__t" x="' + (P / 2) + '" y="' + (y0 - 9) + '" text-anchor="middle">' + tx.w + '</text>');
+      p.push('<text class="plan__t" x="' + (x0 - 9) + '" y="' + (y0 + H / 2) + '" text-anchor="middle" transform="rotate(-90 ' + (x0 - 9) + ' ' + (y0 + H / 2) + ')">' + tx.d + '</text>');
+    }
     return '<svg viewBox="0 0 300 300" aria-hidden="true">' + p.join('') + '</svg>';
   }
   function setView(v) {
@@ -246,7 +278,8 @@
     $('#pane3d').hidden = v !== '3d'; $('#panePhoto').hidden = v !== 'photo'; $('#paneCompare').hidden = v !== 'compare';
     $('#viewerBar').hidden = v !== '3d';
     if (v === 'photo') updatePhoto();
-    if (v === 'compare') $('#compareSvg').innerHTML = compareSvg(currentUnit());
+    $('#compareNote').hidden = v !== 'compare';
+    if (v === 'compare') renderCompare();
     if (viewer) viewer.setActive(v === '3d' && viewerVisible);
     if (v === '3d' && viewer) viewer.resize();
   }
@@ -254,7 +287,7 @@
   function renderUnit(instant) {
     renderInfo(); updateViewer(instant);
     if (state.view === 'photo') updatePhoto();
-    if (state.view === 'compare') $('#compareSvg').innerHTML = compareSvg(currentUnit());
+    if (state.view === 'compare') renderCompare();
     syncPrices(); syncQuoteSize(); updateDock();
   }
   function selectSize(a, user) {
@@ -443,16 +476,12 @@
 
   /* ---------------- branches ---------------- */
   function renderBranches() {
-    var view = state.bview || state.branch || D.branches[0].id;
-    $('#branchTabs').innerHTML = D.branches.map(function (b) {
-      return '<button class="seg__btn' + (b.id === view ? ' is-on' : '') + '" type="button" role="tab" aria-selected="' + (b.id === view) + '" data-bview="' + b.id + '">' + (state.branch === b.id ? icon('i-check') : '') + '<span>' + t(b.name) + '</span></button>';
-    }).join('');
     $('#branchList').innerHTML = D.branches.map(function (b) {
       var nm = plain(b.name), chosen = state.branch === b.id;
       var first = b.map
         ? '<a class="btn btn--sm btn--navy" target="_blank" rel="noopener" href="' + b.map + '">' + icon('i-pin') + '<span>' + t('b.dir') + '</span></a>'
         : '<a class="btn btn--sm btn--navy" target="_blank" rel="noopener" href="' + wa([plain('wa.hello'), plain('wa.loc', { b: nm })]) + '">' + icon('i-pin') + '<span>' + t('b.loc') + '</span></a>';
-      return '<li class="card branch' + (chosen ? ' is-chosen' : '') + (b.id === view ? ' is-active' : '') + '" data-b="' + b.id + '"><h3 class="branch__name"><span>' + t(b.name) + '</span>' + (chosen ? '<span class="plate">' + t('b.chosen') + '</span>' : '') + '</h3>' +
+      return '<li class="card branch' + (chosen ? ' is-chosen' : '') + '" data-b="' + b.id + '"><h3 class="branch__name"><span>' + t(b.name) + '</span>' + (chosen ? '<span class="plate">' + t('b.chosen') + '</span>' : '') + '</h3>' +
         '<p class="branch__row">' + icon('i-pin') + '<span>' + t(b.area) + '</span></p>' +
         (b.map ? '' : '<p class="tiny">' + t('b.note') + '</p>') +
         '<div class="branch__actions">' + first +
@@ -462,12 +491,8 @@
   }
   $('#branchList').addEventListener('click', function (e) {
     var b = e.target.closest ? e.target.closest('[data-choose]') : null; if (!b) return;
-    var id = b.getAttribute('data-choose'); state.branch = state.branch === id ? null : id; state.bview = id;
+    var id = b.getAttribute('data-choose'); state.branch = state.branch === id ? null : id;
     renderBranches(); renderInfo(); $('#qBranch').value = state.branch || ''; renderQuote(); updateDock();
-  });
-  $('#branchTabs').addEventListener('click', function (e) {
-    var b = e.target.closest ? e.target.closest('[data-bview]') : null; if (!b) return;
-    state.bview = b.getAttribute('data-bview'); renderBranches();
   });
 
   /* ---------------- contact + quote ---------------- */
@@ -476,7 +501,7 @@
     var sz = $('#qSize'), keep = sz.value, br = $('#qBranch'), kb = br.value || state.branch || '', tm = $('#qTerm'), kt = tm.value || 'x';
     fillSelect(sz, [['', plain('c.sizeAny')]].concat(D.sizes.map(function (s) { return [String(s.a), s.a + ' ' + plain('m2')]; })).concat([['big', plain('c.sizeBig')]]), keep);
     fillSelect(br, [['', plain('c.branchAny')]].concat(D.branches.map(function (b) { return [b.id, plain(b.name)]; })), kb);
-    fillSelect(tm, [['x', plain('c.tx')], ['1', plain('c.t1')], ['3', plain('c.t3')], ['6', plain('c.t6')], ['12', plain('c.t12')]], kt);
+    fillSelect(tm, [['x', plain('c.tx')], ['D', plain('c.tD')], ['M', plain('c.tM')], ['Y', plain('c.tY')]], kt);
   }
   var quoteTouched = false;
   function syncQuoteSize() { if (!quoteTouched && state.touched) { $('#qSize').value = String(state.size); renderQuote(); } }
@@ -492,7 +517,7 @@
     $('#qPreview').textContent = L.join('\n'); $('#qSend').href = wa(L);
   }
   ['qName', 'qSize', 'qBranch', 'qTerm', 'qNotes'].forEach(function (id) {
-    $('#' + id).addEventListener('input', function () { if (id === 'qSize') quoteTouched = true; if (id === 'qBranch') { state.branch = this.value || null; if (state.branch) state.bview = state.branch; renderBranches(); renderInfo(); } renderQuote(); });
+    $('#' + id).addEventListener('input', function () { if (id === 'qSize') quoteTouched = true; if (id === 'qBranch') { state.branch = this.value || null; renderBranches(); renderInfo(); } renderQuote(); });
   });
   $('#qType').addEventListener('click', function (e) {
     var b = e.target.closest ? e.target.closest('[data-type]') : null; if (!b) return; state.type = b.getAttribute('data-type');
@@ -507,7 +532,9 @@
   function staticLinks() {
     var general = wa([plain('wa.hello'), plain('wa.general')]);
     $('#heroContact').href = general; $('#waMain').href = general; $('#journeyWa').href = general;
-    $('#helperPhotos').href = wa([plain('wa.hello'), plain('wa.photos')]);
+    var photos = wa([plain('wa.hello'), plain('wa.photos')]);
+    $('#helperPhotos').href = photos; $('#journeyPhotos').href = photos;
+    $('#bigWa').href = wa([plain('wa.hello'), plain('wa.bigAsk')]);
   }
 
   /* ---------------- dock, toast, menu ---------------- */
@@ -518,7 +545,7 @@
     if (state.touched) { $('#dockWaText').textContent = plain('d.ask', { a: u.a }); $('#dockWa').href = wa(unitLines(u)); }
     else { $('#dockWaText').textContent = plain('d.wa'); $('#dockWa').href = wa([plain('wa.hello'), plain('wa.general')]); }
     sv.hidden = state.saved == null;
-    if (state.saved != null) $('#dockSavedText').textContent = plain('d.my', { a: unitFor(state.saved).a });
+    if (state.saved != null) { var sa = unitFor(state.saved).a; $('#dockSavedText').textContent = plain('d.my', { a: sa }); sv.setAttribute('aria-label', plain('d.myLabel', { a: sa })); }
   }
   $('#dockSaved').addEventListener('click', function () { if (state.saved != null) selectSize(state.saved, true); });
   var menu = $('#menu'), menuBtn = $('#menuBtn');
@@ -539,8 +566,10 @@
     cbs.push(cb); if (loading3d) return; loading3d = true;
     var done = function (ok) { loading3d = false; var q = cbs; cbs = []; q.forEach(function (f) { f(ok && !!window.THREE && !!window.RV3D); }); };
     var scene = function (ok) { if (!ok) return done(false); if (window.RV3D) return done(true); loadScript(ASSET + 'js/scene3d.js', done); };
+    // a hosted copy tries its own file first, the single-file preview tries the CDN first; each falls back to the other
+    var own = ASSET + 'vendor/three.min.js', first = D.threeFirst && D.threeCdn ? D.threeCdn : own, second = first === own ? D.threeCdn : own;
     if (window.THREE) scene(true);
-    else loadScript(ASSET + 'vendor/three.min.js', function (ok) { if (ok) scene(true); else if (D.threeCdn) loadScript(D.threeCdn, scene); else scene(false); });
+    else loadScript(first, function (ok) { if (ok) scene(true); else if (second) loadScript(second, scene); else scene(false); });
   }
   function setLite(on, auto) {
     state.lite = on; if (!auto) store.set('rv_lite', on ? '1' : '0');
@@ -563,7 +592,7 @@
       if (corridor || state.lite) return;
       var go = function () {
         if (corridor || state.lite) return;
-        try { corridor = window.RV3D.createCorridor($('#corridor'), { low: !!lowEnd, logo: ASSET + 'img/logo-white.png' }); }
+        try { corridor = window.RV3D.createCorridor($('#corridor'), { low: !!lowEnd, logo: imgUrl('logo-white', 'png') }); }
         catch (e) { corridor = null; return setLite(true, true); }
         $('#corridor').addEventListener('webglcontextlost', function (ev) { ev.preventDefault(); setLite(true, true); });
         measure(); cam.z = camT.z = 2.4; intro0 = 0;

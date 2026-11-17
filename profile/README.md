@@ -27,7 +27,7 @@ python3 -m http.server 8000    # للمعاينة: http://localhost:8000
 ```
 
 - **تغيير سعر أو إضافة مقاس:** عدّل `sizes` في `_src/data.json`. السعر `null` يعرض «اطلب عرض سعر».
-- **إضافة موقع فرع:** ضع رابط Google Maps في `map` للفرع داخل `branches`. الفرع الذي قيمته `null` يعرض زر «أرسلوا لي الموقع» على واتساب.
+- **المناطق:** قائمة `branches` في `_src/data.json` (حالياً مصفح والمفرق). المنطقة التي قيمة `map` فيها `null` تعرض زر «أرسلوا لي الموقع» على واتساب، وإذا وضعت رابط Google Maps يظهر زر «الاتجاهات على الخريطة».
 - **تغيير نص:** عدّل المفتاح في `_src/strings.json` باللغتين.
 
 ## النشر
@@ -38,6 +38,12 @@ python3 -m http.server 8000    # للمعاينة: http://localhost:8000
 
 ```bash
 python3 _src/build.py --base https://example.com/profile/
+```
+
+لصفحة معاينة واحدة تعمل لحالها (الصور مدمجة داخلها):
+
+```bash
+python3 _src/build.py --artifact مجلد_الإخراج
 ```
 
 ## روابط مفيدة

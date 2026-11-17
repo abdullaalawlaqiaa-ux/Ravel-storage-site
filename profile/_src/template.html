@@ -206,9 +206,10 @@
             </div>
             <div class="viewer__pane viewer__compare" id="paneCompare" hidden>
               <div id="compareSvg"></div>
-              <span class="viewer__cap viewer__cap--static" data-i18n="cmp.tap"></span>
+              <span class="viewer__cap" id="compareCap"></span>
             </div>
           </div>
+          <p class="tiny viewer__note" id="compareNote" data-i18n="cmp.tap" hidden></p>
           <div class="viewer__bar" id="viewerBar">
             <button class="toggle" id="itemsToggle" type="button" aria-pressed="true"><span class="toggle__ui" aria-hidden="true"></span><span id="itemsToggleText"></span></button>
             <span class="tiny" data-i18n="u.example"></span>
@@ -228,6 +229,22 @@
     <span class="eyebrow" data-i18n="h.eyebrow"></span>
     <h2 class="h2" id="helper-h" data-i18n="h.h2"></h2>
     <p class="lead" data-i18n="h.p"></p>
+    <div class="card option option--best">
+      <span class="option__n" aria-hidden="true">1</span>
+      <div class="option__body">
+        <span class="option__badge" data-i18n="h.o1b"></span>
+        <h3 class="h3 h3--flush" data-i18n="h.o1"></h3>
+        <p data-i18n="h.o1d"></p>
+        <a class="btn btn--wa" id="helperPhotos" href="#contact" target="_blank" rel="noopener"><svg class="ic"><use href="#i-photo"/></svg><span data-i18n="h.sendPhotos"></span></a>
+      </div>
+    </div>
+    <div class="option option--head">
+      <span class="option__n" aria-hidden="true">2</span>
+      <div class="option__body">
+        <h3 class="h3 h3--flush" data-i18n="h.o2"></h3>
+        <p data-i18n="h.o2d"></p>
+      </div>
+    </div>
     <div class="helper card" id="helperBox">
       <div class="helper__head">
         <span class="helper__step" id="helperStep"></span>
@@ -239,7 +256,6 @@
         <button class="btn btn--navy" id="helperNext" type="button"><span id="helperNextText"></span><svg class="ic ic--dir"><use href="#i-arrow"/></svg></button>
       </div>
     </div>
-    <p class="helper__or"><span data-i18n="h.or"></span> <a class="link" id="helperPhotos" href="#contact" target="_blank" rel="noopener" data-i18n="h.sendPhotos"></a></p>
   </div>
 </section>
 
@@ -260,12 +276,19 @@
       <span id="pSelectedText"></span>
       <a class="link" href="#units" data-i18n="p.view"></a>
     </div>
-    <p class="card note" data-i18n="p.big"></p>
+    <div class="card bigask">
+      <p class="note" data-i18n="p.big"></p>
+      <div class="bigask__btns">
+        <a class="btn btn--sm btn--wa" id="bigWa" href="#contact" target="_blank" rel="noopener"><svg class="ic"><use href="#i-chat"/></svg><span data-i18n="c.wa"></span></a>
+        <a class="btn btn--sm btn--navy" href="tel:+971503250551"><svg class="ic"><use href="#i-phone"/></svg><span data-i18n="c.call"></span></a>
+      </div>
+    </div>
     <div class="card">
       <h3 class="h3 h3--flush" data-i18n="p.term"></h3>
       <ul class="ticks">
         <li data-i18n="p.term1"></li><li data-i18n="p.term2"></li><li data-i18n="p.term3"></li>
       </ul>
+      <p class="callout" data-i18n="p.term4"></p>
     </div>
     <a class="btn btn--wa" id="priceQuote" href="#contact"><svg class="ic"><use href="#i-chat"/></svg><span data-i18n="p.cta"></span></a>
   </div>
@@ -385,7 +408,7 @@
     <ol class="journey" id="journeyList">
       <li class="jstep is-open">
         <button class="jstep__head" type="button" aria-expanded="true" aria-controls="j1"><span class="jstep__n">1</span><span class="jstep__t" data-i18n="j.1t"></span><svg class="ic"><use href="#i-chev"/></svg></button>
-        <div class="jstep__body" id="j1"><p data-i18n="j.1d"></p><a class="btn btn--sm btn--navy" href="#units"><span data-i18n="j.1c"></span></a></div>
+        <div class="jstep__body" id="j1"><p data-i18n="j.1d"></p><div class="jstep__btns"><a class="btn btn--sm btn--wa" id="journeyPhotos" href="#contact" target="_blank" rel="noopener"><svg class="ic"><use href="#i-photo"/></svg><span data-i18n="j.1c"></span></a><a class="btn btn--sm btn--ghost" href="#helper"><span data-i18n="j.1c2"></span></a></div></div>
       </li>
       <li class="jstep">
         <button class="jstep__head" type="button" aria-expanded="false" aria-controls="j2"><span class="jstep__n">2</span><span class="jstep__t" data-i18n="j.2t"></span><svg class="ic"><use href="#i-chev"/></svg></button>
@@ -410,7 +433,6 @@
     <span class="eyebrow" data-i18n="b.eyebrow"></span>
     <h2 class="h2" id="branches-h" data-i18n="b.h2"></h2>
     <p class="lead" data-i18n="b.p"></p>
-    <div class="seg seg--full branchtabs" id="branchTabs" role="tablist" data-i18n-attr="aria-label:b.tabs"></div>
     <ul class="branches" id="branchList"><!--BRANCHES--></ul>
   </div>
 </section>
