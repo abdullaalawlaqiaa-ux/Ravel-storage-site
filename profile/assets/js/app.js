@@ -149,22 +149,51 @@
   }
 
   /* ---------------- units: explorer UI ---------------- */
-  var sizesEl = $('#sizes'), infoEl = $('#unitInfo');
+  var sizesEl = $('#sizes'), infoEl = $('#unitInfo'), footPrev = null;
   function renderSizes() {
     var h = D.sizes.map(function (s) {
       var on = state.size === s.a;
-      return '<button class="size' + (s.photo ? ' has-photo' : '') + '" type="button" role="radio" aria-checked="' + on + '" tabindex="' + (on ? 0 : -1) + '" data-a="' + s.a + '" aria-label="' + s.a + ' ' + plain('m2') + '">' + s.a + '</button>';
+      return '<button class="size rtick' + (s.photo ? ' has-photo' : '') + '" type="button" role="radio" aria-checked="' + on + '" tabindex="' + (on ? 0 : -1) + '" data-a="' + s.a + '" aria-label="' + s.a + ' ' + plain('m2') + '"><b>' + s.a + '</b><small>' + t('m2') + '</small></button>';
     }).join('');
     var onBig = state.size === 'big';
-    h += '<button class="size size--more" type="button" role="radio" aria-checked="' + onBig + '" tabindex="' + (onBig ? 0 : -1) + '" data-a="big" aria-label="' + plain('u.open') + '"><bdi dir="ltr">100+</bdi></button>';
-    sizesEl.innerHTML = h; $('#bigRange').hidden = !onBig;
+    h += '<button class="size rtick rtick--more" type="button" role="radio" aria-checked="' + onBig + '" tabindex="' + (onBig ? 0 : -1) + '" data-a="big" aria-label="' + plain('u.open') + '"><b><bdi dir="ltr">100+</bdi></b><small>' + t('m2') + '</small></button>';
+    sizesEl.innerHTML = h; rulerNear = null; $('#bigRange').hidden = !onBig;
     $('#bigInput').value = state.big; $('#bigOut').textContent = state.big + ' ' + plain('m2');
+    requestAnimationFrame(function () { rulerGo(state.size, true); });
   }
+  /* the ruler: the tick under the needle is the chosen size, so dragging it reshapes the unit as it goes */
+  var rulerTarget = null, rulerT = 0, rulerRaf = 0, rulerNear = null;
+  function rulerMark() {
+    var r = sizesEl.getBoundingClientRect(), mid = r.left + r.width / 2, best = null, bd = 1e9;
+    $$('.size', sizesEl).forEach(function (b) { var q = b.getBoundingClientRect(), dd = Math.abs(q.left + q.width / 2 - mid); if (dd < bd) { bd = dd; best = b; } });
+    if (best && best !== rulerNear) { if (rulerNear) rulerNear.classList.remove('is-near'); best.classList.add('is-near'); rulerNear = best; }
+    return best;
+  }
+  function rulerGo(a, instant) {
+    var b = $('.size[data-a="' + a + '"]', sizesEl); if (!b) return;
+    var r = sizesEl.getBoundingClientRect(), q = b.getBoundingClientRect(), delta = (q.left + q.width / 2) - (r.left + r.width / 2);
+    if (!r.width || Math.abs(delta) < 1) { rulerMark(); return; }
+    rulerTarget = String(a); clearTimeout(rulerT); rulerT = setTimeout(function () { rulerTarget = null; }, 900);
+    if (instant || reduced || !sizesEl.scrollBy) sizesEl.scrollLeft += delta; else sizesEl.scrollBy({ left: delta, behavior: 'smooth' });
+  }
+  sizesEl.addEventListener('scroll', function () {
+    if (rulerRaf) return;
+    rulerRaf = requestAnimationFrame(function () {
+      rulerRaf = 0; var c = rulerMark(); if (!c) return;
+      var a = c.getAttribute('data-a');
+      if (rulerTarget != null) { if (a === rulerTarget) rulerTarget = null; return; }   // gliding to a chosen tick: wait until it lands
+      if (String(state.size) !== a) selectSize(a === 'big' ? 'big' : +a, true, true);
+    });
+  }, { passive: true });
   function fitsKey(u) { return 'fits.' + u.fits; }
   function dimsHtml(u) { return (u.exact ? '' : '≈ ') + '<span dir="ltr">' + fmtDim(u.w) + ' × ' + fmtDim(u.d) + '</span> ' + t('m'); }
   function renderInfo() {
     var u = currentUnit(), saved = state.saved === state.size, h = '';
-    h += '<div class="unitinfo__top"><span class="unitinfo__a">' + u.a + '</span><span class="unitinfo__u">' + t('m2') + '</span>' + (u.open ? '<span class="unitinfo__tag">' + t('u.open') + '</span>' : '') + '</div>';
+    // a small floor shape beside the number: it starts at the previous size and stretches to the new one
+    var fs = 58 / Math.max(u.w, u.d), nf = { w: Math.round(u.w * fs), h: Math.round(u.d * fs), s: fs }, pf = footPrev || nf;
+    h += '<div class="unitinfo__top"><span class="unitinfo__a">' + u.a + '</span><span class="unitinfo__u">' + t('m2') + '</span>' +
+      (u.open ? '<span class="unitinfo__tag">' + t('u.open') + '</span>'
+        : '<span class="foot" aria-hidden="true"><i style="width:' + pf.w + 'px;height:' + pf.h + 'px;background-size:' + pf.s.toFixed(2) + 'px ' + pf.s.toFixed(2) + 'px"></i></span>') + '</div>';
     if (u.open) h += '<p class="tiny">' + t('u.openNote') + '</p>';
     else {
       h += '<dl class="facts"><div class="fact"><dt>' + t('u.dims') + '</dt><dd>' + dimsHtml(u) + '</dd></div>';
@@ -184,6 +213,10 @@
     h += '</div>';
     h += '<a class="link" href="#helper">' + t('u.unsure') + '</a>';
     infoEl.innerHTML = h;
+    if (!u.open) {
+      footPrev = nf; var fi = $('.foot i', infoEl);
+      requestAnimationFrame(function () { if (!fi) return; fi.style.width = nf.w + 'px'; fi.style.height = nf.h + 'px'; fi.style.backgroundSize = nf.s.toFixed(2) + 'px ' + nf.s.toFixed(2) + 'px'; });
+    }
   }
   function unitTexts(u) { var p = u.exact ? '' : '≈ '; return { w: p + fmtDim(u.w) + ' ' + plain('m'), d: p + fmtDim(u.d) + ' ' + plain('m'), h: D.height + ' ' + plain('m') }; }
 
@@ -276,6 +309,7 @@
     state.view = v;
     $$('#viewTabs .seg__btn').forEach(function (b) { var on = b.getAttribute('data-view') === v; b.classList.toggle('is-on', on); b.setAttribute('aria-selected', on); });
     $('#pane3d').hidden = v !== '3d'; $('#panePhoto').hidden = v !== 'photo'; $('#paneCompare').hidden = v !== 'compare';
+    $('#viewerStage').setAttribute('data-view', v);
     $('#viewerBar').hidden = v !== '3d';
     if (v === 'photo') updatePhoto();
     $('#compareNote').hidden = v !== 'compare';
@@ -288,13 +322,15 @@
     renderInfo(); updateViewer(instant);
     if (state.view === 'photo') updatePhoto();
     if (state.view === 'compare') renderCompare();
-    syncPrices(); syncQuoteSize(); updateDock();
+    syncPrices(); syncQuoteSize(); updateDock(); renderDoor();
   }
-  function selectSize(a, user) {
+  function selectSize(a, user, fromRuler) {
     state.size = a; if (user) state.touched = true;
     $$('.size', sizesEl).forEach(function (b) { var on = String(b.getAttribute('data-a')) === String(a); b.setAttribute('aria-checked', on); b.tabIndex = on ? 0 : -1; });
     $('#bigRange').hidden = a !== 'big';
+    if (!fromRuler) rulerGo(a, false);
     renderUnit(false);
+    if (window.RVFX) window.RVFX.sizeChanged();
   }
   sizesEl.addEventListener('click', function (e) { var b = e.target.closest ? e.target.closest('.size') : null; if (b) selectSize(b.getAttribute('data-a') === 'big' ? 'big' : +b.getAttribute('data-a'), true); });
   sizesEl.addEventListener('keydown', function (e) {
@@ -348,6 +384,20 @@
     if (state.branch) L.push(plain('wa.branch', { b: branchName(state.branch) }));
     return L;
   }
+  // the live box above the list: how full the suggested unit is, with one colour per kind of item
+  function fillSync() {
+    if (!window.RVFX) return;
+    var r = helperCalc(), cats = [], has = r.lines.length > 0;
+    HC.forEach(function (c) {
+      if (!H.cats[c.id]) return; var v = 0;
+      c.items.forEach(function (it) { v += (H.qty[it[0]] || 0) * (it[1] + (it[2] || 0) * 1.65); });
+      if (v > 0) cats.push([c.id, v]);
+    });
+    var frac = !has ? 0 : r.rec ? Math.min(1, r.need / r.rec) : 1;
+    window.RVFX.fill(H.step >= 2, frac, cats,
+      !has ? '' : r.rec ? r.rec + ' ' + plain('m2') : plain('h.fillOver'),
+      !has ? plain('h.fillEmpty') : r.rec ? plain('h.fillNote', { p: Math.round(frac * 100) }) : '');
+  }
   function renderHelper() {
     var h = '', total = 0;
     $('#helperStep').textContent = plain('h.step', { n: H.step }); $('#helperBar').style.width = (H.step * 33.34) + '%';
@@ -390,7 +440,7 @@
     $('#helperBack').style.visibility = H.step === 1 ? 'hidden' : 'visible';
     $('#helperNextText').textContent = plain(H.step === 1 ? 'h.next' : H.step === 2 ? 'h.calc' : 'h.restart');
     $('#helperNext').className = 'btn ' + (H.step === 3 ? 'btn--ghost' : 'btn--navy');
-    remeasureSoon();
+    fillSync(); remeasureSoon();
   }
   hBody.addEventListener('click', function (e) {
     var el = e.target.closest ? e.target.closest('[data-cat],[data-preset],[data-step],[data-see]') : null; if (!el) return;
@@ -404,7 +454,7 @@
     }
     if (el.hasAttribute('data-step')) {
       var it = el.getAttribute('data-item'), q = clamp((H.qty[it] || 0) + (+el.getAttribute('data-step')), 0, 200); H.qty[it] = q; H.preset = null;
-      var out = el.parentNode.querySelector('output'); out.textContent = q; out.className = q ? '' : 'is-zero';
+      var out = el.parentNode.querySelector('output'); out.textContent = q; out.className = q ? '' : 'is-zero'; fillSync();
       var er2 = $('.helper__err', hBody); if (er2) er2.remove(); return;
     }
     if (el.hasAttribute('data-see')) selectSize(+el.getAttribute('data-see'), true);
@@ -444,35 +494,11 @@
     $$('#whoTabs .seg__btn').forEach(function (b) { var on = b.getAttribute('data-who') === w; b.classList.toggle('is-on', on); b.setAttribute('aria-selected', on); });
     $('#who-ind').hidden = w !== 'ind'; $('#who-biz').hidden = w !== 'biz'; remeasureSoon();
   });
-  // features
-  var featUser = false, featIdx = 1;
-  function setFeat(f) {
-    featIdx = +f;
-    $$('#feat .scene').forEach(function (s) { s.classList.toggle('is-on', +s.getAttribute('data-f') === featIdx); });
-    $$('#feat .feat__panel').forEach(function (s) { s.classList.toggle('is-on', +s.getAttribute('data-f') === featIdx); });
-    $$('#featTabs .ftab').forEach(function (b) { var on = +b.getAttribute('data-f') === featIdx; b.classList.toggle('is-on', on); b.setAttribute('aria-selected', on); });
-  }
-  tabs($('#featTabs'), 'data-f', function (f) { featUser = true; setFeat(f); });
-  // journey
-  $('#journeyList').addEventListener('click', function (e) {
-    var hd = e.target.closest ? e.target.closest('.jstep__head') : null; if (!hd) return;
-    var li = hd.parentNode, open = !li.classList.contains('is-open');
-    $$('#journeyList .jstep').forEach(function (x) { x.classList.remove('is-open'); $('.jstep__head', x).setAttribute('aria-expanded', 'false'); });
-    if (open) { li.classList.add('is-open'); hd.setAttribute('aria-expanded', 'true'); }
-    remeasureSoon();
-  });
   $$('.qa').forEach(function (d) { d.addEventListener('toggle', remeasureSoon); });
-  // gentle auto-advance while a section is on screen (never under reduced motion)
-  var vis = {};
-  if ('IntersectionObserver' in window) {
-    var io = new IntersectionObserver(function (es) { es.forEach(function (e) { vis[e.target.id] = e.isIntersecting; }); }, { threshold: .25 });
-    ['service', 'why'].forEach(function (id) { io.observe($('#' + id)); });
-  }
-  var stepIdx = 0;
-  if (!reduced) {
-    setInterval(function () { if (!vis.service) return; stepIdx = (stepIdx + 1) % 3; $$('#steps3 .step').forEach(function (s, i) { s.classList.toggle('is-on', i === stepIdx); }); }, 2200);
-    setInterval(function () { if (!vis.why || featUser) return; setFeat(featIdx % 6 + 1); }, 4600);
-  }
+  // the three "how it works" steps light up in turn while they are on screen (never under reduced motion)
+  var stepsOn = false, stepIdx = 0;
+  if ('IntersectionObserver' in window) new IntersectionObserver(function (es) { stepsOn = es[0].isIntersecting; }, { threshold: .4 }).observe($('#steps3'));
+  if (!reduced) setInterval(function () { if (!stepsOn) return; stepIdx = (stepIdx + 1) % 3; $$('#steps3 .step').forEach(function (s, i) { s.classList.toggle('is-on', i === stepIdx); }); }, 2200);
 
   /* ---------------- branches ---------------- */
   function renderBranches() {
@@ -592,7 +618,7 @@
       if (corridor || state.lite) return;
       var go = function () {
         if (corridor || state.lite) return;
-        try { corridor = window.RV3D.createCorridor($('#corridor'), { low: !!lowEnd, logo: imgUrl('logo-white', 'png') }); }
+        try { corridor = window.RV3D.createCorridor($('#corridor'), { low: !!lowEnd, logo: imgUrl('logo-white', 'png'), doors: 1 }); }
         catch (e) { corridor = null; return setLite(true, true); }
         $('#corridor').addEventListener('webglcontextlost', function (ev) { ev.preventDefault(); setLite(true, true); });
         measure(); cam.z = camT.z = 2.4; intro0 = 0;
@@ -605,75 +631,91 @@
     if (viewer || state.lite) { if (viewer) { $('#viewerStage').classList.remove('is-lite3d'); viewer.setActive(state.view === '3d' && viewerVisible); } return; }
     ensure3D(function (ok) {
       if (!ok || viewer || state.lite) return;
-      try { viewer = window.RV3D.createUnitViewer($('#unitCanvas'), $('#unitLabels'), { still: reduced, onUser: function () { $('#unitHint').classList.add('is-off'); } }); }
+      try {
+        viewer = window.RV3D.createUnitViewer($('#unitCanvas'), $('#unitLabels'), {
+          still: reduced, dark: true,
+          onUser: function () { $('#unitHint').classList.add('is-off'); },
+          onTap: function () { doorIntro = true; setDoor(!doorOpen); }
+        });
+      }
       catch (e) { viewer = null; return; }
-      $('#viewerStage').classList.remove('is-lite3d'); viewer.resize(); updateViewer(true); viewer.setActive(state.view === '3d' && viewerVisible);
+      $('#viewerStage').classList.remove('is-lite3d'); viewer.resize(); updateViewer(true); viewer.setLid(doorOpen, true);
+      viewer.setActive(state.view === '3d' && viewerVisible); if (viewerSeen) doorFirstView();
     });
   }
+  var viewerSeen = false;
   if ('IntersectionObserver' in window) {
     new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting && !state.lite) startViewer(); }); }, { rootMargin: '900px 0px' }).observe($('#units'));
     new IntersectionObserver(function (es) { es.forEach(function (e) { viewerVisible = e.isIntersecting; if (viewer) viewer.setActive(viewerVisible && state.view === '3d' && !state.lite); }); }, { threshold: .05 }).observe($('#viewerStage'));
-  } else viewerVisible = true;
+    new IntersectionObserver(function (es) { if (es[0].isIntersecting) { viewerSeen = true; if (viewer) doorFirstView(); } }, { threshold: .6 }).observe($('#viewerStage'));
+  } else { viewerVisible = true; viewerSeen = true; }
 
-  /* ---------------- the walk: scroll drives the camera ---------------- */
-  var walks = $$('.walk'), anchors = [], vh = window.innerHeight, docH = 1, contactTop = 1e9, narrow = true;
-  var cam = { z: 2.4, yaw: 0, x: 0, shift: .14 }, camT = { z: 0, yaw: 0, x: 0, shift: .14 }, doors = [], intro0 = -1, lastT = 0, lastY = -1, fps = { n: 0, sum: 0, stage: 0 };
+  /* ---------------- the opening walk: scrolling the first section takes the camera to a door and through it ---------------- */
+  var heroEl = $('#top'), heroTop = $('#heroTop'), heroPanel = $('#heroPanel'), whiteEl = $('#stageWhite');
+  var vh = window.innerHeight, docH = 1, heroLen = 0, contactTop = 1e9, narrow = true;
+  var cam = { z: 2.4, yaw: 0, x: 0, shift: .14 }, camT = { z: 0, yaw: 0, x: 0, shift: .14 }, doorK = 0, intro0 = -1, lastT = 0, lastY = -1, lastP = -1, fps = { n: 0, sum: 0, stage: 0 };
   // while the visitor rests on the first screen the walk continues slowly by itself, up to CREEP_MAX metres
   var creep = 0, CREEP_MAX = 2.6;
+  // dragging sideways on the corridor turns the head a little; it eases back when released
+  var look = 0, lookT = 0, lookFrom = null;
   function measure() {
     vh = window.innerHeight; narrow = window.innerWidth < 860;
     var sy = window.pageYOffset || rootEl.scrollTop || 0;
-    anchors = walks.map(function (wk) {
-      var sh = wk.nextElementSibling, top = wk.getBoundingClientRect().top + sy, st = sh.getBoundingClientRect().top + sy, sb = st + sh.offsetHeight;
-      return { a: top - vh, b: st - vh * .5, c: sb - vh, top: st };
-    });
-    docH = Math.max(1, rootEl.scrollHeight - vh); contactTop = anchors.length ? anchors[anchors.length - 1].top : 1e9;
+    heroLen = Math.max(0, heroEl.offsetHeight - vh);
+    docH = Math.max(1, rootEl.scrollHeight - vh);
+    contactTop = $('#contact').getBoundingClientRect().top + sy;
     if (corridor) corridor.resize(); if (viewer) viewer.resize();
-    lastY = -1;
+    lastY = -1; lastP = -1;
   }
   var rmT = 0; function remeasureSoon() { clearTimeout(rmT); rmT = setTimeout(measure, 120); }
-  function poseAt(y) {
-    var st = corridor.stops, prev = -creep, z = prev, yaw = 0, x = 0, i, open = [];
-    for (i = 0; i < st.length; i++) open.push(0);
-    for (i = 0; i < anchors.length && i < st.length; i++) {
-      var A = anchors[i], s = st[i], stop = s.end ? s.z + 4.6 : s.z + 2.7, turn = s.end ? 0 : s.side * -0.38;
-      if (y <= A.a) { z = prev; break; }
-      if (y < A.b) {
-        var k = (y - A.a) / (A.b - A.a); z = lerp(prev, stop, ease(k));
-        var kk = ease(seg(k, .4, 1)); open[i] = easeOut(seg(k, .5, .95)); yaw = turn * kk; x = -s.side * .32 * kk; break;
-      }
-      open[i] = 1;
-      if (i === anchors.length - 1 || y < A.c) { var h = i === anchors.length - 1 ? 1 : seg(y, A.b, A.c), back = 1 - ease(seg(h, .72, 1)); z = stop - .6 * h; yaw = turn * back; x = -s.side * .32 * back; break; }
-      prev = stop - .6; z = prev;
-    }
-    for (var j = 0; j < i; j++) open[j] = 1;
-    return { z: z, yaw: yaw, x: x, open: open };
+  function easeIn(x) { return x * x; }
+  // p runs 0..1 over the opening section: walk to the door, turn to it as it opens, step through into the light
+  function poseAt(p) {
+    var s = corridor.stops[0];
+    return {
+      z: lerp(-creep, s.z, ease(seg(p, 0, .6))),
+      yaw: -s.side * (Math.PI / 2) * ease(seg(p, .36, .72)) + look * (1 - seg(p, .25, .45)),
+      x: s.side * 2.5 * easeIn(seg(p, .7, .97)),
+      open: easeOut(seg(p, .28, .62))
+    };
   }
+  stage.addEventListener('pointerdown', function (e) { lookFrom = { x: e.clientX, mouse: e.pointerType === 'mouse' }; });
+  stage.addEventListener('pointermove', function (e) {
+    if (lookFrom) lookT = clamp((e.clientX - lookFrom.x) * 0.0022, -.34, .34);
+    else if (e.pointerType === 'mouse') lookT = clamp((.5 - e.clientX / Math.max(1, window.innerWidth)) * .14, -.07, .07);
+  });
+  ['pointerup', 'pointercancel', 'pointerleave'].forEach(function (n) { stage.addEventListener(n, function () { lookFrom = null; lookT = 0; }); });
   function tick(now) {
     requestAnimationFrame(tick);
     var y = window.pageYOffset || rootEl.scrollTop || 0, dt = Math.min(80, now - (lastT || now)); lastT = now;
+    var p = heroLen > 4 ? clamp(y / heroLen, 0, 1) : 0;
     if (y !== lastY) {
       lastY = y;
       $('#progressBar').style.transform = 'scaleX(' + clamp(y / docH, 0, 1).toFixed(4) + ')';
-      $('#topbar').classList.toggle('is-solid', y > vh * .5);
-      dock.classList.toggle('is-on', y > vh * .7 && y < contactTop - vh * .45);
-      if (state.lite && !reduced) poster.style.transform = 'scale(' + (1 + creep / CREEP_MAX * .14 + clamp(y / docH, 0, 1) * 1.25).toFixed(4) + ')';
+      $('#topbar').classList.toggle('is-solid', y > heroLen + vh * .4);
+      dock.classList.toggle('is-on', y > heroLen + vh * .5 && y < contactTop - vh * .45);
     }
-    if (!reduced && y < 12 && creep < CREEP_MAX && !doc.hidden && (state.lite || intro0 > 0)) {
-      creep = Math.min(CREEP_MAX, creep + dt * 0.00017);
-      if (state.lite) poster.style.transform = 'scale(' + (1 + creep / CREEP_MAX * .14).toFixed(4) + ')';
+    if (!reduced && y < 12 && creep < CREEP_MAX && !doc.hidden && (state.lite || intro0 > 0)) { creep = Math.min(CREEP_MAX, creep + dt * 0.00017); lastP = -1; }
+    if (p !== lastP) {
+      lastP = p;
+      // the headline panel and the logo lift away as the walk begins; the last stretch fades to white
+      var hp = seg(p, 0, .2);
+      heroPanel.style.transform = hp ? 'translate3d(0,' + (-80 * hp).toFixed(1) + 'px,0)' : '';
+      heroPanel.style.opacity = hp ? (1 - hp).toFixed(3) : ''; heroPanel.style.pointerEvents = hp > .5 ? 'none' : '';
+      heroTop.style.transform = hp ? 'translate3d(0,' + (-46 * hp).toFixed(1) + 'px,0)' : '';
+      heroTop.style.opacity = hp ? (1 - hp).toFixed(3) : '';
+      whiteEl.style.opacity = seg(p, .84, .98).toFixed(3);
+      if (state.lite && !reduced) poster.style.transform = 'scale(' + (1 + creep / CREEP_MAX * .14 + ease(p) * 1.25).toFixed(4) + ')';
     }
-    if (state.lite || !corridor) return;
-    var p = poseAt(y), f = 1 - Math.exp(-dt / 120);
+    // the corridor is drawn only while the opening scene is on screen
+    if (state.lite || !corridor || doc.hidden || y > heroLen + vh) return;
+    var q = poseAt(p), f = 1 - Math.exp(-dt / 120);
     if (intro0 === 0) intro0 = now;
     var intro = reduced ? 0 : 2.4 * (1 - easeOut(seg(now - intro0, 0, 3200)));
-    camT.z = p.z + intro; camT.yaw = p.yaw; camT.x = p.x; camT.shift = narrow ? lerp(.14, .05, seg(y, 0, vh * .7)) : .03;
+    look += (lookT - look) * Math.min(1, dt / 170);
+    camT.z = q.z + intro; camT.yaw = q.yaw; camT.x = q.x; camT.shift = narrow ? lerp(.14, 0, seg(p, 0, .3)) : .03 * (1 - seg(p, .3, .6));
     cam.z += (camT.z - cam.z) * f; cam.yaw += (camT.yaw - cam.yaw) * f; cam.x += (camT.x - cam.x) * f; cam.shift += (camT.shift - cam.shift) * f;
-    for (var i = 0; i < p.open.length; i++) { doors[i] = (doors[i] || 0) + (p.open[i] - (doors[i] || 0)) * f; corridor.setDoor(i, Math.round(doors[i] * 500) / 500); }
-    // on phones a sheet can cover the whole screen: skip drawing the corridor behind it
-    var covered = false;
-    if (narrow) for (var a = 0; a < anchors.length; a++) { if (y >= anchors[a].top + 2 && y <= anchors[a].c - 2) { covered = true; break; } }
-    if (covered || doc.hidden) return;
+    doorK += (q.open - doorK) * f; corridor.setDoor(0, Math.round(doorK * 500) / 500);
     corridor.setPose(cam, reduced ? 0 : now); corridor.render();
     // watchdog: if the device cannot keep up, lower the resolution, then fall back to lite mode
     if (params.perf !== 'off' && now - intro0 > 1500) {
@@ -687,11 +729,26 @@
     }
   }
 
+  /* ---------------- the unit's door: closed it is a locked box, open you see inside ---------------- */
+  var doorOpen = !!reduced, doorIntro = false;
+  function renderDoor() {
+    var u = currentUnit();
+    $('#doorBtn').hidden = !!u.open; $('#doorBtn').setAttribute('aria-pressed', doorOpen);
+    $('#doorBtnText').textContent = plain(doorOpen ? 'u.doorClose' : 'u.doorOpen');
+  }
+  function setDoor(open, instant) { doorOpen = open; if (viewer) viewer.setLid(open, instant); renderDoor(); }
+  $('#doorBtn').addEventListener('click', function () { doorIntro = true; setDoor(!doorOpen); $('#unitHint').classList.add('is-off'); });
+  // the first time the model comes on screen it opens by itself, to show what a tap does
+  function doorFirstView() { if (doorIntro) return; doorIntro = true; setTimeout(function () { if (!doorOpen) setDoor(true); }, 650); }
+
   /* ---------------- boot ---------------- */
   function renderAll() {
     applyLang(); syncViewLabel(); renderSizes(); renderItemsToggle(); renderPrices(); renderBranches(); buildQuoteForm(); renderQuote(); staticLinks();
-    renderUnit(true); renderHelper(); setFeat(featIdx); updateDock(); remeasureSoon();
+    renderUnit(true); renderHelper(); updateDock(); remeasureSoon();
+    if (window.RVFX) window.RVFX.refresh();
   }
+  // the scroll-driven opening needs room to scroll; without motion the first section is one screen tall
+  rootEl.classList.toggle('walk3d', !reduced);
   var storedLite = store.get('rv_lite');
   var wantLite = params.lite === '1' || (params.lite !== '0' && (storedLite === '1' || (storedLite !== '0' && (reduced || !webglOk() || (navigator.connection && navigator.connection.saveData) || (navigator.deviceMemory && navigator.deviceMemory <= 2)))));
   state.lite = wantLite; $('#liteToggle').checked = wantLite; stage.classList.toggle('is-lite', wantLite); $('#viewerStage').classList.add('is-lite3d');

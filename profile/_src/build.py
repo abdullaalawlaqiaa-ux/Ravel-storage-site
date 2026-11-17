@@ -16,7 +16,11 @@ ROOT = os.path.dirname(HERE)
 THREE_CDN = "https://cdnjs.cloudflare.com/ajax/libs/three.js/0.149.0/three.min.js"
 EARLY = ("<script>(function(d){var l='ar';try{l=localStorage.getItem('rv_lang')||'ar'}catch(e){}"
          "if(location.hash==='#en'||/[?&]lang=en/.test(location.search))l='en';"
-         "d.lang=l==='en'?'en':'ar';d.dir=l==='en'?'ltr':'rtl';d.classList.add('js')})(document.documentElement)</script>")
+         "d.lang=l==='en'?'en':'ar';d.dir=l==='en'?'ltr':'rtl';d.classList.add('js');"
+         # motion is switched on before the first paint, and off again if the motion script never arrives
+         "if(!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)){d.classList.add('fx');"
+         "setTimeout(function(){if(!window.RVFX)d.classList.remove('fx')},4000)}"
+         "})(document.documentElement)</script>")
 
 
 def read(p):
@@ -72,7 +76,7 @@ def main():
 
     page = tpl.replace("<!--HEAD-->", EARLY).replace("<!--/HEAD-->", "")
     page = page.replace("<!--BODY-->", "").replace("<!--/BODY-->", "")
-    page = page.replace("<!--SCRIPTS-->", '<script src="assets/js/data.js" defer></script>\n<script src="assets/js/app.js" defer></script>')
+    page = page.replace("<!--SCRIPTS-->", '<script src="assets/js/data.js" defer></script>\n<script src="assets/js/app.js" defer></script>\n<script src="assets/js/fx.js" defer></script>')
     write(os.path.join(ROOT, "index.html"), page)
     print("index.html", len(page.encode("utf-8")), "bytes")
 
@@ -112,6 +116,7 @@ def main():
             "<script>window.RV_DATA=" + json.dumps(adata, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/") + ";</script>",
             "<script>\n" + read("assets/js/scene3d.js") + "\n</script>",
             "<script>\n" + read("assets/js/app.js") + "\n</script>",
+            "<script>\n" + read("assets/js/fx.js") + "\n</script>",
         ])
         p = os.path.join(args.artifact, "ravel-storage-profile.html")
         write(p, out)

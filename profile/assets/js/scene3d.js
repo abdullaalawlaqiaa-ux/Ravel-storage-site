@@ -162,8 +162,8 @@
     var cc = mk(512, 512); paintCeiling(cc.getContext('2d'), 512, 512);
     var ceilTex = texOf(cc, 1, L / 1.5);
 
-    /* chapter doors: 8 side doors + the end wall */
-    var slots = [10, 16, 22, 28, 34, 40, 46, 52], stops = [], skip = { '-1': {}, '1': {} };
+    /* doors that open: `opts.doors` of them along the sides (the opening scene uses one), then the end wall */
+    var slots = [10, 16, 22, 28, 34, 40, 46, 52].slice(0, opts.doors || 8), stops = [], skip = { '-1': {}, '1': {} };
     slots.forEach(function (i, k) {
       var s = k % 2 === 0 ? 1 : -1; skip[s][i] = true;
       stops.push({ z: Z0 - (i + 0.5) * MOD, side: s, slot: i });
@@ -372,7 +372,7 @@
 
   RV3D.createUnitViewer = function (canvasEl, labelsEl, opts) {
     var T = window.THREE; opts = opts || {};
-    var HH = 3;
+    var HH = 3, dark = !!opts.dark;
     var renderer = new T.WebGLRenderer({ canvas: canvasEl, antialias: true, alpha: true });
     renderer.setClearColor(0x000000, 0);
     var scene = new T.Scene(), cam = new T.PerspectiveCamera(30, 1, 0.1, 500);
@@ -388,25 +388,29 @@
     var floor = new T.Mesh(new T.PlaneGeometry(1, 1), new T.MeshLambertMaterial({ map: gridTex })); floor.rotation.x = -Math.PI / 2; root.add(floor);
     var slab = new T.Mesh(new T.BoxGeometry(1, 1, 1), new T.MeshLambertMaterial({ color: 0xC9D1DC })); root.add(slab);
     var sc = mk(128, 128), sg = sc.getContext('2d'), sgr = sg.createRadialGradient(64, 64, 20, 64, 64, 64);
-    sgr.addColorStop(0, 'rgba(11,31,58,.28)'); sgr.addColorStop(1, 'rgba(11,31,58,0)'); sg.fillStyle = sgr; sg.fillRect(0, 0, 128, 128);
+    sgr.addColorStop(0, dark ? 'rgba(3,9,22,.55)' : 'rgba(11,31,58,.28)'); sgr.addColorStop(1, dark ? 'rgba(3,9,22,0)' : 'rgba(11,31,58,0)'); sg.fillStyle = sgr; sg.fillRect(0, 0, 128, 128);
     var shadow = new T.Mesh(new T.PlaneGeometry(1, 1), new T.MeshBasicMaterial({ map: new T.CanvasTexture(sc), transparent: true, depthWrite: false })); shadow.rotation.x = -Math.PI / 2; shadow.position.y = -0.09; root.add(shadow);
 
-    // four walls: the ones between the camera and the room fade out
+    // four walls and a roof: closed, the unit is a box; open, the roof lifts away and the walls nearest the camera fade
     var walls = [[0, -1], [-1, 0], [1, 0], [0, 1]].map(function (n) {
       var m = new T.Mesh(new T.BoxGeometry(1, 1, 1), new T.MeshLambertMaterial({ color: 0xF7F9FB, transparent: true, opacity: 1, depthWrite: false }));
       m.userData.n = n; m.renderOrder = 3; root.add(m); return m;
     });
-    var edges = new T.LineSegments(new T.EdgesGeometry(new T.BoxGeometry(1, 1, 1)), new T.LineBasicMaterial({ color: 0x152249, transparent: true, opacity: 0.32 })); root.add(edges);
-    // door outline on the front wall, and cyan dimension lines
-    var doorG = new T.BufferGeometry(); doorG.setAttribute('position', new T.Float32BufferAttribute([-.45, 0, 0, -.45, 2.2, 0, -.45, 2.2, 0, .45, 2.2, 0, .45, 2.2, 0, .45, 0, 0], 3));
-    var door = new T.LineSegments(doorG, new T.LineBasicMaterial({ color: 0x152249 })); root.add(door);
+    var roof = new T.Mesh(new T.BoxGeometry(1, 1, 1), new T.MeshLambertMaterial({ color: 0xE9EEF3, transparent: true, opacity: 1, depthWrite: false })); roof.renderOrder = 4; root.add(roof);
+    var edges = new T.LineSegments(new T.EdgesGeometry(new T.BoxGeometry(1, 1, 1)), new T.LineBasicMaterial({ color: dark ? 0xffffff : 0x152249, transparent: true, opacity: dark ? 0.5 : 0.32 })); root.add(edges);
+    // the door: a hinged leaf with a padlock, on the front wall
+    var doorPivot = new T.Group(); root.add(doorPivot);
+    var leafGeo = new T.BoxGeometry(.9, 2.2, .045);
+    var leaf = new T.Mesh(leafGeo, new T.MeshLambertMaterial({ color: 0xD9E0E8 })); leaf.position.set(.45, 1.1, 0); doorPivot.add(leaf);
+    var leafEdge = new T.LineSegments(new T.EdgesGeometry(leafGeo), new T.LineBasicMaterial({ color: 0x152249, transparent: true, opacity: 0.6 })); leafEdge.position.copy(leaf.position); doorPivot.add(leafEdge);
+    var padlock = new T.Mesh(new T.BoxGeometry(.1, .12, .05), new T.MeshLambertMaterial({ color: 0xFFC83D })); padlock.position.set(.79, 1.08, .045); doorPivot.add(padlock);
     var sill = new T.Mesh(new T.BoxGeometry(.9, .02, .1), new T.MeshBasicMaterial({ color: 0x152249 })); root.add(sill);
     var dimMat = new T.MeshBasicMaterial({ color: 0x2EC5FF });
     var dimW = new T.Mesh(new T.BoxGeometry(1, .03, .04), dimMat), dimD = new T.Mesh(new T.BoxGeometry(.04, .03, 1), dimMat), dimH = new T.Mesh(new T.BoxGeometry(.04, 1, .04), dimMat);
     root.add(dimW); root.add(dimD); root.add(dimH);
 
     // a 1.75 m person at the door, for scale
-    var person = new T.Group(), pm = new T.MeshLambertMaterial({ color: 0x152249 });
+    var person = new T.Group(), pm = new T.MeshLambertMaterial({ color: dark ? 0x2EC5FF : 0x152249 });
     [-0.085, 0.085].forEach(function (x) { var l = new T.Mesh(new T.CylinderGeometry(.065, .058, .86, 12), pm); l.position.set(x, .43, 0); person.add(l); });
     var torso = new T.Mesh(new T.CylinderGeometry(.2, .15, .62, 16), pm); torso.scale.z = .62; torso.position.y = 1.17; person.add(torso);
     var head = new T.Mesh(new T.SphereGeometry(.115, 18, 14), pm); head.position.y = 1.635; person.add(head);
@@ -416,7 +420,8 @@
     var items = null;
     var labels = ['w', 'd', 'h'].map(function () { var e = document.createElement('span'); e.className = 'vlabel'; labelsEl.appendChild(e); return e; });
 
-    var st = { w: 2, d: 3, tw: 2, td: 3, open: false, az: 0.66, el: 0.5, dist: 12, tdist: 12, user: -1e9, drag: null, pop: 1, showItems: true, layout: [], pending: false, active: false, raf: 0, t0: performance.now(), size: { w: 1, h: 1 } };
+    var st = { w: 2, d: 3, tw: 2, td: 3, open: false, az: 0.66, el: 0.5, dist: 12, tdist: 12, user: -1e9, drag: null, pop: 1, showItems: true, layout: [], pending: false, active: false, raf: 0, t0: performance.now(), size: { w: 1, h: 1 },
+      lid: opts.still ? 1 : 0, lidT: opts.still ? 1 : 0, wasOpen: false };
 
     function fit() {
       var r = 0.5 * Math.sqrt(st.tw * st.tw + st.td * st.td + HH * HH) + 0.55;
@@ -434,8 +439,10 @@
         else { m.scale.set(t, HH, d); m.position.set(n[0] * (w / 2 + t / 2), HH / 2, 0); }
         m.visible = !st.open;
       });
+      roof.scale.set(w + .14, .07, d + .14); roof.position.set(0, HH + .035, 0);
       edges.scale.set(w, st.open ? 0.001 : HH, d); edges.position.y = st.open ? 0.001 : HH / 2;
-      door.position.set(0, 0, d / 2 + .035); door.visible = !st.open; sill.position.set(0, .011, d / 2 + .06); sill.visible = !st.open;
+      doorPivot.position.set(-.45, 0, d / 2 + .085); doorPivot.visible = !st.open;
+      sill.position.set(0, .011, d / 2 + .06); sill.visible = !st.open;
       dimW.scale.x = w; dimD.scale.z = d; dimH.scale.y = HH; dimW.visible = dimD.visible = dimH.visible = !st.open;
       person.position.set(Math.min(w / 2 - .25, .8) + (w < 1.5 ? .35 : 0), 0, d / 2 + .3);
     }
@@ -462,6 +469,13 @@
       if (Math.abs(st.w - st.tw) > 0.004 || Math.abs(st.d - st.td) > 0.004) { st.w += (st.tw - st.w) * k; st.d += (st.td - st.d) * k; shell(); }
       else if (st.pending) { st.w = st.tw; st.d = st.td; shell(); st.pending = false; buildItems(); }
       st.dist += (st.tdist - st.dist) * 0.12;
+      // the lid: 0 closed (a locked box), 1 open (door swung out, roof gone, near walls faded)
+      st.lid += (st.lidT - st.lid) * 0.085; if (Math.abs(st.lidT - st.lid) < 0.002) st.lid = st.lidT;
+      var opened = st.open || st.lid > 0.4;
+      doorPivot.rotation.y = -st.lid * 1.95;
+      roof.material.opacity = 1 - Math.min(1, st.lid * 1.7); roof.visible = !st.open && roof.material.opacity > 0.02;
+      if (items) { if (opened && !st.wasOpen) st.pop = 0; items.visible = opened; }
+      st.wasOpen = opened;
       if (items && st.pop < 1) { st.pop = Math.min(1, st.pop + 0.045); var e = 1 - Math.pow(1 - st.pop, 3); items.scale.y = 0.02 + 0.98 * e; itemMat.opacity = Math.min(1, st.pop * 2.2); }
       // idle sway until the visitor takes over
       var idle = now - st.user > 3500 && !st.drag, sway = idle && !opts.still ? Math.sin((now - st.t0) / 2600) * 0.2 : 0;
@@ -470,7 +484,7 @@
       cam.lookAt(0, cy, 0);
       var cx = Math.sin(az), cz = Math.cos(az);
       walls.forEach(function (m) {
-        var n = m.userData.n, facing = n[0] * cx + n[1] * cz, target = facing > 0.12 ? 0 : 0.97;
+        var n = m.userData.n, facing = n[0] * cx + n[1] * cz, target = facing > 0.12 && opened ? 0 : 0.97;
         m.material.opacity += (target - m.material.opacity) * 0.18; m.visible = !st.open && m.material.opacity > 0.02;
       });
       person.rotation.y = az;
@@ -480,16 +494,21 @@
       dimW.position.set(0, .02, st.bz); dimD.position.set(st.bx, .02, 0); dimH.position.set(st.hx, HH / 2, -st.d / 2 - .12);
       renderer.render(scene, cam);
       place(labels[0], -st.w * .22, .02, st.bz); place(labels[1], st.bx, .02, 0); place(labels[2], st.hx, HH * .6, -st.d / 2 - .12);
-      labels.forEach(function (el) { el.style.display = st.open ? 'none' : ''; });
+      labels.forEach(function (lb) { lb.style.display = st.open ? 'none' : ''; });
     }
-    // drag to rotate (horizontal drag only on touch, so the page still scrolls)
-    canvasEl.addEventListener('pointerdown', function (e) { st.drag = { x: e.clientX, y: e.clientY, az: st.az, el: st.el, mouse: e.pointerType === 'mouse' }; st.user = performance.now(); try { canvasEl.setPointerCapture(e.pointerId); } catch (_) {} if (opts.onUser) opts.onUser(); });
+    // drag to rotate (horizontal drag only on touch, so the page still scrolls); a short tap opens or closes the door
+    canvasEl.addEventListener('pointerdown', function (e) { st.drag = { x: e.clientX, y: e.clientY, az: st.az, el: st.el, mouse: e.pointerType === 'mouse', t: performance.now(), moved: 0 }; st.user = performance.now(); try { canvasEl.setPointerCapture(e.pointerId); } catch (_) {} if (opts.onUser) opts.onUser(); });
     canvasEl.addEventListener('pointermove', function (e) {
       if (!st.drag) return; st.user = performance.now();
+      st.drag.moved = Math.max(st.drag.moved, Math.abs(e.clientX - st.drag.x) + Math.abs(e.clientY - st.drag.y));
       st.az = st.drag.az - (e.clientX - st.drag.x) * 0.009;
       if (st.drag.mouse) st.el = Math.max(0.16, Math.min(1.15, st.drag.el + (e.clientY - st.drag.y) * 0.006));
     });
-    ['pointerup', 'pointercancel', 'pointerleave'].forEach(function (n) { canvasEl.addEventListener(n, function () { st.drag = null; }); });
+    canvasEl.addEventListener('pointerup', function () {
+      var g = st.drag; st.drag = null;
+      if (g && g.moved < 9 && performance.now() - g.t < 450 && opts.onTap) opts.onTap();
+    });
+    ['pointercancel', 'pointerleave'].forEach(function (n) { canvasEl.addEventListener(n, function () { st.drag = null; }); });
     canvasEl.addEventListener('keydown', function (e) { if (e.key === 'ArrowLeft') { st.az -= .2; st.user = performance.now(); } if (e.key === 'ArrowRight') { st.az += .2; st.user = performance.now(); } });
 
     resize(); shell();
@@ -503,6 +522,7 @@
       },
       setLabels: function (texts) { labels[0].textContent = texts.w; labels[1].textContent = texts.d; labels[2].textContent = texts.h; },
       setItems: function (on) { st.showItems = on; buildItems(); if (!on) st.pop = 1; },
+      setLid: function (open, instant) { st.lidT = open ? 1 : 0; if (instant) st.lid = st.lidT; },
       setActive: function (on) { if (on === st.active) return; st.active = on; if (on && !st.raf) st.raf = requestAnimationFrame(frame); },
       resize: resize,
       dispose: function () { st.active = false; renderer.dispose(); }
