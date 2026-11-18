@@ -82,15 +82,13 @@
   <div class="menu__panel" role="dialog" aria-modal="true" data-i18n-attr="aria-label:a11y.menu" aria-label="القائمة">
     <button class="top__btn menu__close" id="menuClose" type="button" data-i18n-attr="aria-label:a11y.close" aria-label="إغلاق"><svg class="ic"><use href="#i-close"/></svg></button>
     <nav class="menu__nav">
-      <a href="#service"><span class="plate">01</span><span data-i18n="nav.service">كيف تعمل الخدمة</span></a>
-      <a href="#units"><span class="plate">02</span><span data-i18n="nav.units">استكشف الوحدات</span></a>
+      <a href="#service"><span class="plate">01</span><span data-i18n="nav.service">من نحن</span></a>
+      <a href="#units"><span class="plate">02</span><span data-i18n="nav.units">الوحدات والأسعار</span></a>
       <a href="#helper"><span class="plate">03</span><span data-i18n="nav.helper">المساحة المناسبة</span></a>
-      <a href="#prices"><span class="plate">04</span><span data-i18n="nav.prices">الأسعار</span></a>
-      <a href="#why"><span class="plate">05</span><span data-i18n="nav.why">لماذا رافل</span></a>
-      <a href="#journey"><span class="plate">06</span><span data-i18n="nav.journey">خطوات الحجز</span></a>
-      <a href="#branches"><span class="plate">07</span><span data-i18n="nav.branches">أين نتواجد</span></a>
-      <a href="#faq"><span class="plate">08</span><span data-i18n="nav.faq">أسئلة سريعة</span></a>
-      <a href="#contact"><span class="plate">09</span><span data-i18n="nav.contact">احجز الآن</span></a>
+      <a href="#why"><span class="plate">04</span><span data-i18n="nav.why">لماذا رافل</span></a>
+      <a href="#journey"><span class="plate">05</span><span data-i18n="nav.journey">خطوات الحجز</span></a>
+      <a href="#faq"><span class="plate">06</span><span data-i18n="nav.faq">أسئلة سريعة</span></a>
+      <a href="#contact"><span class="plate">07</span><span data-i18n="nav.contact">احجز الآن</span></a>
     </nav>
     <label class="switch" for="liteToggle">
       <input type="checkbox" id="liteToggle">
@@ -148,12 +146,6 @@
         <button class="vault__relock" id="vaultLock" type="button" data-i18n-attr="aria-label:s.lock" aria-label="أقفل الوحدة"><svg class="ic"><use href="#i-lock"/></svg></button>
       </figure>
       <div class="split__col">
-        <h3 class="h3" data-i18n="s.how">كيف تعمل الخدمة؟</h3>
-        <ol class="steps3" id="steps3">
-          <li class="step is-on"><span class="step__n">1</span><b data-i18n="s.1t">تختار المساحة</b><span data-i18n="s.1d">على قد أغراضك</span></li>
-          <li class="step"><span class="step__n">2</span><b data-i18n="s.2t">تخزّن أغراضك</b><span data-i18n="s.2d">في وحدة مقفلة</span></li>
-          <li class="step"><span class="step__n">3</span><b data-i18n="s.3t">تدخل متى شئت</b><span data-i18n="s.3d">على مدار الساعة</span></li>
-        </ol>
         <h3 class="h3" data-i18n="s.who">متى تحتاج مساحة تخزين؟</h3>
         <div class="seg" role="tablist" id="whoTabs">
           <button class="seg__btn is-on" type="button" role="tab" aria-selected="true" aria-controls="who-ind" id="tab-ind" data-who="ind"><svg class="ic"><use href="#i-home"/></svg><span data-i18n="s.ind">للأفراد</span></button>
@@ -224,16 +216,48 @@
 
       <div class="unitinfo card" id="unitInfo" aria-live="polite"></div>
     </div>
+
+    <details class="card card--flush allprices" id="prices">
+      <summary class="allprices__sum"><span data-i18n="p.all">كل الأسعار</span><svg class="ic"><use href="#i-chev"/></svg></summary>
+      <div class="allprices__body">
+        <div class="ptable-wrap">
+          <i class="ptable__hl" id="ptableHl" aria-hidden="true"></i>
+          <table class="ptable" id="ptable">
+            <thead><tr><th scope="col" data-i18n="p.colA">المساحة <small>م²</small></th><th scope="col" data-i18n="p.colV">الحجم <small>م³</small></th><th scope="col" data-i18n="p.colP">الإيجار الشهري <small>درهم</small></th></tr></thead>
+            <tbody id="ptbody"><tr data-a="1" tabindex="0" aria-selected="false"><td>1</td><td>3</td><td>300</td></tr><tr data-a="2" tabindex="0" aria-selected="false"><td>2</td><td>6</td><td>400</td></tr><tr data-a="4" tabindex="0" aria-selected="false"><td>4</td><td>12</td><td>600</td></tr><tr data-a="5" tabindex="0" aria-selected="false"><td>5</td><td>15</td><td>700</td></tr><tr data-a="6" tabindex="0" aria-selected="false"><td>6</td><td>18</td><td>800</td></tr><tr data-a="7" tabindex="0" aria-selected="false"><td>7</td><td>21</td><td>900</td></tr><tr data-a="8" tabindex="0" aria-selected="false"><td>8</td><td>24</td><td>1,000</td></tr><tr data-a="9" tabindex="0" aria-selected="false"><td>9</td><td>27</td><td>1,100</td></tr><tr data-a="10" tabindex="0" aria-selected="false"><td>10</td><td>30</td><td>1,200</td></tr><tr data-a="12" tabindex="0" aria-selected="false"><td>12</td><td>36</td><td>1,500</td></tr><tr data-a="16" tabindex="0" aria-selected="false"><td>16</td><td>48</td><td>2,000</td></tr><tr data-a="20" tabindex="0" aria-selected="false"><td>20</td><td>60</td><td>2,400</td></tr><tr data-a="25" tabindex="0" aria-selected="false"><td>25</td><td>75</td><td>3,000</td></tr><tr data-a="30" tabindex="0" aria-selected="false"><td>30</td><td>90</td><td>3,500</td></tr></tbody>
+          </table>
+        </div>
+        <p class="tiny tiny--center" data-i18n="p.tap">اضغط على أي صف لاختيار المساحة</p>
+        <div class="pselected" id="pSelected" hidden>
+          <span id="pSelectedText"></span>
+          <a class="link" href="#explorer" data-i18n="p.view">شاهدها بالمجسّم</a>
+        </div>
+        <div class="bigask">
+          <p class="note" data-i18n="p.big">للمساحات الأكبر (حتى 500 م²) يرجى الاستفسار عبر الاتصال أو الواتساب.</p>
+          <div class="bigask__btns">
+            <a class="btn btn--sm btn--wa" id="bigWa" href="#contact" target="_blank" rel="noopener"><svg class="ic"><use href="#i-chat"/></svg><span data-i18n="c.wa">واتساب</span></a>
+            <a class="btn btn--sm btn--navy" href="tel:+971503250551"><svg class="ic"><use href="#i-phone"/></svg><span data-i18n="c.call">اتصال</span></a>
+          </div>
+        </div>
+      </div>
+    </details>
+    <div class="card terms">
+      <h3 class="h3 h3--flush" data-i18n="p.term">مدة الإيجار والدفع</h3>
+      <ul class="ticks">
+        <li data-i18n="p.term1">نوفر دفعات مرنة: إيجار يومي، شهري، أو سنوي.</li><li data-i18n="p.term2">الدفع بعد توقيع العقد.</li><li data-i18n="p.term3">أسعار الجدول للإيجار الشهري. لأسعار الإيجار اليومي والسنوي يرجى الاستفسار.</li>
+      </ul>
+      <p class="callout" data-i18n="p.term4"><b>ملاحظة:</b> عند تغيير نوع الإيجار، مثلاً من شهري إلى يومي، يجب إبلاغنا قبل تجديد الإيجار الشهري.</p>
+    </div>
   </div>
 </section>
+
 
 <section class="sec" id="helper" data-theme="grey" aria-labelledby="helper-h">
   <div class="wrap wrap--narrow">
     <span class="eyebrow"><span class="plate">03</span><span data-i18n="h.eyebrow">المساحة المناسبة</span></span>
     <h2 class="h2" id="helper-h" data-i18n="h.h2" data-kinetic>ما تعرف كم مساحة تحتاج؟</h2>
-    <p class="lead" data-i18n="h.p">عندك خياران: أرسل لنا صور أغراضك، وهو الأدق، أو قدّر المساحة بنفسك بالحاسبة.</p>
+    <p class="lead" data-i18n="h.p">أرسل لنا صور أغراضك ونقترح لك المساحة الأنسب. وللتقدير السريع، هذا دليل تقريبي للمساحات.</p>
     <div class="card option option--best">
-      <span class="option__n" aria-hidden="true">1</span>
       <div class="option__body">
         <span class="option__badge" data-i18n="h.o1b">الاقتراح الأدق</span>
         <h3 class="h3 h3--flush" data-i18n="h.o1">أرسل لنا صور أغراضك</h3>
@@ -241,68 +265,15 @@
         <a class="btn btn--wa" id="helperPhotos" href="#contact" target="_blank" rel="noopener"><svg class="ic"><use href="#i-photo"/></svg><span data-i18n="h.sendPhotos">أرسل صور أغراضك</span></a>
       </div>
     </div>
-    <div class="option option--head">
-      <span class="option__n" aria-hidden="true">2</span>
-      <div class="option__body">
-        <h3 class="h3 h3--flush" data-i18n="h.o2">أو استخدم حاسبة المساحة</h3>
-        <p data-i18n="h.o2d">اختر نوع أغراضك وكمياتها التقريبية، ونقترح لك مساحة مناسبة.</p>
-      </div>
-    </div>
-    <div class="helper card" id="helperBox">
-      <div class="helper__head">
-        <span class="helper__step" id="helperStep"></span>
-        <div class="helper__bar" aria-hidden="true"><i id="helperBar"></i></div>
-      </div>
-      <div class="fill" id="fillBox" hidden>
-        <canvas id="fillCanvas" aria-hidden="true"></canvas>
-        <div class="fill__text"><b id="fillSize"></b><span id="fillNote"></span></div>
-      </div>
-      <div class="helper__body" id="helperBody" aria-live="polite"></div>
-      <div class="helper__nav">
-        <button class="btn btn--ghost" id="helperBack" type="button"><svg class="ic ic--back"><use href="#i-arrow"/></svg><span data-i18n="h.back">رجوع</span></button>
-        <button class="btn btn--navy" id="helperNext" type="button"><span id="helperNextText"></span><svg class="ic ic--dir"><use href="#i-arrow"/></svg></button>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="sec" id="prices" data-theme="white" aria-labelledby="prices-h">
-  <div class="wrap wrap--narrow">
-    <span class="eyebrow"><span class="plate">04</span><span data-i18n="p.eyebrow">الأسعار</span></span>
-    <h2 class="h2" id="prices-h" data-i18n="p.h2" data-kinetic>أسعار واضحة، إيجار شهري</h2>
-    <div class="card card--flush ptable-wrap">
-      <i class="ptable__hl" id="ptableHl" aria-hidden="true"></i>
-      <table class="ptable" id="ptable">
-        <thead><tr><th scope="col" data-i18n="p.colA">المساحة <small>م²</small></th><th scope="col" data-i18n="p.colV">الحجم <small>م³</small></th><th scope="col" data-i18n="p.colP">الإيجار الشهري <small>درهم</small></th></tr></thead>
-        <tbody id="ptbody"><tr data-a="1" tabindex="0" aria-selected="false"><td>1</td><td>3</td><td>300</td></tr><tr data-a="2" tabindex="0" aria-selected="false"><td>2</td><td>6</td><td>400</td></tr><tr data-a="4" tabindex="0" aria-selected="false"><td>4</td><td>12</td><td>600</td></tr><tr data-a="5" tabindex="0" aria-selected="false"><td>5</td><td>15</td><td>700</td></tr><tr data-a="6" tabindex="0" aria-selected="false"><td>6</td><td>18</td><td>800</td></tr><tr data-a="7" tabindex="0" aria-selected="false"><td>7</td><td>21</td><td>900</td></tr><tr data-a="8" tabindex="0" aria-selected="false"><td>8</td><td>24</td><td>1,000</td></tr><tr data-a="9" tabindex="0" aria-selected="false"><td>9</td><td>27</td><td>1,100</td></tr><tr data-a="10" tabindex="0" aria-selected="false"><td>10</td><td>30</td><td>1,200</td></tr><tr data-a="12" tabindex="0" aria-selected="false"><td>12</td><td>36</td><td>1,500</td></tr><tr data-a="16" tabindex="0" aria-selected="false"><td>16</td><td>48</td><td>2,000</td></tr><tr data-a="20" tabindex="0" aria-selected="false"><td>20</td><td>60</td><td>2,400</td></tr><tr data-a="25" tabindex="0" aria-selected="false"><td>25</td><td>75</td><td>3,000</td></tr><tr data-a="30" tabindex="0" aria-selected="false"><td>30</td><td>90</td><td>3,500</td></tr></tbody>
-      </table>
-    </div>
-    <p class="tiny tiny--center" data-i18n="p.tap">اضغط على أي صف لاختيار المساحة</p>
-    <div class="pselected" id="pSelected" hidden>
-      <span id="pSelectedText"></span>
-      <a class="link" href="#units" data-i18n="p.view">شاهدها بالمجسّم</a>
-    </div>
-    <div class="card bigask">
-      <p class="note" data-i18n="p.big">للمساحات الأكبر (حتى 500 م²) يرجى الاستفسار عبر الاتصال أو الواتساب.</p>
-      <div class="bigask__btns">
-        <a class="btn btn--sm btn--wa" id="bigWa" href="#contact" target="_blank" rel="noopener"><svg class="ic"><use href="#i-chat"/></svg><span data-i18n="c.wa">واتساب</span></a>
-        <a class="btn btn--sm btn--navy" href="tel:+971503250551"><svg class="ic"><use href="#i-phone"/></svg><span data-i18n="c.call">اتصال</span></a>
-      </div>
-    </div>
-    <div class="card">
-      <h3 class="h3 h3--flush" data-i18n="p.term">مدة الإيجار والدفع</h3>
-      <ul class="ticks">
-        <li data-i18n="p.term1">نوفر دفعات مرنة: إيجار يومي، شهري، أو سنوي.</li><li data-i18n="p.term2">الدفع بعد توقيع العقد.</li><li data-i18n="p.term3">أسعار الجدول للإيجار الشهري. لأسعار الإيجار اليومي والسنوي يرجى الاستفسار.</li>
-      </ul>
-      <p class="callout" data-i18n="p.term4"><b>ملاحظة:</b> عند تغيير نوع الإيجار، مثلاً من شهري إلى يومي، يجب إبلاغنا قبل تجديد الإيجار الشهري.</p>
-    </div>
-    <a class="btn btn--wa" id="priceQuote" href="#contact"><svg class="ic"><use href="#i-chat"/></svg><span data-i18n="p.cta">اطلب عرض سعر</span></a>
+    <h3 class="h3" data-i18n="h.guide">دليل سريع للمساحات</h3>
+    <ul class="card card--flush guide" id="guide"><li><a class="grow" href="#explorer" data-a="1"><b class="grow__a"><span dir="ltr">1 – 2</span> <small data-i18n="m2">م²</small></b><span class="grow__t" data-i18n="fits.r1">كراتين وحقائب وأغراض شخصية</span><svg class="ic ic--dir"><use href="#i-arrow"/></svg></a></li><li><a class="grow" href="#explorer" data-a="4"><b class="grow__a"><span dir="ltr">4 – 6</span> <small data-i18n="m2">م²</small></b><span class="grow__t" data-i18n="fits.r2">محتويات غرفة واحدة</span><svg class="ic ic--dir"><use href="#i-arrow"/></svg></a></li><li><a class="grow" href="#explorer" data-a="7"><b class="grow__a"><span dir="ltr">7 – 8</span> <small data-i18n="m2">م²</small></b><span class="grow__t" data-i18n="fits.r2p">أكثر من محتويات غرفة، وأقل من أثاث شقة غرفة وصالة</span><svg class="ic ic--dir"><use href="#i-arrow"/></svg></a></li><li><a class="grow" href="#explorer" data-a="9"><b class="grow__a"><span dir="ltr">9 – 10</span> <small data-i18n="m2">م²</small></b><span class="grow__t" data-i18n="fits.r3">أثاث شقة غرفة وصالة</span><svg class="ic ic--dir"><use href="#i-arrow"/></svg></a></li><li><a class="grow" href="#explorer" data-a="12"><b class="grow__a"><span dir="ltr">12 – 16</span> <small data-i18n="m2">م²</small></b><span class="grow__t" data-i18n="fits.r4">أثاث شقة غرفتين</span><svg class="ic ic--dir"><use href="#i-arrow"/></svg></a></li><li><a class="grow" href="#explorer" data-a="20"><b class="grow__a"><span dir="ltr">20 – 30</span> <small data-i18n="m2">م²</small></b><span class="grow__t" data-i18n="fits.r5">شقة ثلاث غرف أو فيلا صغيرة</span><svg class="ic ic--dir"><use href="#i-arrow"/></svg></a></li><li><a class="grow" href="#explorer" data-a="50"><b class="grow__a"><span dir="ltr">50 – 100</span> <small data-i18n="m2">م²</small></b><span class="grow__t" data-i18n="fits.r6">مخزون وبضائع الشركات</span><svg class="ic ic--dir"><use href="#i-arrow"/></svg></a></li><li><a class="grow" href="#explorer" data-a="big"><b class="grow__a"><span dir="ltr">+100</span> <small data-i18n="m2">م²</small></b><span class="grow__t" data-i18n="fits.open">بضائع ومعدات بكميات كبيرة</span><svg class="ic ic--dir"><use href="#i-arrow"/></svg></a></li></ul>
+    <p class="tiny tiny--center" data-i18n="h.guideTap">اضغط على أي صف لتشاهد الوحدة</p>
   </div>
 </section>
 
 <section class="sec" id="why" data-theme="night" aria-labelledby="why-h">
   <div class="wrap">
-    <span class="eyebrow"><span class="plate">05</span><span data-i18n="f.eyebrow">مميزاتنا</span></span>
+    <span class="eyebrow"><span class="plate">04</span><span data-i18n="f.eyebrow">مميزاتنا</span></span>
     <h2 class="h2" id="why-h" data-i18n="f.h2" data-kinetic>لماذا رافل؟</h2>
     <div class="deck" id="deck" role="group" data-i18n-attr="aria-label:f.tabs" aria-label="المميزات">
       <article class="fcard" data-f="1">
@@ -446,13 +417,13 @@
 
 <section class="sec" id="journey" data-theme="white" aria-labelledby="journey-h">
   <div class="wrap">
-    <span class="eyebrow"><span class="plate">06</span><span data-i18n="j.eyebrow">كيف تبدأ؟</span></span>
+    <span class="eyebrow"><span class="plate">05</span><span data-i18n="j.eyebrow">كيف تبدأ؟</span></span>
     <h2 class="h2" id="journey-h" data-i18n="j.h2" data-kinetic>أربع مراحل ووحدتك جاهزة</h2>
   </div>
   <div class="story" id="story" tabindex="0" role="group" data-i18n-attr="aria-label:nav.journey" aria-label="خطوات الحجز">
     <article class="spanel"><span class="spanel__n" aria-hidden="true">1</span><span class="spanel__of" aria-hidden="true">1 / 4</span>
-      <h3 data-i18n="j.1t">اختر المساحة المناسبة</h3><p data-i18n="j.1d">الأدق أن ترسل لنا صور أو قائمة أغراضك على واتساب، ونقترح لك المساحة الأنسب. أو استخدم حاسبة المساحة لتقدير سريع.</p>
-      <div class="spanel__btns"><a class="btn btn--sm btn--wa" id="journeyPhotos" href="#contact" target="_blank" rel="noopener"><svg class="ic"><use href="#i-photo"/></svg><span data-i18n="j.1c">أرسل صور أغراضك</span></a><a class="btn btn--sm btn--ghost" href="#helper"><span data-i18n="j.1c2">افتح حاسبة المساحة</span></a></div>
+      <h3 data-i18n="j.1t">اختر المساحة المناسبة</h3><p data-i18n="j.1d">أرسل لنا صور أو قائمة أغراضك على واتساب، ونقترح لك المساحة الأنسب. وللتقدير السريع شاهد دليل المساحات.</p>
+      <div class="spanel__btns"><a class="btn btn--sm btn--wa" id="journeyPhotos" href="#contact" target="_blank" rel="noopener"><svg class="ic"><use href="#i-photo"/></svg><span data-i18n="j.1c">أرسل صور أغراضك</span></a><a class="btn btn--sm btn--ghost" href="#helper"><span data-i18n="j.1c2">دليل المساحات</span></a></div>
     </article>
     <article class="spanel"><span class="spanel__n" aria-hidden="true">2</span><span class="spanel__of" aria-hidden="true">2 / 4</span>
       <h3 data-i18n="j.2t">تواصل معنا وأكّد التفاصيل</h3><p data-i18n="j.2d">يؤكد لك فريق رافل المساحة والتوفر والمنطقة ونوع الوحدة، مكيّفة أو غير مكيّفة.</p>
@@ -477,29 +448,16 @@
   </div>
 </section>
 
-<section class="sec" id="branches" data-theme="grey" aria-labelledby="branches-h">
-  <div class="wrap">
-    <span class="eyebrow"><span class="plate">07</span><span data-i18n="b.eyebrow">مواقعنا</span></span>
-    <h2 class="h2" id="branches-h" data-i18n="b.h2" data-kinetic>أين نتواجد؟</h2>
-    <p class="lead" data-i18n="b.p">نتواجد في مصفح والمفرق بأبوظبي. اختر المنطقة الأقرب لك، ونؤكد لك التوفر عند التواصل.</p>
-    <ul class="branches" id="branchList"><li class="card branch"><h3 class="branch__name"><span>مصفح</span></h3><p class="branch__row"><span>أبوظبي</span></p></li><li class="card branch"><h3 class="branch__name"><span>المفرق</span></h3><p class="branch__row"><span>أبوظبي</span></p></li></ul>
-  </div>
-</section>
 
-<section class="sec" id="faq" data-theme="white" aria-labelledby="faq-h">
+<section class="sec" id="faq" data-theme="grey" aria-labelledby="faq-h">
   <div class="wrap wrap--narrow">
-    <span class="eyebrow"><span class="plate">08</span><span data-i18n="q.eyebrow">أسئلة سريعة</span></span>
+    <span class="eyebrow"><span class="plate">06</span><span data-i18n="q.eyebrow">أسئلة سريعة</span></span>
     <h2 class="h2" id="faq-h" data-i18n="q.h2" data-kinetic>كل ما يهمك قبل الحجز</h2>
     <div class="faq">
-      <details class="qa"><summary><span data-i18n="q.1">هل أحتاج مستودعاً كبيراً؟</span><svg class="ic"><use href="#i-chev"/></svg></summary><p data-i18n="q.1a">لا. الوحدات تبدأ من 1 م².</p></details>
-      <details class="qa"><summary><span data-i18n="q.2">هل أستطيع الوصول لأغراضي؟</span><svg class="ic"><use href="#i-chev"/></svg></summary><p data-i18n="q.2a">نعم، في أي وقت، 24/7.</p></details>
-      <details class="qa"><summary><span data-i18n="q.3">كيف أعرف المساحة المناسبة؟</span><svg class="ic"><use href="#i-chev"/></svg></summary><p data-i18n="q.3a">أرسل لنا قائمة أو صور الأغراض ونقترح عليك. ويمكنك أيضاً تجربة حاسبة المساحة.</p><a class="link" href="#helper" data-i18n="q.helper">افتح حاسبة المساحة</a></details>
-      <details class="qa"><summary><span data-i18n="q.4">عندي أغراض ثقيلة؟</span><svg class="ic"><use href="#i-chev"/></svg></summary><p data-i18n="q.4a">يمكنك استئجار رافعة شوكية بالساعة.</p></details>
-      <details class="qa"><summary><span data-i18n="q.5">هل يجب أن أزور الفرع للحجز؟</span><svg class="ic"><use href="#i-chev"/></svg></summary><p data-i18n="q.5a">لا. يمكنك الحجز بإرسال المستندات عبر واتساب أو البريد.</p></details>
-      <details class="qa"><summary><span data-i18n="q.6">ما المستندات المطلوبة؟</span><svg class="ic"><use href="#i-chev"/></svg></summary><p data-i18n="q.6a">توقيع عقد الإيجار، وإرسال صورة الهوية، وإرسال صورة الرخصة التجارية للشركات.</p></details>
-      <details class="qa"><summary><span data-i18n="q.7">هل الوحدات مكيّفة؟</span><svg class="ic"><use href="#i-chev"/></svg></summary><p data-i18n="q.7a">لدينا وحدات مكيّفة وغير مكيّفة. اسأل عن المتوفر عند الحجز.</p></details>
-      <details class="qa"><summary><span data-i18n="q.8">كم ارتفاع الوحدة؟</span><svg class="ic"><use href="#i-chev"/></svg></summary><p data-i18n="q.8a">3 أمتار، عشان تستغل الارتفاع وتوفّر على نفسك.</p></details>
-      <details class="qa"><summary><span data-i18n="q.9">ما الممنوع تخزينه؟</span><svg class="ic"><use href="#i-chev"/></svg></summary><p data-i18n="q.9a">المواد القابلة للاشتعال، المواد الغذائية سريعة التلف، الحيوانات، وأي شيء غير قانوني.</p></details>
+      <details class="qa"><summary><span data-i18n="q.1">كيف أعرف المساحة المناسبة؟</span><svg class="ic"><use href="#i-chev"/></svg></summary><p data-i18n="q.1a">أرسل لنا قائمة أو صور أغراضك ونقترح لك المساحة الأنسب. وللتقدير السريع شاهد دليل المساحات.</p><a class="link" href="#helper" data-i18n="q.helper">شاهد دليل المساحات</a></details>
+      <details class="qa"><summary><span data-i18n="q.2">عندي أغراض ثقيلة؟</span><svg class="ic"><use href="#i-chev"/></svg></summary><p data-i18n="q.2a">يمكنك استئجار رافعة شوكية بالساعة.</p></details>
+      <details class="qa"><summary><span data-i18n="q.3">هل يجب أن أزور الفرع للحجز؟</span><svg class="ic"><use href="#i-chev"/></svg></summary><p data-i18n="q.3a">لا. يمكنك الحجز بإرسال المستندات عبر واتساب أو البريد.</p></details>
+      <details class="qa"><summary><span data-i18n="q.4">ما الممنوع تخزينه؟</span><svg class="ic"><use href="#i-chev"/></svg></summary><p data-i18n="q.4a">المواد القابلة للاشتعال، المواد الغذائية سريعة التلف، الحيوانات، وأي شيء غير قانوني.</p></details>
     </div>
   </div>
 </section>
@@ -517,18 +475,10 @@
 
     <form class="quote card" id="quoteForm" novalidate>
       <h3 class="h3 h3--flush" data-i18n="c.formH">اطلب عرض سعر</h3>
-      <div class="field"><label for="qName" data-i18n="c.name">الاسم (اختياري)</label><input id="qName" name="name" type="text" autocomplete="name" maxlength="60"></div>
-      <div class="field"><label for="qSize" data-i18n="c.size">المساحة</label><select id="qSize" name="size"></select></div>
-      <div class="field">
-        <span class="field__label" id="qTypeLabel" data-i18n="c.type">نوع التخزين</span>
-        <div class="seg seg--full" role="radiogroup" aria-labelledby="qTypeLabel" id="qType">
-          <button class="seg__btn is-on" type="button" role="radio" aria-checked="true" data-type="personal"><svg class="ic"><use href="#i-home"/></svg><span data-i18n="c.personal">شخصي</span></button>
-          <button class="seg__btn" type="button" role="radio" aria-checked="false" data-type="business"><svg class="ic"><use href="#i-building"/></svg><span data-i18n="c.business">تجاري</span></button>
-        </div>
+      <div class="quote__row">
+        <div class="field"><label for="qSize" data-i18n="c.size">المساحة</label><select id="qSize" name="size"></select></div>
+        <div class="field"><label for="qBranch" data-i18n="c.branch">المنطقة</label><select id="qBranch" name="branch"></select></div>
       </div>
-      <div class="field"><label for="qBranch" data-i18n="c.branch">المنطقة</label><select id="qBranch" name="branch"></select></div>
-      <div class="field"><label for="qTerm" data-i18n="c.term">مدة الإيجار</label><select id="qTerm" name="term"></select></div>
-      <div class="field"><label for="qNotes" data-i18n="c.notes">ملاحظات (اختياري)</label><textarea id="qNotes" name="notes" rows="2" maxlength="300"></textarea></div>
       <div class="preview">
         <span class="tiny" data-i18n="c.preview">هذه هي الرسالة التي ستُرسل على واتساب:</span>
         <pre id="qPreview" dir="auto"></pre>

@@ -193,8 +193,6 @@ main{position:relative;z-index:1;overflow-x:clip}
 .seg__btn .ic{width:18px;height:18px}
 .seg__btn.is-on{background:var(--navy);color:#fff}
 .seg--sm .seg__btn{min-height:36px;padding:4px 11px;font-size:13px}
-.seg--full{display:flex}
-.seg--full .seg__btn{flex:1}
 .seg--dark{border-color:#3A4C86;background:var(--navy-soft)}
 .seg--dark .seg__btn{color:#C9D1DC}
 .seg--dark .seg__btn.is-on{background:#fff;color:var(--navy)}
@@ -223,13 +221,6 @@ main{position:relative;z-index:1;overflow-x:clip}
 .fx .vault__relock{position:absolute;z-index:3;top:10px;inset-inline-end:10px;display:grid;place-items:center;width:40px;height:40px;border:0;border-radius:50%;background:rgba(255,255,255,.92);color:var(--navy);cursor:pointer;opacity:0;pointer-events:none;transition:opacity .4s ease .6s,transform .2s var(--ease)}
 .fx .vault.is-open .vault__relock{opacity:1;pointer-events:auto}
 .vault__relock:active{transform:scale(.9)}
-.steps3{list-style:none;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0;padding:0}
-.step{display:grid;justify-items:center;gap:1px;padding:14px 6px 12px;border-radius:18px;background:var(--grey-100);color:var(--navy);text-align:center;transition:transform .45s var(--ease),box-shadow .45s ease,background .45s ease}
-.step__n{display:grid;place-items:center;width:36px;height:36px;margin-bottom:6px;border-radius:50%;background:var(--navy);color:#fff;font:800 16px/1 var(--f-num);transition:background .45s ease,color .45s ease}
-.step b{font:700 14px/1.6 var(--f-display)}
-.step span:last-child{color:var(--ink-muted);font-size:12.5px;line-height:1.6}
-.step.is-on{transform:translateY(-5px);background:#fff;box-shadow:var(--shadow)}
-.step.is-on .step__n{background:var(--cyan);color:var(--navy)}
 .who{margin-top:10px}
 @media (min-width:860px){.split{grid-template-columns:1fr 1fr;gap:28px;align-items:start}.split__col .h3:first-child{margin-top:6px}}
 
@@ -321,72 +312,38 @@ main{position:relative;z-index:1;overflow-x:clip}
 @keyframes pop{0%{transform:scale(.6)}60%{transform:scale(1.25)}100%{transform:scale(1)}}
 @media (min-width:900px){.explorer{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);align-items:start;gap:26px}.viewer__stage{aspect-ratio:5/4}}
 
-/* ---------- 03 size helper ---------- */
-.helper{display:grid;gap:14px;margin-top:20px}
-.helper__head{display:flex;align-items:center;gap:12px}
-.helper__step{color:var(--ink-muted);font:600 13px/1.6 var(--f-text);white-space:nowrap}
-.helper__bar{flex:1;height:6px;border-radius:3px;background:var(--grey-100);overflow:hidden}
-.helper__bar i{display:block;width:33.3%;height:100%;border-radius:3px;background:var(--navy);transition:width .45s var(--ease)}
-/* a box that fills with small blocks as items are added; the blocks move away from a finger */
-.fill{position:relative;border-radius:16px;background:var(--navy);color:#fff;overflow:hidden}
-.fill canvas{display:block;width:100%;height:132px;touch-action:pan-y}
-.fill__text{position:absolute;inset-inline-start:14px;top:10px;display:grid;line-height:1.5;pointer-events:none}
-.fill__text b{font:800 26px/1.2 var(--f-num)}
-.fill__text span{color:var(--grey-300);font-size:12.5px}
-.helper__body{min-height:150px}
-.helper__body > *{animation:fadeup .4s var(--ease) both}
-.helper__q{margin:0 0 2px;font:800 21px/1.6 var(--f-display)}
-.cats{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin-top:12px}
-.cat{position:relative;display:flex;flex-direction:column;align-items:flex-start;justify-content:space-between;gap:10px;min-height:92px;padding:13px;border:1.5px solid var(--grey-200);border-radius:16px;background:#fff;color:var(--navy);font:700 15px/1.5 var(--f-display);text-align:start;cursor:pointer;transition:background .25s ease,color .25s ease,transform .2s var(--ease)}
-.cat:active{transform:scale(.97)}
-.cat .ic{width:26px;height:26px}
-.cat__check{position:absolute;top:10px;inset-inline-end:10px;display:grid;place-items:center;width:22px;height:22px;border:1.5px solid var(--grey-300);border-radius:50%;color:transparent;transition:transform .3s var(--ease-out),background .2s ease}
-.cat__check .ic{width:14px;height:14px;stroke-width:2.6}
-.cat[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:#fff}
-.cat[aria-pressed="true"] .cat__check{background:var(--cyan);border-color:var(--cyan);color:var(--navy);transform:scale(1.12)}
-.presets{display:flex;flex-wrap:wrap;gap:7px;margin:8px 0 2px}
-.preset{padding:6px 13px;border:1.5px solid var(--grey-200);border-radius:999px;background:#fff;color:var(--navy);font:600 13.5px/1.6 var(--f-text);cursor:pointer;transition:transform .2s var(--ease)}
-.preset:active{transform:scale(.95)}
-.preset.is-on{background:var(--navy);border-color:var(--navy);color:#fff}
-.qgroup{margin-top:14px}
-.qgroup h4{display:flex;align-items:center;gap:8px;margin:0 0 2px;font:800 16.5px/1.6 var(--f-display)}
-.qrow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--grey-100)}
-.qrow:last-child{border-bottom:0}
-.qrow__name{font-size:15px;line-height:1.6}
-.stepper{display:inline-flex;align-items:center;gap:2px;flex:none;direction:ltr}
-.stepper button{display:grid;place-items:center;width:40px;height:40px;padding:0;border:1.5px solid var(--grey-200);border-radius:12px;background:#fff;color:var(--navy);cursor:pointer;transition:transform .15s var(--ease),background .15s ease}
-.stepper button:active{transform:scale(.88);background:var(--cyan-wash)}
-.stepper button .ic{width:18px;height:18px;stroke-width:2.2}
-.stepper output{min-width:34px;text-align:center;font:800 17px/1 var(--f-num)}
-.stepper output.is-zero{color:var(--grey-300)}
-.stepper output.is-bump{animation:pop .3s var(--ease-out)}
-.result{display:grid;justify-items:center;gap:10px;text-align:center}
-.result__size{font:800 76px/1 var(--f-num);letter-spacing:-.02em}
-.result__size small{font:800 26px/1 var(--f-display);letter-spacing:0}
-.result__over{font:800 30px/1.5 var(--f-display)}
-.result__fits{font:700 16.5px/1.7 var(--f-display)}
-.result p{margin:0}
-.disclaimer{padding:9px 14px;border-radius:14px;background:var(--grey-100);color:var(--ink-muted);font-size:14px;line-height:1.7}
-.result__actions{display:grid;gap:9px;width:100%;margin-top:4px}
-.helper__nav{display:flex;justify-content:space-between;gap:10px}
-.helper__nav .btn{flex:1}
-.helper__nav .btn--ghost{flex:0 1 auto}
-.helper__err{margin:8px 0 0;color:#B42318;font:600 14px/1.6 var(--f-text)}
+/* ---------- 03 the right size: send photos, or read the short guide ---------- */
 .option{display:flex;align-items:flex-start;gap:12px;margin-top:18px}
-.option__n{flex:none;display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--navy);color:#fff;font:800 16px/1 var(--f-num)}
 .option__body{flex:1;min-width:0;display:grid;gap:8px;justify-items:start}
 .option__body p{margin:0;color:var(--muted)}
 .option__body .btn{margin-top:4px}
 .option__badge{display:inline-flex;align-items:center;gap:6px;padding:2px 12px;border-radius:999px;background:var(--yellow);color:var(--navy);font:700 12.5px/1.8 var(--f-display)}
 .option--best{border:2px solid var(--cyan)}
-.option--best .option__n{background:var(--cyan);color:var(--navy)}
-.option--head{margin-top:24px;padding-inline:20px}
-.option--head + .helper{margin-top:12px}
-@media (min-width:560px){.cats{grid-template-columns:repeat(3,1fr)}.result__actions{grid-template-columns:1fr 1fr}}
+.guide{list-style:none;margin:0;padding:0}
+.guide li + li{border-top:1px solid var(--grey-100)}
+.grow{display:grid;grid-template-columns:minmax(76px,auto) minmax(0,1fr) auto;align-items:center;gap:14px;padding:13px 16px;color:var(--navy);text-decoration:none;transition:background .2s ease}
+.grow:hover,.grow:active,.grow:focus-visible{background:var(--cyan-wash)}
+.grow__a{font:800 18px/1.4 var(--f-num);white-space:nowrap}
+.grow__a small{color:var(--ink-muted);font:700 12.5px/1 var(--f-display)}
+.grow__t{color:var(--ink-muted);font-size:15px;line-height:1.7}
+.grow .ic{width:18px;height:18px;color:var(--grey-300)}
 
-/* ---------- 04 prices: the quiet section ---------- */
+/* ---------- prices: the full list, folded under the unit explorer (inside 02) ---------- */
 .ptable-wrap{position:relative}
-#prices .card--flush{background:#fff;box-shadow:0 0 0 1.5px var(--grey-200)}
+.allprices,.terms{max-width:720px;margin-inline:auto}
+.allprices{margin-top:16px}
+.allprices__sum{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px 18px;font:800 17px/1.6 var(--f-display);cursor:pointer;list-style:none}
+.allprices__sum::-webkit-details-marker{display:none}
+.allprices__sum .ic{transition:transform .35s var(--ease-out)}
+.allprices[open] .allprices__sum .ic{transform:rotate(180deg)}
+.allprices__body{display:grid;gap:14px;padding-bottom:18px}
+.allprices[open] .allprices__body{animation:fadeup .4s var(--ease) both}
+.allprices__body > :not(.ptable-wrap){margin-inline:18px}
+.allprices .btn{display:flex}
+.allprices .bigask__btns .btn{min-width:132px}
+.terms{margin-top:12px}
+.terms .callout{background:var(--cyan-wash)}
+#explorer{scroll-margin-top:72px}
 .ptable{position:relative;width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
 .ptable th{padding:13px 8px;background:var(--navy);color:#fff;font:700 14.5px/1.6 var(--f-display);text-align:center}
 .ptable th small{color:var(--grey-300);font:400 12px/1 var(--f-text)}
@@ -404,14 +361,12 @@ main{position:relative;z-index:1;overflow-x:clip}
 .ptable tbody tr[aria-selected="true"]{background:var(--cyan-wash)}
 .pselected{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:6px 14px;padding:10px 16px;border-radius:var(--r-card);background:var(--navy);color:#fff;font:700 15px/1.7 var(--f-display);text-align:center}
 .pselected .link{color:#fff}
-#prices .btn{display:flex}
 .bigask{display:grid;gap:12px;justify-items:center}
 .bigask__btns{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
-#prices .bigask__btns .btn{min-width:132px}
 .callout{margin:14px 0 0;padding:10px 14px;border-radius:14px;background:#fff;color:var(--navy);font-size:14.5px;line-height:1.8}
 .callout b{font-family:var(--f-display);font-weight:800}
 
-/* ---------- 05 features: a stack of cards with depth; drag the top one away ---------- */
+/* ---------- 04 features: a stack of cards with depth; drag the top one away ---------- */
 .deck{display:grid;gap:14px;margin-top:24px}
 .fcard{position:relative}
 .fcard__in{display:flex;flex-direction:column;height:100%;padding:14px 14px 22px;border-radius:28px;background:#fff;color:var(--navy);box-shadow:0 26px 60px rgba(0,0,0,.34)}
@@ -446,7 +401,7 @@ main{position:relative;z-index:1;overflow-x:clip}
 .extra span{color:var(--ink-muted);font-size:14px;line-height:1.7}
 @media (min-width:860px){.deck{grid-template-columns:repeat(3,1fr)}.fxdeck .deck{height:500px}}
 
-/* ---------- 06 booking steps: one story you swipe sideways ---------- */
+/* ---------- 05 booking steps: one story you swipe sideways ---------- */
 .story{display:flex;gap:14px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;margin-top:24px;padding:6px var(--gr) 12px var(--gl);scroll-padding-inline:var(--gl)}
 .story::-webkit-scrollbar{display:none}
 .story.is-grab{scroll-snap-type:none;cursor:grabbing}
@@ -467,21 +422,9 @@ main{position:relative;z-index:1;overflow-x:clip}
 .story__btn{box-shadow:none}
 @media (hover:none){.story__btn{display:none}}
 
-/* ---------- 07 where we are ---------- */
-.branches{list-style:none;display:grid;gap:12px;margin:20px 0 0;padding:0}
-.branch{display:grid;gap:10px;align-content:start;transition:box-shadow .3s ease,transform .3s var(--ease-out)}
-.branch.is-chosen{box-shadow:0 0 0 3px var(--cyan);transform:translateY(-3px)}
-.branch__name{display:flex;align-items:center;gap:8px;margin:0;font:800 26px/1.5 var(--f-display)}
-.branch__name .plate{margin-inline-start:auto;background:var(--cyan-wash);color:var(--navy);font-family:var(--f-display);letter-spacing:0}
-.branch__row{display:flex;align-items:flex-start;gap:8px;margin:0;color:var(--ink-muted);font-size:15px;line-height:1.7}
-.branch .tiny{margin:0}
-.branch__row .ic{width:19px;height:19px;margin-top:3px}
-.branch__actions{display:grid;gap:8px;margin-top:4px}
-@media (min-width:620px){.branches{grid-template-columns:1fr 1fr}}
-
-/* ---------- 08 faq ---------- */
+/* ---------- 06 faq ---------- */
 .faq{display:grid;gap:10px;margin-top:20px}
-.qa{padding:0 18px;border-radius:18px;background:var(--grey-100);color:var(--navy);transition:background .3s ease}
+.qa{padding:0 18px;border-radius:18px;background:#fff;color:var(--navy);box-shadow:0 0 0 1px rgba(21,34,73,.08);transition:background .3s ease}
 .qa[open]{background:var(--cyan-wash)}
 .qa summary{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px 0;font:700 16.5px/1.7 var(--f-display);cursor:pointer;list-style:none}
 .qa summary::-webkit-details-marker{display:none}
@@ -491,7 +434,7 @@ main{position:relative;z-index:1;overflow-x:clip}
 .qa[open] > p,.qa[open] > .link{animation:fadeup .4s var(--ease) both}
 .qa .link{display:inline-block;margin:0 0 16px}
 
-/* ---------- 09 contact ---------- */
+/* ---------- 07 contact ---------- */
 .contact__logo{display:block;width:176px;height:auto;margin:0 auto}
 #contact .h2,#contact .lead{margin-inline:auto;text-align:center}
 #contact .h2{display:block}
@@ -502,6 +445,8 @@ main{position:relative;z-index:1;overflow-x:clip}
 .btn--pulse::before{content:"";position:absolute;inset:-2px;border-radius:inherit;border:2px solid var(--green);opacity:0;animation:breathe 2.8s ease-out infinite;pointer-events:none}
 @keyframes breathe{0%{opacity:.75;transform:scale(1)}70%,100%{opacity:0;transform:scale(1.08,1.4)}}
 .quote{display:grid;gap:13px;margin-top:22px;color:var(--navy)}
+.quote__row{display:grid;gap:13px}
+@media (min-width:480px){.quote__row{grid-template-columns:1fr 1fr}}
 .field{display:grid;gap:5px;min-width:0}
 .field label,.field__label{color:var(--ink-muted);font:600 14px/1.6 var(--f-text)}
 .field input,.field select,.field textarea{width:100%;min-height:48px;padding:9px 14px;border:1.5px solid var(--grey-200);border-radius:var(--r-ctl);background:#fff;color:var(--navy);font:400 16px/1.6 var(--f-text);transition:border-color .2s ease,box-shadow .2s ease}
@@ -599,7 +544,6 @@ main{position:relative;z-index:1;overflow-x:clip}
 /* shapes that could vanish when the ground takes their colour keep a hairline edge */
 .btn--navy{box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.24)}
 .card{box-shadow:0 0 0 1px rgba(21,34,73,.06)}
-#prices .card--flush{box-shadow:0 0 0 1.5px var(--grey-200)}
 .option--best{box-shadow:none}
 
 /* ---------- fixes after the first phone review ---------- */
@@ -613,17 +557,3 @@ main{position:relative;z-index:1;overflow-x:clip}
 /* the navy button needs an edge only where it sits straight on a dark ground */
 .btn--navy{box-shadow:none}
 [data-tone="dark"] .wrap > .btn--navy{box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.3)}
-/* the home list is long, so it folds into rooms; each category ends with a free "Other" field */
-.cat--wide{grid-column:1/-1;min-height:76px}
-.qsub{border-top:1px solid var(--grey-100)}
-.qsub__head{display:flex;align-items:center;gap:8px;width:100%;padding:13px 0;border:0;background:none;color:var(--navy);font:700 15.5px/1.6 var(--f-display);text-align:start;cursor:pointer}
-.qsub__head > span:first-child{flex:1}
-.qsub__n{display:inline-grid;place-items:center;min-width:24px;height:24px;padding:0 7px;border-radius:999px;background:var(--cyan);color:var(--navy);font:800 13px/1 var(--f-num)}
-.qsub__head .ic{width:20px;height:20px;color:var(--ink-muted);transition:transform .3s var(--ease-out)}
-.qsub.is-open .qsub__head .ic{transform:rotate(180deg)}
-.qsub__body{display:none;padding-bottom:6px}
-.qsub.is-open .qsub__body{display:block;animation:fadeup .35s var(--ease) both}
-.qother{display:grid;gap:5px;margin-top:6px;padding-top:12px;border-top:1px solid var(--grey-100)}
-.qother label{font:700 15.5px/1.6 var(--f-display)}
-.qother textarea{width:100%;min-height:66px;padding:9px 14px;border:1.5px solid var(--grey-200);border-radius:var(--r-ctl);background:#fff;color:var(--navy);font:400 16px/1.6 var(--f-text);resize:vertical;transition:border-color .2s ease,box-shadow .2s ease}
-.qother textarea:focus{outline:0;border-color:var(--cyan);box-shadow:0 0 0 4px rgba(46,197,255,.22)}

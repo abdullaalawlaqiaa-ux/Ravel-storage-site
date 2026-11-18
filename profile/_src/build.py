@@ -63,10 +63,20 @@ def main():
     rows = "".join('<tr data-a="%s" tabindex="0" aria-selected="false"><td>%s</td><td>%s</td><td>%s</td></tr>'
                    % (s["a"], s["a"], s["a"] * D["height"], format(s["price"], ","))
                    for s in D["sizes"] if s["price"])
-    branches = "".join('<li class="card branch"><h3 class="branch__name"><span>%s</span></h3>'
-                       '<p class="branch__row"><span>%s</span></p></li>'
-                       % (T(b["name"]), T(b["area"])) for b in D["branches"])
-    tpl = tpl.replace("<!--PRICEROWS-->", rows).replace("<!--BRANCHES-->", branches)
+    # the size guide: neighbouring sizes that hold the same kind of load share a row, which leads to the smallest of them
+    groups = []
+    for s in D["sizes"]:
+        if groups and groups[-1][0] == s["fits"]:
+            groups[-1][1].append(s["a"])
+        else:
+            groups.append((s["fits"], [s["a"]]))
+    rows_guide = [(g[1][0], "%d – %d" % (g[1][0], g[1][-1]) if len(g[1]) > 1 else str(g[1][0]), g[0]) for g in groups]
+    rows_guide.append(("big", "+%d" % D["sizes"][-1]["a"], "open"))
+    guide = "".join('<li><a class="grow" href="#explorer" data-a="%s"><b class="grow__a"><span dir="ltr">%s</span> '
+                    '<small data-i18n="m2">%s</small></b><span class="grow__t" data-i18n="fits.%s">%s</span>'
+                    '<svg class="ic ic--dir"><use href="#i-arrow"/></svg></a></li>'
+                    % (a, label, T("m2"), key, T("fits." + key)) for a, label, key in rows_guide)
+    tpl = tpl.replace("<!--PRICEROWS-->", rows).replace("<!--GUIDE-->", guide)
     tpl = tpl.replace("<!--SIZES-->", "").replace("<!--UNITINFO-->", "")
 
     data = dict(D)

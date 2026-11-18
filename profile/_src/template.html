@@ -85,12 +85,10 @@
       <a href="#service"><span class="plate">01</span><span data-i18n="nav.service"></span></a>
       <a href="#units"><span class="plate">02</span><span data-i18n="nav.units"></span></a>
       <a href="#helper"><span class="plate">03</span><span data-i18n="nav.helper"></span></a>
-      <a href="#prices"><span class="plate">04</span><span data-i18n="nav.prices"></span></a>
-      <a href="#why"><span class="plate">05</span><span data-i18n="nav.why"></span></a>
-      <a href="#journey"><span class="plate">06</span><span data-i18n="nav.journey"></span></a>
-      <a href="#branches"><span class="plate">07</span><span data-i18n="nav.branches"></span></a>
-      <a href="#faq"><span class="plate">08</span><span data-i18n="nav.faq"></span></a>
-      <a href="#contact"><span class="plate">09</span><span data-i18n="nav.contact"></span></a>
+      <a href="#why"><span class="plate">04</span><span data-i18n="nav.why"></span></a>
+      <a href="#journey"><span class="plate">05</span><span data-i18n="nav.journey"></span></a>
+      <a href="#faq"><span class="plate">06</span><span data-i18n="nav.faq"></span></a>
+      <a href="#contact"><span class="plate">07</span><span data-i18n="nav.contact"></span></a>
     </nav>
     <label class="switch" for="liteToggle">
       <input type="checkbox" id="liteToggle">
@@ -148,12 +146,6 @@
         <button class="vault__relock" id="vaultLock" type="button" data-i18n-attr="aria-label:s.lock"><svg class="ic"><use href="#i-lock"/></svg></button>
       </figure>
       <div class="split__col">
-        <h3 class="h3" data-i18n="s.how"></h3>
-        <ol class="steps3" id="steps3">
-          <li class="step is-on"><span class="step__n">1</span><b data-i18n="s.1t"></b><span data-i18n="s.1d"></span></li>
-          <li class="step"><span class="step__n">2</span><b data-i18n="s.2t"></b><span data-i18n="s.2d"></span></li>
-          <li class="step"><span class="step__n">3</span><b data-i18n="s.3t"></b><span data-i18n="s.3d"></span></li>
-        </ol>
         <h3 class="h3" data-i18n="s.who"></h3>
         <div class="seg" role="tablist" id="whoTabs">
           <button class="seg__btn is-on" type="button" role="tab" aria-selected="true" aria-controls="who-ind" id="tab-ind" data-who="ind"><svg class="ic"><use href="#i-home"/></svg><span data-i18n="s.ind"></span></button>
@@ -224,8 +216,41 @@
 
       <div class="unitinfo card" id="unitInfo" aria-live="polite"><!--UNITINFO--></div>
     </div>
+
+    <details class="card card--flush allprices" id="prices">
+      <summary class="allprices__sum"><span data-i18n="p.all"></span><svg class="ic"><use href="#i-chev"/></svg></summary>
+      <div class="allprices__body">
+        <div class="ptable-wrap">
+          <i class="ptable__hl" id="ptableHl" aria-hidden="true"></i>
+          <table class="ptable" id="ptable">
+            <thead><tr><th scope="col" data-i18n="p.colA"></th><th scope="col" data-i18n="p.colV"></th><th scope="col" data-i18n="p.colP"></th></tr></thead>
+            <tbody id="ptbody"><!--PRICEROWS--></tbody>
+          </table>
+        </div>
+        <p class="tiny tiny--center" data-i18n="p.tap"></p>
+        <div class="pselected" id="pSelected" hidden>
+          <span id="pSelectedText"></span>
+          <a class="link" href="#explorer" data-i18n="p.view"></a>
+        </div>
+        <div class="bigask">
+          <p class="note" data-i18n="p.big"></p>
+          <div class="bigask__btns">
+            <a class="btn btn--sm btn--wa" id="bigWa" href="#contact" target="_blank" rel="noopener"><svg class="ic"><use href="#i-chat"/></svg><span data-i18n="c.wa"></span></a>
+            <a class="btn btn--sm btn--navy" href="tel:+971503250551"><svg class="ic"><use href="#i-phone"/></svg><span data-i18n="c.call"></span></a>
+          </div>
+        </div>
+      </div>
+    </details>
+    <div class="card terms">
+      <h3 class="h3 h3--flush" data-i18n="p.term"></h3>
+      <ul class="ticks">
+        <li data-i18n="p.term1"></li><li data-i18n="p.term2"></li><li data-i18n="p.term3"></li>
+      </ul>
+      <p class="callout" data-i18n="p.term4"></p>
+    </div>
   </div>
 </section>
+
 
 <section class="sec" id="helper" data-theme="grey" aria-labelledby="helper-h">
   <div class="wrap wrap--narrow">
@@ -233,7 +258,6 @@
     <h2 class="h2" id="helper-h" data-i18n="h.h2" data-kinetic></h2>
     <p class="lead" data-i18n="h.p"></p>
     <div class="card option option--best">
-      <span class="option__n" aria-hidden="true">1</span>
       <div class="option__body">
         <span class="option__badge" data-i18n="h.o1b"></span>
         <h3 class="h3 h3--flush" data-i18n="h.o1"></h3>
@@ -241,68 +265,15 @@
         <a class="btn btn--wa" id="helperPhotos" href="#contact" target="_blank" rel="noopener"><svg class="ic"><use href="#i-photo"/></svg><span data-i18n="h.sendPhotos"></span></a>
       </div>
     </div>
-    <div class="option option--head">
-      <span class="option__n" aria-hidden="true">2</span>
-      <div class="option__body">
-        <h3 class="h3 h3--flush" data-i18n="h.o2"></h3>
-        <p data-i18n="h.o2d"></p>
-      </div>
-    </div>
-    <div class="helper card" id="helperBox">
-      <div class="helper__head">
-        <span class="helper__step" id="helperStep"></span>
-        <div class="helper__bar" aria-hidden="true"><i id="helperBar"></i></div>
-      </div>
-      <div class="fill" id="fillBox" hidden>
-        <canvas id="fillCanvas" aria-hidden="true"></canvas>
-        <div class="fill__text"><b id="fillSize"></b><span id="fillNote"></span></div>
-      </div>
-      <div class="helper__body" id="helperBody" aria-live="polite"></div>
-      <div class="helper__nav">
-        <button class="btn btn--ghost" id="helperBack" type="button"><svg class="ic ic--back"><use href="#i-arrow"/></svg><span data-i18n="h.back"></span></button>
-        <button class="btn btn--navy" id="helperNext" type="button"><span id="helperNextText"></span><svg class="ic ic--dir"><use href="#i-arrow"/></svg></button>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="sec" id="prices" data-theme="white" aria-labelledby="prices-h">
-  <div class="wrap wrap--narrow">
-    <span class="eyebrow"><span class="plate">04</span><span data-i18n="p.eyebrow"></span></span>
-    <h2 class="h2" id="prices-h" data-i18n="p.h2" data-kinetic></h2>
-    <div class="card card--flush ptable-wrap">
-      <i class="ptable__hl" id="ptableHl" aria-hidden="true"></i>
-      <table class="ptable" id="ptable">
-        <thead><tr><th scope="col" data-i18n="p.colA"></th><th scope="col" data-i18n="p.colV"></th><th scope="col" data-i18n="p.colP"></th></tr></thead>
-        <tbody id="ptbody"><!--PRICEROWS--></tbody>
-      </table>
-    </div>
-    <p class="tiny tiny--center" data-i18n="p.tap"></p>
-    <div class="pselected" id="pSelected" hidden>
-      <span id="pSelectedText"></span>
-      <a class="link" href="#units" data-i18n="p.view"></a>
-    </div>
-    <div class="card bigask">
-      <p class="note" data-i18n="p.big"></p>
-      <div class="bigask__btns">
-        <a class="btn btn--sm btn--wa" id="bigWa" href="#contact" target="_blank" rel="noopener"><svg class="ic"><use href="#i-chat"/></svg><span data-i18n="c.wa"></span></a>
-        <a class="btn btn--sm btn--navy" href="tel:+971503250551"><svg class="ic"><use href="#i-phone"/></svg><span data-i18n="c.call"></span></a>
-      </div>
-    </div>
-    <div class="card">
-      <h3 class="h3 h3--flush" data-i18n="p.term"></h3>
-      <ul class="ticks">
-        <li data-i18n="p.term1"></li><li data-i18n="p.term2"></li><li data-i18n="p.term3"></li>
-      </ul>
-      <p class="callout" data-i18n="p.term4"></p>
-    </div>
-    <a class="btn btn--wa" id="priceQuote" href="#contact"><svg class="ic"><use href="#i-chat"/></svg><span data-i18n="p.cta"></span></a>
+    <h3 class="h3" data-i18n="h.guide"></h3>
+    <ul class="card card--flush guide" id="guide"><!--GUIDE--></ul>
+    <p class="tiny tiny--center" data-i18n="h.guideTap"></p>
   </div>
 </section>
 
 <section class="sec" id="why" data-theme="night" aria-labelledby="why-h">
   <div class="wrap">
-    <span class="eyebrow"><span class="plate">05</span><span data-i18n="f.eyebrow"></span></span>
+    <span class="eyebrow"><span class="plate">04</span><span data-i18n="f.eyebrow"></span></span>
     <h2 class="h2" id="why-h" data-i18n="f.h2" data-kinetic></h2>
     <div class="deck" id="deck" role="group" data-i18n-attr="aria-label:f.tabs">
       <article class="fcard" data-f="1">
@@ -446,7 +417,7 @@
 
 <section class="sec" id="journey" data-theme="white" aria-labelledby="journey-h">
   <div class="wrap">
-    <span class="eyebrow"><span class="plate">06</span><span data-i18n="j.eyebrow"></span></span>
+    <span class="eyebrow"><span class="plate">05</span><span data-i18n="j.eyebrow"></span></span>
     <h2 class="h2" id="journey-h" data-i18n="j.h2" data-kinetic></h2>
   </div>
   <div class="story" id="story" tabindex="0" role="group" data-i18n-attr="aria-label:nav.journey">
@@ -477,29 +448,16 @@
   </div>
 </section>
 
-<section class="sec" id="branches" data-theme="grey" aria-labelledby="branches-h">
-  <div class="wrap">
-    <span class="eyebrow"><span class="plate">07</span><span data-i18n="b.eyebrow"></span></span>
-    <h2 class="h2" id="branches-h" data-i18n="b.h2" data-kinetic></h2>
-    <p class="lead" data-i18n="b.p"></p>
-    <ul class="branches" id="branchList"><!--BRANCHES--></ul>
-  </div>
-</section>
 
-<section class="sec" id="faq" data-theme="white" aria-labelledby="faq-h">
+<section class="sec" id="faq" data-theme="grey" aria-labelledby="faq-h">
   <div class="wrap wrap--narrow">
-    <span class="eyebrow"><span class="plate">08</span><span data-i18n="q.eyebrow"></span></span>
+    <span class="eyebrow"><span class="plate">06</span><span data-i18n="q.eyebrow"></span></span>
     <h2 class="h2" id="faq-h" data-i18n="q.h2" data-kinetic></h2>
     <div class="faq">
-      <details class="qa"><summary><span data-i18n="q.1"></span><svg class="ic"><use href="#i-chev"/></svg></summary><p data-i18n="q.1a"></p></details>
+      <details class="qa"><summary><span data-i18n="q.1"></span><svg class="ic"><use href="#i-chev"/></svg></summary><p data-i18n="q.1a"></p><a class="link" href="#helper" data-i18n="q.helper"></a></details>
       <details class="qa"><summary><span data-i18n="q.2"></span><svg class="ic"><use href="#i-chev"/></svg></summary><p data-i18n="q.2a"></p></details>
-      <details class="qa"><summary><span data-i18n="q.3"></span><svg class="ic"><use href="#i-chev"/></svg></summary><p data-i18n="q.3a"></p><a class="link" href="#helper" data-i18n="q.helper"></a></details>
+      <details class="qa"><summary><span data-i18n="q.3"></span><svg class="ic"><use href="#i-chev"/></svg></summary><p data-i18n="q.3a"></p></details>
       <details class="qa"><summary><span data-i18n="q.4"></span><svg class="ic"><use href="#i-chev"/></svg></summary><p data-i18n="q.4a"></p></details>
-      <details class="qa"><summary><span data-i18n="q.5"></span><svg class="ic"><use href="#i-chev"/></svg></summary><p data-i18n="q.5a"></p></details>
-      <details class="qa"><summary><span data-i18n="q.6"></span><svg class="ic"><use href="#i-chev"/></svg></summary><p data-i18n="q.6a"></p></details>
-      <details class="qa"><summary><span data-i18n="q.7"></span><svg class="ic"><use href="#i-chev"/></svg></summary><p data-i18n="q.7a"></p></details>
-      <details class="qa"><summary><span data-i18n="q.8"></span><svg class="ic"><use href="#i-chev"/></svg></summary><p data-i18n="q.8a"></p></details>
-      <details class="qa"><summary><span data-i18n="q.9"></span><svg class="ic"><use href="#i-chev"/></svg></summary><p data-i18n="q.9a"></p></details>
     </div>
   </div>
 </section>
@@ -517,18 +475,10 @@
 
     <form class="quote card" id="quoteForm" novalidate>
       <h3 class="h3 h3--flush" data-i18n="c.formH"></h3>
-      <div class="field"><label for="qName" data-i18n="c.name"></label><input id="qName" name="name" type="text" autocomplete="name" maxlength="60"></div>
-      <div class="field"><label for="qSize" data-i18n="c.size"></label><select id="qSize" name="size"></select></div>
-      <div class="field">
-        <span class="field__label" id="qTypeLabel" data-i18n="c.type"></span>
-        <div class="seg seg--full" role="radiogroup" aria-labelledby="qTypeLabel" id="qType">
-          <button class="seg__btn is-on" type="button" role="radio" aria-checked="true" data-type="personal"><svg class="ic"><use href="#i-home"/></svg><span data-i18n="c.personal"></span></button>
-          <button class="seg__btn" type="button" role="radio" aria-checked="false" data-type="business"><svg class="ic"><use href="#i-building"/></svg><span data-i18n="c.business"></span></button>
-        </div>
+      <div class="quote__row">
+        <div class="field"><label for="qSize" data-i18n="c.size"></label><select id="qSize" name="size"></select></div>
+        <div class="field"><label for="qBranch" data-i18n="c.branch"></label><select id="qBranch" name="branch"></select></div>
       </div>
-      <div class="field"><label for="qBranch" data-i18n="c.branch"></label><select id="qBranch" name="branch"></select></div>
-      <div class="field"><label for="qTerm" data-i18n="c.term"></label><select id="qTerm" name="term"></select></div>
-      <div class="field"><label for="qNotes" data-i18n="c.notes"></label><textarea id="qNotes" name="notes" rows="2" maxlength="300"></textarea></div>
       <div class="preview">
         <span class="tiny" data-i18n="c.preview"></span>
         <pre id="qPreview" dir="auto"></pre>
