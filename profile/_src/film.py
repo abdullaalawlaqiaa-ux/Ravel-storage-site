@@ -26,6 +26,7 @@ GEN = os.path.join(HERE, "gen")
 IMG = os.path.join(ROOT, "assets", "img")
 OUT = os.path.join(IMG, "film")
 SHOTS = ["shot1.mp4", "shot2.mp4", "shot3.mp4"]
+SIZE = (720, 1280)  # every frame is brought to this size; the shots come a few pixels apart
 WANT = 128          # frames in the finished film, give or take a few
 MAX_SKIP = 10       # a still stretch keeps at least one frame in this many
 QUALITY = 55
@@ -54,14 +55,14 @@ def pick(motion, forced, target):
     return keep
 
 
-def real_ending(last_png, out_path):
+def real_ending(last_frame, out_path):
     """The real photo of the unit, laid over the film's last frame where the two show the same thing."""
     try:
         import cv2
     except ImportError:
         print("OpenCV not installed: the real-photo ending was not rebuilt")
         return False
-    last = cv2.imread(last_png)
+    last = cv2.cvtColor(np.asarray(last_frame), cv2.COLOR_RGB2BGR)
     real = cv2.imread(os.path.join(IMG, "unit-6.jpg"))
     sift = cv2.SIFT_create(6000)
     k1, d1 = sift.detectAndCompute(cv2.cvtColor(real, cv2.COLOR_BGR2GRAY), None)
@@ -116,15 +117,16 @@ def main():
         total = 0
         for j, i in enumerate(keep):
             im = Image.open(frames[i]).convert("RGB")
+            if im.size != SIZE:
+                im = im.resize(SIZE, Image.LANCZOS)
             p = os.path.join(OUT, "%03d.webp" % j)
             im.save(p, quality=QUALITY, method=6)
             total += os.path.getsize(p)
             if j == 0:
                 im.save(os.path.join(IMG, "film-poster.webp"), quality=74, method=6)
-        w, h = Image.open(frames[0]).size
-        last_png = frames[keep[-1]]
-        if not real_ending(last_png, os.path.join(IMG, "film-real.webp")):
-            Image.open(last_png).convert("RGB").save(os.path.join(IMG, "film-real.webp"), quality=80, method=6)
+        w, h = SIZE
+        if not real_ending(im, os.path.join(IMG, "film-real.webp")):   # im is the last frame written
+            im.save(os.path.join(IMG, "film-real.webp"), quality=80, method=6)
         info = {"n": len(keep), "w": w, "h": h, "cuts": [keep.index(ends[0]), keep.index(ends[1])]}
         with open(os.path.join(HERE, "film.json"), "w", encoding="utf-8") as f:
             json.dump(info, f)
