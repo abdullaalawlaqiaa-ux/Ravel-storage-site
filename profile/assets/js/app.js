@@ -77,22 +77,35 @@
   function currentUnit() { return unitFor(state.size); }
 
   /* ---------------- example layout of items (shared by the 3D model and the 2D plan) ---------------- */
+  // What a unit of each size would hold, stored the way movers store it: the bed taken apart with its mattress beside it,
+  // wardrobes wrapped and strapped, carpets rolled, boxes taped and tagged. Sizes are footprints in metres;
+  // "wall" marks the tall pieces, which stand against a wall and never in the middle of the room.
   var CAT = {
     box: { w: .5, d: .45, h: .42, c: '#C69D70' }, suit: { w: .5, d: .3, h: .72, c: '#4A5A73' },
-    wardrobe: { w: 1.2, d: .6, h: 2.0, c: '#B48A5F' }, mattress: { w: 1.6, d: .28, h: 2.0, c: '#BCD0E8' },
-    dresser: { w: .9, d: .45, h: .8, c: '#B48A5F' }, sofa: { w: 2.0, d: .9, h: .85, c: '#152249' },
-    armchair: { w: .9, d: .85, h: .85, c: '#22346E' }, fridge: { w: .7, d: .7, h: 1.8, c: '#AEB9C6' },
-    washer: { w: .6, d: .6, h: .85, c: '#D5DCE5' }, table: { w: 1.4, d: .8, h: .75, c: '#8FA0B8' },
-    tv: { w: 1.2, d: .2, h: .75, c: '#C69D70' }, shelf: { w: .9, d: .4, h: 1.8, c: '#B8C3D1' },
+    bed: { w: 1.85, d: .62, h: 2.0, c: '#DCE6F2', wall: 1 }, bedS: { w: 1.22, d: .6, h: 2.0, c: '#DCE6F2', wall: 1 },
+    wardrobe: { w: 1.2, d: .6, h: 2.0, c: '#7A5236', wall: 1 }, wardrobe3: { w: 1.8, d: .6, h: 2.1, c: '#6A4630', wall: 1 },
+    wardrobeS: { w: 1.0, d: .58, h: 1.95, c: '#7A5236', wall: 1 },
+    fridge: { w: .7, d: .7, h: 1.8, c: '#DDE3EA', wall: 1 }, shelf: { w: .9, d: .4, h: 1.8, c: '#B8C3D1', wall: 1 },
+    carpet: { w: .56, d: .5, h: 2.3, c: '#8E2F3A', wall: 1 },
+    dresser: { w: .9, d: .45, h: .8, c: '#7A5236' }, nights: { w: .5, d: .42, h: 1.0, c: '#6A4630' },
+    sofa: { w: 2.0, d: .9, h: .85, c: '#22346E' }, sofa2: { w: 1.5, d: .88, h: .85, c: '#22346E' }, armchair: { w: .9, d: .85, h: .85, c: '#5B6B86' },
+    table: { w: 1.4, d: .86, h: .75, c: '#6A4630' }, majlis: { w: 1.9, d: .7, h: .8, c: '#8E2F3A' },
+    washer: { w: .6, d: .6, h: .85, c: '#E4E9EF' }, tv: { w: 1.25, d: .2, h: .78, c: '#C69D70' },
     pallet: { w: 1.2, d: 1.0, h: 1.5, c: '#C69D70' }, rack: { w: 2.0, d: .6, h: 2.3, c: '#8FA0B8' }
   };
+  function times(kind, n) { var a = []; while (n-- > 0) a.push(kind); return a; }
+  // From 4 m2 up a unit holds furniture, not only boxes, and the bigger it is the more rooms it holds:
+  // one bedroom, then a flat, then two and three bedrooms with their living and dining rooms.
   var SEQ = {
     r1: ['box', 'box', 'suit', 'box', 'suit', 'box', 'box', 'box'],
-    r2: ['mattress', 'wardrobe', 'dresser', 'box', 'tv', 'box', 'suit', 'box', 'box', 'box'],
-    r2p: ['mattress', 'wardrobe', 'dresser', 'washer', 'armchair', 'tv', 'box', 'box', 'suit', 'box', 'box', 'box'],
-    r3: ['mattress', 'wardrobe', 'sofa', 'fridge', 'washer', 'dresser', 'table', 'tv', 'box', 'box', 'box', 'box', 'suit', 'box', 'box'],
-    r4: ['mattress', 'wardrobe', 'sofa', 'fridge', 'mattress', 'wardrobe', 'washer', 'dresser', 'table', 'armchair', 'tv', 'shelf', 'box', 'box', 'box', 'box', 'box', 'box', 'suit', 'box', 'box'],
-    r5: ['mattress', 'wardrobe', 'sofa', 'fridge', 'mattress', 'wardrobe', 'washer', 'dresser', 'table', 'armchair', 'sofa', 'mattress', 'wardrobe', 'shelf', 'tv', 'dresser', 'shelf', 'armchair', 'box', 'box', 'box', 'box', 'box', 'box', 'box', 'box', 'suit', 'box', 'box', 'box', 'box', 'suit']
+    r2: ['bed', 'wardrobeS', 'carpet', 'dresser', 'box', 'box', 'nights', 'suit', 'tv'].concat(times('box', 4)),
+    r2p: ['bed', 'wardrobe', 'fridge', 'carpet', 'sofa2', 'dresser', 'box', 'box', 'washer', 'nights', 'tv', 'suit'].concat(times('box', 5)),
+    r3: ['bed', 'wardrobeS', 'wardrobe', 'fridge', 'carpet', 'sofa2', 'table', 'dresser', 'box', 'box', 'box', 'washer', 'nights', 'armchair', 'tv', 'suit', 'suit'].concat(times('box', 6)),
+    r4: ['bed', 'wardrobe3', 'bedS', 'wardrobe', 'fridge', 'carpet', 'shelf', 'sofa', 'table', 'dresser', 'box', 'box', 'box', 'majlis', 'washer', 'nights', 'armchair', 'dresser', 'tv', 'suit', 'suit']
+      .concat(times('box', 9)),
+    r5: ['bed', 'wardrobe3', 'fridge', 'bed', 'wardrobe', 'bedS', 'wardrobe', 'carpet', 'bedS', 'wardrobeS', 'shelf', 'carpet', 'fridge', 'shelf',
+      'sofa', 'sofa', 'table', 'majlis', 'dresser', 'box', 'box', 'box', 'box', 'washer', 'dresser', 'washer', 'nights', 'nights', 'armchair', 'armchair', 'tv', 'tv', 'table', 'majlis', 'suit', 'suit', 'suit']
+      .concat(times('box', 16))
   };
   var layoutCache = {};
   function buildLayout(u) {
@@ -108,42 +121,50 @@
         row++; z += 1 + (row % 2 === 0 ? 2.1 : .15);
       }
     } else {
-      out = pack(w, d, SEQ[u.fits] || SEQ.r2, u.a * 1.65 * .82);
+      out = pack(w, d, SEQ[u.fits] || SEQ.r2);
     }
     layoutCache[key] = out; return out;
   }
   function item(kind, x, z, yaw, i) {
-    var c = CAT[kind], it = { kind: kind, x: x, z: z, w: c.w, d: c.d, h: c.h, c: c.c, yaw: yaw || 0 };
-    if (kind === 'box') it.n = 3 + (i % 3 === 1 ? 0 : 1);
+    var c = CAT[kind], it = { kind: kind, x: x, z: z, w: c.w, d: c.d, h: c.h, c: c.c, yaw: yaw || 0, v: i };
+    if (kind === 'box') { it.n = 3; it.small = i % 3 === 0; }
     if (kind === 'dresser' || kind === 'washer') it.top = i % 2 === 0;
     return it;
   }
-  // greedy fill on a 10 cm grid: back wall first, then along the side walls, keeping a walkway to the door
-  function pack(w, d, seq, capVol) {
-    var R = .1, nx = Math.round(w / R), nz = Math.round(d / R), occ = new Uint8Array(nx * nz), out = [], vol = 0;
-    var aisle = w >= 2.9, half = aisle ? 4.5 : 0, backRows = Math.round(1.0 / R), door = Math.round(Math.min(.55, d * .3) / R);
+  // Fill on a 10 cm grid. Tall pieces stand against the back wall, facing the door, then the left wall, then the back half
+  // of the right wall. The unit is first seen from the front right, so those all show their faces and nothing tall stands
+  // in the way. The rest fills the floor in rows from the back, facing the door; a wide unit keeps a walkway from the door.
+  function pack(w, d, seq) {
+    var R = .1, nx = Math.round(w / R), nz = Math.round(d / R), occ = new Uint8Array(nx * nz), out = [];
+    var aisle = w >= 3.9, half = aisle ? 4.5 : 0, backRows = Math.round(1.0 / R), door = Math.round((d <= 2.5 ? .35 : .55) / R);
+    function cells(m) { return Math.ceil(m / R - 1e-6); }
     function blocked(ix, iz) { return iz >= nz - door || (aisle && iz >= backRows && Math.abs(ix + .5 - nx / 2) < half); }
     function free(ix, iz, cw, cd) {
       if (ix < 0 || iz < 0 || ix + cw > nx || iz + cd > nz) return false;
       for (var z = iz; z < iz + cd; z++) for (var x = ix; x < ix + cw; x++) if (occ[z * nx + x] || blocked(x, z)) return false;
       return true;
     }
-    var xs = []; for (var i = 0; i < nx; i++) xs.push(i % 2 === 0 ? i / 2 : nx - 1 - (i - 1) / 2);
+    function put(kind, si, ix, iz, cw, cd, yaw) {
+      for (var z = iz; z < iz + cd; z++) for (var x = ix; x < ix + cw; x++) occ[z * nx + x] = 1;
+      out.push(item(kind, (ix + cw / 2) * R - w / 2, (iz + cd / 2) * R - d / 2, yaw, si));
+      return true;
+    }
     seq.forEach(function (kind, si) {
-      if (vol >= capVol) return;
-      var c = CAT[kind], o, iz, k;
-      var opts = [[c.w, c.d, 0], [c.d, c.w, 1]];
-      for (iz = 0; iz < nz; iz++) for (k = 0; k < xs.length; k++) for (o = 0; o < 2; o++) {
-        var cw = Math.ceil(opts[o][0] / R - 1e-6), cd = Math.ceil(opts[o][1] / R - 1e-6), right = xs[k] >= nx / 2, ix = right ? xs[k] - cw + 1 : xs[k];
-        if (!free(ix, iz, cw, cd)) continue;
-        for (var z = iz; z < iz + cd; z++) for (var x = ix; x < ix + cw; x++) occ[z * nx + x] = 1;
-        var px = (ix + cw / 2) * R - w / 2, pz = (iz + cd / 2) * R - d / 2;
-        // rotated pieces stand along a side wall and face into the room
-        var it = item(kind, px, pz, opts[o][2] ? (px < 0 ? Math.PI / 2 : -Math.PI / 2) : 0, si);
-        out.push(it); vol += c.w * c.d * c.h * (it.n || 1);
-        return;
+      var c = CAT[kind], cw = cells(c.w), cd = cells(c.d), iz, ix, o;
+      if (c.wall) {
+        for (ix = 0; ix + cw <= nx; ix++) if (free(ix, 0, cw, cd)) return put(kind, si, ix, 0, cw, cd, 0);
+        for (iz = 0; iz + cw <= nz; iz++) if (free(0, iz, cd, cw)) return put(kind, si, 0, iz, cd, cw, Math.PI / 2);
+        for (iz = 0; iz + cw <= nz * .5; iz++) if (free(nx - cd, iz, cd, cw)) return put(kind, si, nx - cd, iz, cd, cw, Math.PI / 2);
+        return;   // no wall left for it: it is left out rather than stood in the middle of the room
+      }
+      // rows from the back, each filled from the far (left) side, so the corner nearest the viewer stays low and open
+      for (iz = 0; iz < nz; iz++) for (ix = 0; ix < nx; ix++) for (o = 0; o < 2; o++) {
+        var aw = o ? cd : cw, ad = o ? cw : cd;
+        if (free(ix, iz, aw, ad)) return put(kind, si, ix, iz, aw, ad, o ? Math.PI / 2 : 0);   // turned sideways, a piece still shows its face to the viewer
       }
     });
+    // boxes are stacked lower toward the viewer's corner, so what stands behind them can be seen
+    out.forEach(function (it) { if (it.kind === 'box') { var far = 1 - ((it.z + d / 2) / d * .65 + (it.x + w / 2) / w * .35); it.n = far > .62 ? 4 : far > .4 ? 3 : 2; } });
     return out;
   }
 
@@ -220,9 +241,11 @@
   function unitTexts(u) { var p = u.exact ? '' : '≈ '; return { w: p + fmtDim(u.w) + ' ' + plain('m'), d: p + fmtDim(u.d) + ' ' + plain('m'), h: D.height + ' ' + plain('m') }; }
 
   var viewer = null;
+  // the figure in front of the unit wears a kandura on the Arabic page and a suit on the English one
+  function personKind() { return state.lang === 'ar' ? 'kandura' : 'suit'; }
   function updateViewer(instant) {
     var u = currentUnit(), layout = state.items ? buildLayout(u) : [];
-    if (viewer) viewer.setUnit(u, layout, unitTexts(u), instant);
+    if (viewer) { viewer.setPerson(personKind()); viewer.setUnit(u, layout, unitTexts(u), instant); }
     $('#unitPlan').innerHTML = planSvg(u, layout);
   }
   function nearestPhoto(u) {
@@ -295,7 +318,8 @@
     p.push('<rect class="plan__o" x="' + x0 + '" y="' + y0 + '" width="' + W + '" height="' + H + '"' + (u.open ? ' stroke-dasharray="6 5"' : '') + '/>');
     if (!u.open) {
       var dw = Math.min(.9, u.w * .8) * k; p.push('<line class="plan__d" x1="' + (P / 2 - dw / 2) + '" y1="' + (y0 + H) + '" x2="' + (P / 2 + dw / 2) + '" y2="' + (y0 + H) + '"/>');
-      p.push('<circle cx="' + (P / 2 + Math.min(dw / 2, .5 * k)) + '" cy="' + (y0 + H + Math.max(7, .32 * k)) + '" r="' + Math.max(3.5, .22 * k) + '" fill="#152249"/>');
+      var pr = Math.min(Math.max(3.5, .22 * k), 15);   // the person's dot, kept inside the drawing on the smallest units
+      p.push('<circle cx="' + (P / 2 + Math.min(dw / 2, .5 * k)) + '" cy="' + (y0 + H + pr + 6).toFixed(1) + '" r="' + pr.toFixed(1) + '" fill="#152249"/>');
     }
     if (!u.open) {
       var tx = unitTexts(u);
@@ -488,7 +512,7 @@
       if (!ok || viewer || state.lite) return;
       try {
         viewer = window.RV3D.createUnitViewer($('#unitCanvas'), $('#unitLabels'), {
-          still: reduced, dark: true,
+          still: reduced, dark: true, person: personKind(),
           onUser: function () { $('#unitHint').classList.add('is-off'); },
           onTap: function () { doorIntro = true; setDoor(!doorOpen); }
         });
