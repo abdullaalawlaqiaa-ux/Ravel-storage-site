@@ -1,5 +1,5 @@
 // Ravel Storage – site interactions
-const WHATSAPP_NUMBER = '966500000000'; // غيّر هذا الرقم إلى رقم واتساب الخاص بك
+const WHATSAPP_NUMBER = '971503250551'; // رقم رافل (الإمارات) 0503250551
 
 document.getElementById('year').textContent = new Date().getFullYear();
 
