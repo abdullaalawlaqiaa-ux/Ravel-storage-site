@@ -691,5 +691,8 @@
     };
   };
 
+  // shared with the TRAVEL -> RAVEL film (motion.js), so its storage unit is drawn by the same code as the viewer's
+  RV3D.BoxBatch = BoxBatch; RV3D.addItem = addItem; RV3D.buildPerson = buildPerson; RV3D.mk = mk; RV3D.rr = rr;
+  RV3D.paint = { ribs: ribs, steel: steel, floor: paintFloor };
   window.RV3D = RV3D;
 })();

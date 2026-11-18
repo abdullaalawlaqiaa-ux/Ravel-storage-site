@@ -506,6 +506,19 @@
   <a class="btn btn--navy dock__call" id="dockCall" href="tel:+971503250551" data-i18n-attr="aria-label:d.call" aria-label="اتصال"><svg class="ic"><use href="#i-phone"/></svg></a>
 </div>
 
+<div class="callsheet" id="callSheet" hidden>
+  <div class="callsheet__panel" role="dialog" aria-modal="true" aria-labelledby="callSheetH">
+    <button class="top__btn callsheet__close" id="callSheetClose" type="button" data-i18n-attr="aria-label:a11y.close" aria-label="إغلاق"><svg class="ic"><use href="#i-close"/></svg></button>
+    <h2 class="h3 h3--flush" id="callSheetH"></h2>
+    <a class="callsheet__num num" id="callSheetNum" dir="ltr" href="tel:+971503250551">050 325 0551</a>
+    <p class="tiny" id="callSheetP"></p>
+    <div class="callsheet__btns">
+      <button class="btn btn--navy" id="callSheetCopy" type="button"><svg class="ic"><use href="#i-copy"/></svg><span id="callSheetCopyText"></span></button>
+      <a class="btn btn--wa" id="callSheetWa" href="https://wa.me/971503250551" target="_blank" rel="noopener"><svg class="ic"><use href="#i-chat"/></svg><span data-i18n="c.wa">واتساب</span></a>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="assets/js/data.js" defer></script>
