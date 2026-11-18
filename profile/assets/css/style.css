@@ -253,6 +253,24 @@ main{position:relative;z-index:1;overflow-x:clip}
 .viewer__hint{position:absolute;inset-inline-start:10px;top:10px;display:inline-flex;align-items:center;gap:6px;padding:3px 11px;border-radius:999px;background:var(--navy-deep);color:#fff;font-size:12.5px;pointer-events:none;transition:opacity .4s ease}
 .viewer__hint .ic{width:16px;height:16px}
 .viewer__hint.is-off{opacity:0}
+/* the two example customers: a small switch in the stage's top corner and a card that floats above the chosen one */
+.who{position:absolute;z-index:2;bottom:12px;inset-inline-start:10px;display:flex;gap:3px;padding:3px;border-radius:999px;background:rgba(8,18,38,.72);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.who__btn{min-height:32px;padding:2px 13px;border:0;border-radius:999px;background:none;color:rgba(255,255,255,.78);font:700 13px/1.5 var(--f-display);cursor:pointer;transition:background .25s ease,color .25s ease}
+.who__btn[aria-pressed="true"]{background:#fff;color:var(--navy)}
+.vcard{position:absolute;z-index:1;top:0;left:0;display:grid;gap:2px;width:max-content;max-width:min(220px,58%);padding:8px 12px 9px;cursor:pointer;pointer-events:auto;border-radius:14px;background:rgba(255,255,255,.96);color:var(--navy);box-shadow:0 12px 28px rgba(5,12,30,.35);will-change:transform;opacity:0}
+.vcard::after{content:"";position:absolute;bottom:-6px;left:var(--tip,50%);width:12px;height:12px;margin-left:-6px;background:inherit;transform:rotate(45deg);border-radius:2px}
+.vcard.is-in{animation:vcardin .55s var(--ease-out) both}
+.vcard__n{font:800 15px/1.3 var(--f-display);border-inline-start:3px solid var(--cyan);padding-inline-start:8px}
+.vcard__d{color:var(--ink-muted);font-size:12px;line-height:1.5}
+.vcard.is-min{padding:5px 11px 6px;border-radius:12px}
+.vcard.is-min .vcard__d,.vcard.is-min .vcard__tag{display:none}
+.vcard.is-min .vcard__play{margin-top:2px;min-height:26px;padding:1px 10px;font-size:11.5px}
+.vcard__play{display:inline-flex;align-items:center;justify-self:start;gap:5px;margin-top:5px;min-height:32px;padding:3px 12px;border:0;border-radius:999px;background:var(--yellow);color:var(--navy);font:800 12.5px/1.4 var(--f-display);cursor:pointer}
+.vcard__play[hidden]{display:none}
+.vcard__play .ic{width:14px;height:14px;fill:currentColor}
+.vcard__tag{color:var(--grey-300);font-size:10.5px;line-height:1.5}
+@keyframes vcardin{from{opacity:0;margin-top:10px}to{opacity:1;margin-top:0}}
+.is-lite3d .who,.is-lite3d .vcard{display:none}
 .viewer__door{position:absolute;inset-inline-end:10px;bottom:10px;display:inline-flex;align-items:center;gap:7px;min-height:40px;padding:4px 14px;border:0;border-radius:999px;background:#fff;color:var(--navy);font:700 13.5px/1.5 var(--f-display);cursor:pointer;box-shadow:0 8px 20px rgba(0,0,0,.28);transition:transform .2s var(--ease)}
 .viewer__door:active{transform:scale(.94)}
 .viewer__door .ic{width:18px;height:18px;color:var(--yellow);stroke-width:2.2}

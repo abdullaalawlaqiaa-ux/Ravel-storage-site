@@ -84,6 +84,13 @@
   "u.openNote": ["للمساحات الكبيرة حتى 500 م² يرجى الاستفسار عبر الاتصال أو الواتساب.", "For large spaces up to 500 m², please enquire by phone or WhatsApp."],
   "u.slider": ["المساحة المطلوبة", "Space required"],
   "u.person": ["شخص بطول 1.75 م للمقارنة", "A 1.75 m person for scale"],
+  "who.pick": ["اختر الشخصية", "Choose a character"],
+  "who.rashid": ["راشد", "Rashid"],
+  "who.james": ["James", "James"],
+  "who.rashidD": ["وفّر مساحة أكبر في منزله بتخزين أغراضه في Ravel.", "Made more room at home by storing his things with Ravel."],
+  "who.jamesD": ["Travelling for 6 months.<br>Saved AED 6,600/month by storing his furniture instead of keeping his apartment.", "Travelling for 6 months.<br>Saved AED 6,600/month by storing his furniture instead of keeping his apartment."],
+  "who.play": ["شاهد رحلة James", "Watch James's story"],
+  "who.tag": ["مثال توضيحي", "Illustrative example"],
   "u.lite": ["المجسّم متوقف في الوضع الخفيف", "3D is off in lite mode"],
   "u.liteOn": ["شغّل المجسّم", "Turn 3D on"],
 

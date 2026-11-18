@@ -31,7 +31,7 @@
   var lang0 = params.lang || (hash0 === 'en' ? 'en' : '') || store.get('rv_lang') || 'ar';
   var state = {
     lang: lang0 === 'en' ? 'en' : 'ar', size: 6, big: 150, saved: null, branch: null, view: '3d', items: true,
-    lite: false, touched: false
+    lite: false, touched: false, who: null
   };
   (function () {
     var sv = store.get('rv_saved'); if (!sv) return;
@@ -245,8 +245,35 @@
   function unitTexts(u) { var p = u.exact ? '' : '≈ '; return { w: p + fmtDim(u.w) + ' ' + plain('m'), d: p + fmtDim(u.d) + ' ' + plain('m'), h: D.height + ' ' + plain('m') }; }
 
   var viewer = null;
-  // the figure in front of the unit wears a kandura on the Arabic page and a suit on the English one
-  function personKind() { return state.lang === 'ar' ? 'kandura' : 'suit'; }
+  // Two example customers stand in front of the unit: Rashid in a kandura (the Arabic page's default) and James in a
+  // suit (the English page's). The visitor can switch; his card floats above him in the 3D view.
+  function who() { return state.who || (state.lang === 'ar' ? 'rashid' : 'james'); }
+  function personKind() { return who() === 'rashid' ? 'kandura' : 'suit'; }
+  function renderWho() {
+    var w = who(), card = $('#whoCard'), desc = $('#whoDesc');
+    $$('#whoSel .who__btn').forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-who') === w); });
+    $('#whoName').textContent = plain(w === 'rashid' ? 'who.rashid' : 'who.james');
+    desc.innerHTML = t(w === 'rashid' ? 'who.rashidD' : 'who.jamesD');
+    desc.setAttribute('dir', w === 'james' ? 'ltr' : state.lang === 'ar' ? 'rtl' : 'ltr'); desc.setAttribute('lang', w === 'james' ? 'en' : state.lang);
+    $('#whoPlay').hidden = w !== 'james';
+    openCard();
+  }
+  // On a phone the card would hide part of the unit, so it opens for a few seconds and then folds to his name;
+  // a tap on it opens it again. Turning the model folds it at once.
+  var cardT = 0;
+  function openCard() {
+    var card = $('#whoCard'); clearTimeout(cardT);
+    card.classList.toggle('is-min', false);
+    card.classList.toggle('is-in', false); card.getBoundingClientRect(); card.classList.toggle('is-in', true);   // the soft entrance, again
+    cardT = setTimeout(foldCard, 6500);
+  }
+  function foldCard() { clearTimeout(cardT); $('#whoCard').classList.toggle('is-min', true); }
+  $('#whoCard').addEventListener('click', function (e) { if (e.target.closest && e.target.closest('#whoPlay')) return; if (this.classList.contains('is-min')) openCard(); else foldCard(); });
+  function selectWho(w, user) {
+    if (user && w === 'james') openFilm($('#whoPlay'));   // choosing James plays his story
+    if (w === who() && state.who) return;
+    state.who = w; renderWho(); updateViewer(true);
+  }
   function updateViewer(instant) {
     var u = currentUnit(), layout = state.items ? buildLayout(u) : [];
     if (viewer) { viewer.setPerson(personKind()); viewer.setUnit(u, layout, unitTexts(u), instant); }
@@ -508,6 +535,38 @@
   });
   $('#callSheetCopy').addEventListener('click', function () { copyText($('#callSheetNum'), plain(sheet.getAttribute('data-kind') === 'mail' ? 'cs.copiedMail' : 'c.copied')); });
 
+  /* ---------------- James's story: the TRAVEL -> RAVEL film (motion.js) ---------------- */
+  // Loaded only when asked for. It plays over the page in its own layer; the page's viewer and opening walk rest meanwhile.
+  var filmOpen = false, filmLoading = false;
+  function ensureFilm(cb) {
+    if (window.RVMotion) return cb(true);
+    if (filmLoading) return; filmLoading = true;
+    loadScript(ASSET + 'js/motion.js', function (ok) { filmLoading = false; cb(ok && !!window.RVMotion); });
+  }
+  function openFilm(opener) {
+    if (filmOpen) return;
+    stopAutoWalk(); if (!menu.hidden) setMenu(false);
+    var still = reduced || state.lite || !webglOk();
+    var go = function () {
+      ensureFilm(function (ok) {
+        if (!ok) return;
+        filmOpen = true; if (viewer) viewer.setActive(false);
+        window.RVMotion.open({
+          lang: state.lang, opener: opener || null,
+          items: buildLayout(unitFor(12)), unit: { w: unitFor(12).w, d: unitFor(12).d, h: D.height },
+          jamesImg: D.img && D.img['char-james'] ? D.img['char-james'] : null,
+          wa: wa([plain('wa.hello'), plain('wa.ask')]), tel: 'tel:' + D.phone,
+          reduced: still, low: !!lowEnd,
+          onExplore: function () { selectSize(12, true); setView('3d'); $('#explorer').scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' }); },
+          onClose: function () { filmOpen = false; lastY = -1; if (viewer) viewer.setActive(state.view === '3d' && viewerVisible && !state.lite); }
+        });
+      });
+    };
+    if (still) go(); else ensure3D(function (ok) { if (ok) go(); else { still = true; go(); } });
+  }
+  $('#whoSel').addEventListener('click', function (e) { var b = e.target.closest ? e.target.closest('[data-who]') : null; if (b) selectWho(b.getAttribute('data-who'), true); });
+  $('#whoPlay').addEventListener('click', function () { openFilm(this); });
+
   /* ---------------- 3D: loading, lite mode ---------------- */
   var stage = $('#stage'), poster = $('#poster'), corridor = null, viewerVisible = false, loading3d = false, cbs = [];
   var lowEnd = (navigator.deviceMemory && navigator.deviceMemory <= 4) || (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4);
@@ -560,9 +619,10 @@
       try {
         viewer = window.RV3D.createUnitViewer($('#unitCanvas'), $('#unitLabels'), {
           still: reduced, dark: true, person: personKind(),
-          onUser: function () { $('#unitHint').classList.add('is-off'); },
+          onUser: function () { $('#unitHint').classList.add('is-off'); foldCard(); },
           onTap: function () { doorIntro = true; setDoor(!doorOpen); }
         });
+        if (viewer.setCard) viewer.setCard($('#whoCard'));
       }
       catch (e) { viewer = null; return; }
       $('#viewerStage').classList.remove('is-lite3d'); viewer.resize(); updateViewer(true); viewer.setLid(doorOpen, true);
@@ -652,7 +712,7 @@
       if (state.lite && !reduced) poster.style.transform = 'scale(' + (1 + creep / CREEP_MAX * .14 + ease(p) * 1.25).toFixed(4) + ')';
     }
     // the corridor is drawn only while the opening scene is on screen
-    if (state.lite || !corridor || doc.hidden || y > heroLen + vh) return;
+    if (state.lite || !corridor || doc.hidden || filmOpen || y > heroLen + vh) return;
     var q = poseAt(p), f = 1 - Math.exp(-dt / 120);
     if (intro0 === 0) intro0 = now;
     var intro = reduced ? 0 : 2.4 * (1 - easeOut(seg(now - intro0, 0, 3200)));
@@ -687,7 +747,7 @@
 
   /* ---------------- boot ---------------- */
   function renderAll() {
-    applyLang(); syncViewLabel(); renderSizes(); renderItemsToggle(); renderPrices(); buildQuoteForm(); renderQuote(); staticLinks();
+    applyLang(); syncViewLabel(); renderWho(); renderSizes(); renderItemsToggle(); renderPrices(); buildQuoteForm(); renderQuote(); staticLinks();
     renderUnit(true); updateDock(); remeasureSoon();
     if (window.RVFX) window.RVFX.refresh();
   }
@@ -702,5 +762,5 @@
   if ('ResizeObserver' in window) new ResizeObserver(remeasureSoon).observe($('#main'));
   requestAnimationFrame(tick);
   if (!wantLite) { if (doc.readyState === 'complete') startCorridor(); else { var kick = setTimeout(startCorridor, 900); window.addEventListener('load', function () { clearTimeout(kick); startCorridor(); }); } }
-  window.RV = { layout: buildLayout, unitFor: unitFor, state: state, measure: measure, setLite: setLite, selectSize: selectSize };
+  window.RV = { layout: buildLayout, unitFor: unitFor, state: state, measure: measure, setLite: setLite, selectSize: selectSize, openFilm: openFilm, selectWho: selectWho };
 })();

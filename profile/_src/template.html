@@ -21,6 +21,7 @@
 <link rel="preload" as="image" href="assets/img/corridor.webp" type="image/webp" fetchpriority="high">
 <link rel="preload" as="font" type="font/woff2" href="assets/fonts/kufi-ar.woff2" crossorigin>
 <link rel="stylesheet" href="assets/css/style.css">
+<link rel="stylesheet" href="assets/css/motion.css">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"SelfStorage","name":"Ravel Storage","alternateName":"رافل للتخزين","url":"https://ravelstorage.com","telephone":"+971503250551","email":"info@ravelstorage.com","address":{"@type":"PostalAddress","addressLocality":"Abu Dhabi","addressCountry":"AE"},"areaServed":"Abu Dhabi","sameAs":["https://www.instagram.com/ravelstorage/"]}</script>
 <!--/HEAD-->
 </head>
@@ -34,6 +35,7 @@
   <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.800 3 2.800 15 0 18M12 3c-2.800 3-2.800 15 0 18"/></symbol>
   <symbol id="i-insta" viewBox="0 0 24 24"><rect x="3.500" y="3.500" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17" cy="7" r=".9" fill="currentColor" stroke="none"/></symbol>
   <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z"/></symbol>
   <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
   <symbol id="i-chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
   <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
@@ -185,6 +187,16 @@
               <div class="viewer__plan" id="unitPlan" aria-hidden="true"></div>
               <div class="viewer__labels" id="unitLabels" aria-hidden="true"></div>
               <span class="viewer__hint" id="unitHint"><svg class="ic"><use href="#i-rotate"/></svg><span data-i18n="u.drag"></span></span>
+              <div class="who" id="whoSel" role="group" data-i18n-attr="aria-label:who.pick">
+                <button class="who__btn" type="button" data-who="rashid" aria-pressed="false" data-i18n="who.rashid"></button>
+                <button class="who__btn" type="button" data-who="james" aria-pressed="false" data-i18n="who.james"></button>
+              </div>
+              <div class="vcard" id="whoCard" aria-live="polite">
+                <b class="vcard__n" id="whoName"></b>
+                <span class="vcard__d" id="whoDesc"></span>
+                <button class="vcard__play" id="whoPlay" type="button" hidden><svg class="ic"><use href="#i-play"/></svg><span data-i18n="who.play"></span></button>
+                <small class="vcard__tag" data-i18n="who.tag"></small>
+              </div>
               <button class="viewer__door" id="doorBtn" type="button" aria-pressed="true"><svg class="ic"><use href="#i-lock"/></svg><span id="doorBtnText"></span></button>
             </div>
             <div class="viewer__pane viewer__photo" id="panePhoto" hidden>

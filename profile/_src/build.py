@@ -107,6 +107,10 @@ def main():
         names.add("logo-white")
         # fonts: only the digits face is embedded; the text faces come from the same families on Google Fonts
         css = read("assets/css/style.css")
+        # the film's styles and script travel inside the single page too (in the hosted copy they load on demand)
+        has_film = os.path.exists(os.path.join(ROOT, "assets/js/motion.js"))
+        if has_film:
+            css += "\n" + read("assets/css/motion.css")
         css = re.sub(r'@font-face\{font-family:"RV (?:Kufi|Plex|Mont)";[^}]*\}\n', "", css)
         css = css.replace("url(../fonts/mont-lat.woff2)", "url(%s)" % data_uri("assets/fonts/mont-lat.woff2", "font/woff2"))
         assert "url(../" not in css and "assets/img/" not in body
@@ -124,6 +128,7 @@ def main():
             body,
             "<script>window.RV_DATA=" + json.dumps(adata, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/") + ";</script>",
             "<script>\n" + read("assets/js/scene3d.js") + "\n</script>",
+            ("<script>\n" + read("assets/js/motion.js") + "\n</script>") if has_film else "",
             "<script>\n" + read("assets/js/app.js") + "\n</script>",
             "<script>\n" + read("assets/js/fx.js") + "\n</script>",
         ])
