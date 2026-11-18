@@ -33,7 +33,7 @@
     "unit-100": [1325, 676]
   },
   "branches": [
-    {"id": "mu", "name": "b.mu", "area": "b.aAD", "map": null},
-    {"id": "mf", "name": "b.mf", "area": "b.aAD", "map": null}
+    {"id": "mu", "name": "b.mu"},
+    {"id": "mf", "name": "b.mf"}
   ]
 }

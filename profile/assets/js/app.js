@@ -31,8 +31,7 @@
   var lang0 = params.lang || (hash0 === 'en' ? 'en' : '') || store.get('rv_lang') || 'ar';
   var state = {
     lang: lang0 === 'en' ? 'en' : 'ar', size: 6, big: 150, saved: null, branch: null, view: '3d', items: true,
-    lite: false, type: 'personal', touched: false,
-    helper: { step: 1, cats: {}, qty: {}, preset: null, result: null, err: '' }
+    lite: false, touched: false
   };
   (function () {
     var sv = store.get('rv_saved'); if (!sv) return;
@@ -350,170 +349,13 @@
     renderInfo(); updateDock();
   });
 
-  /* ---------------- size helper ---------------- */
-  // An item is [id, volume in m3, floor area in m2 for things that cannot be stacked]. A category lists its items in groups;
-  // the home category ends with the appliances, so one list covers the whole house. Every category ends with a free "Other" field.
-  var HC = [
-    { id: 'home', ic: 'i-sofa', groups: [
-      { id: 'living', items: [['sofa1', .8], ['sofa2', 1.4], ['sofa3', 2], ['sofa4', 2.6], ['sofa5', 3.3], ['sofaL', 3.6], ['tableC', .4], ['tableS', .15], ['tvUnit', .6], ['bookcase', .9], ['buffet', 1.2], ['carpet', .2], ['majlis', .5]] },
-      { id: 'bed', items: [['bedS', 1.3], ['bedD', 2.2], ['bedBunk', 2], ['bedBaby', .8], ['mattress', .6], ['wardrobe2', 1.3], ['wardrobe4', 2.2], ['wardrobe6', 3.3], ['dresser', .8], ['nightstand', .15], ['drawers', .7], ['mirror', .1]] },
-      { id: 'dining', items: [['dining4', 1.4], ['dining6', 2], ['dining8', 2.6], ['chair', .25], ['kitchenCab', .6]] },
-      { id: 'homeOther', items: [['deskH', .9], ['chairDesk', .35], ['shoe', .4], ['outdoor', 1.2], ['kids', .3]] },
-      { id: 'appl', items: [['fridge', 1.2], ['fridge2', 1.8], ['freezer', 1], ['washer', .5], ['dryer', .5], ['dishwasher', .5], ['cooker', .5], ['microwave', .1], ['tv', .3], ['ac', .3], ['waterCooler', .25], ['vacuum', .1]] }
-    ] },
-    { id: 'boxes', ic: 'i-box', groups: [{ items: [['boxS', .06], ['boxM', .1], ['boxL', .2]] }] },
-    { id: 'business', ic: 'i-pallet', groups: [{ items: [['pallet', 0, 1.5], ['rack', 0, 1.8], ['equip', 0, 1.2], ['stock', .1]] }] },
-    { id: 'personal', ic: 'i-suitcase', groups: [{ items: [['suitcase', .15], ['bag', .1], ['bike', .6], ['sports', .3]] }] },
-    { id: 'office', ic: 'i-desk', groups: [{ items: [['desk', .9], ['chairO', .35], ['cabinet', .5], ['archive', .05], ['printer', .2], ['meeting', 1.5]] }] }
-  ];
-  function catItems(c) { var out = []; c.groups.forEach(function (g) { g.items.forEach(function (it) { out.push(it); }); }); return out; }
-  var PRESETS = {
-    room: { bedD: 1, wardrobe2: 1, dresser: 1, nightstand: 2, tv: 1, boxM: 10 },
-    '1br': { sofa3: 1, sofa1: 1, tableC: 1, tvUnit: 1, bedD: 1, wardrobe4: 1, dresser: 1, nightstand: 2, dining4: 1, fridge: 1, washer: 1, cooker: 1, tv: 1, boxM: 20 },
-    '2br': { sofa3: 1, sofa2: 1, tableC: 1, tvUnit: 1, bedD: 1, bedS: 2, wardrobe4: 1, wardrobe2: 1, dresser: 1, nightstand: 2, dining6: 1, bookcase: 1, fridge: 1, washer: 1, cooker: 1, tv: 1, boxM: 30 },
-    '3br': { sofa3: 1, sofa2: 1, sofa1: 2, tableC: 1, tableS: 2, tvUnit: 1, bedD: 2, bedS: 2, wardrobe6: 1, wardrobe4: 1, wardrobe2: 1, dresser: 2, nightstand: 4, dining6: 1, bookcase: 2, fridge: 1, washer: 1, cooker: 1, tv: 2, ac: 2, boxM: 45, suitcase: 4, bike: 2 }
-  };
-  var REC = D.sizes.filter(function (s) { return s.price || s.a >= 50; }).map(function (s) { return s.a; });
-  var H = state.helper, hBody = $('#helperBody');
-  H.other = H.other || {}; H.sub = H.sub || {};
-  function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
-  function helperCalc() {
-    var vol = 0, foot = 0, lines = [], others = [];
-    HC.forEach(function (c) {
-      if (!H.cats[c.id]) return;
-      catItems(c).forEach(function (it) { var q = H.qty[it[0]] || 0; if (!q) return; vol += q * it[1]; foot += q * (it[2] || 0); lines.push({ k: 'h.i.' + it[0], q: q }); });
-      var o = (H.other[c.id] || '').replace(/\s+/g, ' ').trim(); if (o) others.push({ c: c.id, t: o });
-    });
-    // items stack to roughly 2.2 m and fill about three quarters of the floor: 1 m2 holds about 1.65 m3
-    var need = Math.max(.5, vol / 1.65 + foot), rec = lines.length ? (REC.filter(function (a) { return a >= need - 1e-9; })[0] || null) : null;
-    return { vol: vol, foot: foot, need: need, rec: rec, alt: rec ? REC[REC.indexOf(rec) + 1] || null : null, lines: lines, others: others };
-  }
-  // the message carries what was counted, then anything written under "Other", exactly as the visitor entered it
-  function helperLines(r) {
-    var L = [plain('wa.hello'), plain('wa.helper')];
-    r.lines.forEach(function (l) { L.push('• ' + plain(l.k) + ' × ' + l.q); });
-    r.others.forEach(function (o) { L.push('• ' + plain('wa.other', { c: plain('h.cat.' + o.c), t: o.t })); });
-    if (r.lines.length) L.push(r.rec ? plain('wa.estimate', { a: r.rec }) : plain('wa.estimateBig'));
-    if (state.branch) L.push(plain('wa.branch', { b: branchName(state.branch) }));
-    return L;
-  }
-  // the live box above the list: how full the suggested unit is, with one colour per kind of item
-  function fillSync() {
-    if (!window.RVFX) return;
-    var r = helperCalc(), vols = {}, order = [], has = r.lines.length > 0;
-    HC.forEach(function (c) {
-      if (!H.cats[c.id]) return;
-      c.groups.forEach(function (g) {
-        var key = g.id === 'appl' ? 'appliances' : c.id, v = 0;
-        g.items.forEach(function (it) { v += (H.qty[it[0]] || 0) * (it[1] + (it[2] || 0) * 1.65); });
-        if (v > 0) { if (!(key in vols)) { vols[key] = 0; order.push(key); } vols[key] += v; }
-      });
-    });
-    var frac = !has ? 0 : r.rec ? Math.min(1, r.need / r.rec) : 1;
-    window.RVFX.fill(H.step === 2 || (H.step === 3 && has), frac, order.map(function (k) { return [k, vols[k]]; }),
-      !has ? '' : r.rec ? r.rec + ' ' + plain('m2') : plain('h.fillOver'),
-      !has ? plain('h.fillEmpty') : r.rec ? plain('h.fillNote', { p: Math.round(frac * 100) }) : '');
-  }
-  function qrow(it) {
-    var q = H.qty[it[0]] || 0, nm = plain('h.i.' + it[0]);
-    return '<div class="qrow"><span class="qrow__name">' + t('h.i.' + it[0]) + '</span><span class="stepper">' +
-      '<button type="button" data-step="-1" data-item="' + it[0] + '" aria-label="' + plain('h.minus') + ': ' + nm + '">' + icon('i-minus') + '</button>' +
-      '<output class="' + (q ? '' : 'is-zero') + '" aria-label="' + plain('h.qty') + ': ' + nm + '">' + q + '</output>' +
-      '<button type="button" data-step="1" data-item="' + it[0] + '" aria-label="' + plain('h.plus') + ': ' + nm + '">' + icon('i-plus') + '</button></span></div>';
-  }
-  function chosenIn(g) { return g.items.filter(function (it) { return H.qty[it[0]]; }).length; }
-  function renderHelper() {
-    var h = '';
-    $('#helperStep').textContent = plain('h.step', { n: H.step }); $('#helperBar').style.width = (H.step * 33.34) + '%';
-    if (H.step === 1) {
-      h += '<h3 class="helper__q">' + t('h.s1') + '</h3><p class="tiny">' + t('h.s1hint') + '</p>';
-      h += '<div class="cats">' + HC.map(function (c, i) {
-        return '<button class="cat' + (i === 0 ? ' cat--wide' : '') + '" type="button" aria-pressed="' + !!H.cats[c.id] + '" data-cat="' + c.id + '">' + icon(c.ic) + '<span>' + t('h.cat.' + c.id) + '</span><span class="cat__check">' + icon('i-check') + '</span></button>';
-      }).join('') + '</div>';
-      h += '<p class="label" style="margin:16px 0 0">' + t('h.preset') + '</p><div class="presets">' + ['room', '1br', '2br', '3br'].map(function (p) {
-        return '<button class="preset' + (H.preset === p ? ' is-on' : '') + '" type="button" data-preset="' + p + '">' + t('h.p.' + p) + '</button>';
-      }).join('') + '</div>';
-    } else if (H.step === 2) {
-      h += '<h3 class="helper__q">' + t('h.s2') + '</h3>';
-      HC.forEach(function (c) {
-        if (!H.cats[c.id]) return;
-        h += '<div class="qgroup"><h4>' + icon(c.ic) + '<span>' + t('h.cat.' + c.id) + '</span></h4>';
-        c.groups.forEach(function (g, gi) {
-          var rows = g.items.map(qrow).join('');
-          if (!g.id) { h += rows; return; }
-          // a long list is folded into rooms; the first one, and any that already holds a choice, start open
-          var n = chosenIn(g), open = H.sub[g.id] != null ? H.sub[g.id] : (gi === 0 || n > 0);
-          h += '<div class="qsub' + (open ? ' is-open' : '') + '"><button class="qsub__head" type="button" aria-expanded="' + open + '" data-sub="' + g.id + '"><span>' + t('h.g.' + g.id) + '</span>' +
-            '<span class="qsub__n"' + (n ? '' : ' hidden') + '>' + n + '</span>' + icon('i-chev') + '</button><div class="qsub__body">' + rows + '</div></div>';
-        });
-        h += '<div class="qother"><label for="other-' + c.id + '">' + t('h.other') + '</label>' +
-          '<textarea id="other-' + c.id + '" data-other="' + c.id + '" rows="2" maxlength="300" placeholder="' + esc(plain('h.otherPh')) + '">' + esc(H.other[c.id] || '') + '</textarea></div></div>';
-      });
-      h += '<p class="tiny">' + t('h.otherNote') + '</p>';
-    } else {
-      var r = H.result, u = r.rec ? sizeObj(r.rec) : null, counted = r.lines.length > 0;
-      h += '<div class="result">';
-      if (!counted) h += '<div class="result__over">' + t('h.otherOnly') + '</div><p>' + t('h.otherOnlyP') + '</p>';
-      else {
-        h += '<span class="tiny">' + t('h.s3') + '</span>';
-        if (u) {
-          h += '<div class="result__size">' + u.a + ' <small>' + t('m2') + '</small></div><p class="result__fits">' + t('u.fits') + ': ' + t(fitsKey(u)) + '</p>';
-          if (u.price) h += '<p><b class="num">' + fmt(u.price) + '</b> ' + t('cur') + ' / ' + t('perMonth') + '</p>';
-          if (r.alt) { var au = sizeObj(r.alt); h += '<p class="tiny">' + (u.price && au.price ? t('h.alt', { a: au.a, d: fmt(au.price - u.price) }) : t('h.altNo', { a: au.a })) + '</p>'; }
-        } else h += '<div class="result__over">' + t('h.over') + '</div><p>' + t('h.big') + '</p>';
-        if (r.vol > 0) h += '<p class="tiny">' + t('h.vol', { v: fmtDim(r.vol) }) + ' · ' + t('h.basis') + '</p>';
-        if (r.others.length) h += '<p class="tiny">' + t('h.otherIn') + '</p>';
-        h += '<p class="disclaimer">' + t('h.disclaimer') + '</p>';
-      }
-      h += '<div class="result__actions"><a class="btn btn--wa" target="_blank" rel="noopener" href="' + wa(helperLines(r)) + '">' + icon('i-chat') + '<span>' + t(counted ? 'h.confirm' : 'h.sendList') + '</span></a>';
-      if (u) h += '<a class="btn btn--navy" href="#units" data-see="' + u.a + '">' + icon('i-cube') + '<span>' + t('h.see') + '</span></a>';
-      h += '</div></div>';
-    }
-    if (H.err) h += '<p class="helper__err" role="alert">' + t(H.err) + '</p>';
-    hBody.innerHTML = h;
-    $('#helperBack').style.visibility = H.step === 1 ? 'hidden' : 'visible';
-    $('#helperNextText').textContent = plain(H.step === 1 ? 'h.next' : H.step === 2 ? 'h.calc' : 'h.restart');
-    $('#helperNext').className = 'btn ' + (H.step === 3 ? 'btn--ghost' : 'btn--navy');
-    fillSync(); remeasureSoon();
-  }
-  function clearErr() { H.err = ''; var er = $('.helper__err', hBody); if (er) er.remove(); }
-  hBody.addEventListener('click', function (e) {
-    var el = e.target.closest ? e.target.closest('[data-cat],[data-preset],[data-step],[data-see],[data-sub]') : null; if (!el) return;
-    H.err = '';
-    if (el.hasAttribute('data-cat')) { var id = el.getAttribute('data-cat'); H.cats[id] = !H.cats[id]; H.preset = null; el.setAttribute('aria-pressed', !!H.cats[id]); $$('.preset', hBody).forEach(function (p) { p.classList.remove('is-on'); }); clearErr(); return; }
-    if (el.hasAttribute('data-preset')) {
-      var p = el.getAttribute('data-preset'); H.preset = p; H.qty = {}; H.cats = {}; H.other = {}; H.sub = {};
-      Object.keys(PRESETS[p]).forEach(function (k) { H.qty[k] = PRESETS[p][k]; });
-      HC.forEach(function (c) { if (catItems(c).some(function (it) { return H.qty[it[0]]; })) H.cats[c.id] = true; });
-      H.step = 2; renderHelper(); return;
-    }
-    if (el.hasAttribute('data-sub')) {            // fold or unfold one room of the list
-      var box = el.parentNode, open = !box.classList.contains('is-open');
-      box.classList.toggle('is-open', open); el.setAttribute('aria-expanded', open); H.sub[el.getAttribute('data-sub')] = open; remeasureSoon(); return;
-    }
-    if (el.hasAttribute('data-step')) {
-      var it = el.getAttribute('data-item'), q = clamp((H.qty[it] || 0) + (+el.getAttribute('data-step')), 0, 200); H.qty[it] = q; H.preset = null;
-      var out = el.parentNode.querySelector('output'); out.textContent = q; out.className = q ? '' : 'is-zero';
-      var sub = el.closest('.qsub');
-      if (sub) { var n = $$('output', sub).filter(function (o) { return o.textContent !== '0'; }).length, badge = $('.qsub__n', sub); badge.textContent = n; badge.hidden = !n; }
-      fillSync(); clearErr(); return;
-    }
-    if (el.hasAttribute('data-see')) selectSize(+el.getAttribute('data-see'), true);
+  /* ---------------- size guide: a row shows that size in the explorer ---------------- */
+  $('#guide').addEventListener('click', function (e) {
+    var row = e.target.closest ? e.target.closest('[data-a]') : null; if (!row) return;
+    var a = row.getAttribute('data-a'); selectSize(a === 'big' ? 'big' : +a, true);
   });
-  hBody.addEventListener('input', function (e) {
-    var id = e.target.getAttribute && e.target.getAttribute('data-other'); if (!id) return;
-    H.other[id] = e.target.value; clearErr();
-  });
-  $('#helperNext').addEventListener('click', function () {
-    H.err = '';
-    if (H.step === 1) { if (!HC.some(function (c) { return H.cats[c.id]; })) H.err = 'h.needCat'; else H.step = 2; }
-    else if (H.step === 2) { var r = helperCalc(); if (!r.lines.length && !r.others.length) H.err = 'h.needQty'; else { H.result = r; H.step = 3; } }
-    else { H.step = 1; H.cats = {}; H.qty = {}; H.other = {}; H.sub = {}; H.preset = null; H.result = null; }
-    renderHelper(); $('#helperBox').scrollIntoView({ block: 'nearest', behavior: reduced ? 'auto' : 'smooth' });
-  });
-  $('#helperBack').addEventListener('click', function () { H.err = ''; if (H.step > 1) H.step--; renderHelper(); });
 
-  /* ---------------- prices ---------------- */
+  /* ---------------- prices: the full list opens under the explorer ---------------- */
   var ptbody = $('#ptbody');
   function renderPrices() {
     ptbody.innerHTML = D.sizes.filter(function (s) { return s.price; }).map(function (s) {
@@ -529,6 +371,8 @@
   }
   ptbody.addEventListener('click', function (e) { var tr = e.target.closest ? e.target.closest('tr') : null; if (tr) selectSize(+tr.getAttribute('data-a'), true); });
   ptbody.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { var tr = e.target.closest ? e.target.closest('tr') : null; if (tr) { e.preventDefault(); selectSize(+tr.getAttribute('data-a'), true); } } });
+  // a closed list has no height: the page length and the row highlight are worked out again when it opens
+  $('#prices').addEventListener('toggle', function () { remeasureSoon(); if (window.RVFX) window.RVFX.sizeChanged(); });
 
   /* ---------------- small interactive bits ---------------- */
   function tabs(container, attr, onPick) {
@@ -540,59 +384,25 @@
     $('#who-ind').hidden = w !== 'ind'; $('#who-biz').hidden = w !== 'biz'; remeasureSoon();
   });
   $$('.qa').forEach(function (d) { d.addEventListener('toggle', remeasureSoon); });
-  // the three "how it works" steps light up in turn while they are on screen (never under reduced motion)
-  var stepsOn = false, stepIdx = 0;
-  if ('IntersectionObserver' in window) new IntersectionObserver(function (es) { stepsOn = es[0].isIntersecting; }, { threshold: .4 }).observe($('#steps3'));
-  if (!reduced) setInterval(function () { if (!stepsOn) return; stepIdx = (stepIdx + 1) % 3; $$('#steps3 .step').forEach(function (s, i) { s.classList.toggle('is-on', i === stepIdx); }); }, 2200);
-
-  /* ---------------- branches ---------------- */
-  function renderBranches() {
-    $('#branchList').innerHTML = D.branches.map(function (b) {
-      var nm = plain(b.name), chosen = state.branch === b.id;
-      var first = b.map
-        ? '<a class="btn btn--sm btn--navy" target="_blank" rel="noopener" href="' + b.map + '">' + icon('i-pin') + '<span>' + t('b.dir') + '</span></a>'
-        : '<a class="btn btn--sm btn--navy" target="_blank" rel="noopener" href="' + wa([plain('wa.hello'), plain('wa.loc', { b: nm })]) + '">' + icon('i-pin') + '<span>' + t('b.loc') + '</span></a>';
-      return '<li class="card branch' + (chosen ? ' is-chosen' : '') + '" data-b="' + b.id + '"><h3 class="branch__name"><span>' + t(b.name) + '</span>' + (chosen ? '<span class="plate">' + t('b.chosen') + '</span>' : '') + '</h3>' +
-        '<p class="branch__row">' + icon('i-pin') + '<span>' + t(b.area) + '</span></p>' +
-        (b.map ? '' : '<p class="tiny">' + t('b.note') + '</p>') +
-        '<div class="branch__actions">' + first +
-        '<a class="btn btn--sm btn--ghost" target="_blank" rel="noopener" href="' + wa([plain('wa.hello'), plain('wa.visit', { b: nm })]) + '">' + t('b.visit') + '</a>' +
-        '<button class="btn btn--sm btn--line" type="button" data-choose="' + b.id + '" aria-pressed="' + chosen + '">' + (chosen ? icon('i-check') : '') + '<span>' + t(chosen ? 'b.chosen' : 'b.choose') + '</span></button></div></li>';
-    }).join('');
-  }
-  $('#branchList').addEventListener('click', function (e) {
-    var b = e.target.closest ? e.target.closest('[data-choose]') : null; if (!b) return;
-    var id = b.getAttribute('data-choose'); state.branch = state.branch === id ? null : id;
-    renderBranches(); renderInfo(); $('#qBranch').value = state.branch || ''; renderQuote(); updateDock();
-  });
-
   /* ---------------- contact + quote ---------------- */
   function fillSelect(el, opts, val) { el.innerHTML = opts.map(function (o) { return '<option value="' + o[0] + '">' + o[1] + '</option>'; }).join(''); el.value = val; }
   function buildQuoteForm() {
-    var sz = $('#qSize'), keep = sz.value, br = $('#qBranch'), kb = br.value || state.branch || '', tm = $('#qTerm'), kt = tm.value || 'x';
+    var sz = $('#qSize'), keep = sz.value, br = $('#qBranch'), kb = br.value || state.branch || '';
     fillSelect(sz, [['', plain('c.sizeAny')]].concat(D.sizes.map(function (s) { return [String(s.a), s.a + ' ' + plain('m2')]; })).concat([['big', plain('c.sizeBig')]]), keep);
     fillSelect(br, [['', plain('c.branchAny')]].concat(D.branches.map(function (b) { return [b.id, plain(b.name)]; })), kb);
-    fillSelect(tm, [['x', plain('c.tx')], ['D', plain('c.tD')], ['M', plain('c.tM')], ['Y', plain('c.tY')]], kt);
   }
   var quoteTouched = false;
   function syncQuoteSize() { if (!quoteTouched && state.touched) { $('#qSize').value = String(state.size); renderQuote(); } }
   function renderQuote() {
-    var name = $('#qName').value.trim(), sz = $('#qSize').value, br = $('#qBranch').value, tm = $('#qTerm').value, notes = $('#qNotes').value.trim();
+    var sz = $('#qSize').value, br = $('#qBranch').value;
     var L = [plain('wa.hello'), plain('wa.quote')];
-    if (name) L.push('• ' + plain('wa.name', { n: name }));
     L.push('• ' + (sz === 'big' ? plain('wa.size', { a: '100+' }) : sz ? plain('wa.size', { a: sz }) : plain('wa.sizeAny')));
-    L.push('• ' + plain('wa.type', { t: plain(state.type === 'business' ? 'c.business' : 'c.personal') }));
     if (br) L.push('• ' + plain('wa.branch', { b: branchName(br) }));
-    if (tm !== 'x') L.push('• ' + plain('wa.term', { t: plain('c.t' + tm) }));
-    if (notes) L.push('• ' + plain('wa.notes', { n: notes }));
     $('#qPreview').textContent = L.join('\n'); $('#qSend').href = wa(L);
   }
-  ['qName', 'qSize', 'qBranch', 'qTerm', 'qNotes'].forEach(function (id) {
-    $('#' + id).addEventListener('input', function () { if (id === 'qSize') quoteTouched = true; if (id === 'qBranch') { state.branch = this.value || null; renderBranches(); renderInfo(); } renderQuote(); });
-  });
-  $('#qType').addEventListener('click', function (e) {
-    var b = e.target.closest ? e.target.closest('[data-type]') : null; if (!b) return; state.type = b.getAttribute('data-type');
-    $$('#qType .seg__btn').forEach(function (x) { var on = x === b; x.classList.toggle('is-on', on); x.setAttribute('aria-checked', on); }); renderQuote();
+  ['qSize', 'qBranch'].forEach(function (id) {
+    // the chosen area also goes into the unit's own WhatsApp message and the bottom bar
+    $('#' + id).addEventListener('input', function () { if (id === 'qSize') quoteTouched = true; else { state.branch = this.value || null; renderInfo(); updateDock(); } renderQuote(); });
   });
   $('#quoteForm').addEventListener('submit', function (e) { e.preventDefault(); });
   $('#copyNum').addEventListener('click', function () {
@@ -869,8 +679,8 @@
 
   /* ---------------- boot ---------------- */
   function renderAll() {
-    applyLang(); syncViewLabel(); renderSizes(); renderItemsToggle(); renderPrices(); renderBranches(); buildQuoteForm(); renderQuote(); staticLinks();
-    renderUnit(true); renderHelper(); updateDock(); remeasureSoon();
+    applyLang(); syncViewLabel(); renderSizes(); renderItemsToggle(); renderPrices(); buildQuoteForm(); renderQuote(); staticLinks();
+    renderUnit(true); updateDock(); remeasureSoon();
     if (window.RVFX) window.RVFX.refresh();
   }
   // the scroll-driven opening needs room to scroll; without motion the first section is one screen tall
