@@ -17,6 +17,7 @@
 | `assets/js/app.js` | منطق الصفحة: المستكشف والمسطرة، قائمة الأسعار، دليل المساحات، رسائل واتساب، مشهد الافتتاحية |
 | `assets/js/fx.js` | طبقة الحركة: تبدّل ألوان الخلفية، العناوين، القفل، رزمة البطاقات، القصة الأفقية. الصفحة تعمل بدونه |
 | `assets/js/scene3d.js` | الممر والوحدة المجسّمة (Three.js) |
+| `assets/js/motion.js` + `assets/css/motion.css` | فيلم «TRAVEL → RAVEL» لقصة James، يُحمَّل فقط عند اختيار James أو زر «شاهد رحلة James» |
 | `assets/img`, `assets/fonts`, `assets/vendor` | الصور الحقيقية، الخطوط، مكتبة Three.js |
 
 `index.html` و `assets/js/data.js` ناتجان عن البناء، فلا تعدّلهما مباشرة.
