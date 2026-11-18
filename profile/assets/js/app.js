@@ -94,15 +94,17 @@
     pallet: { w: 1.2, d: 1.0, h: 1.5, c: '#C69D70' }, rack: { w: 2.0, d: .6, h: 2.3, c: '#8FA0B8' }
   };
   function times(kind, n) { var a = []; while (n-- > 0) a.push(kind); return a; }
-  // From 4 m2 up a unit holds furniture, not only boxes, and the bigger it is the more rooms it holds:
-  // one bedroom, then a flat, then two and three bedrooms with their living and dining rooms.
+  // From 4 m2 up a unit holds furniture, not only boxes, and the bigger it is the more rooms it holds: a studio (r2),
+  // a one-bedroom flat (r2p), a little more (r3), two bedrooms (r4), three or a small villa (r5). The keys are the
+  // "fits" values of the sizes in data.json, which also name the description shown beside each size.
   var SEQ = {
     r1: ['box', 'box', 'suit', 'box', 'suit', 'box', 'box', 'box'],
     r2: ['bed', 'wardrobeS', 'carpet', 'dresser', 'box', 'box', 'nights', 'suit', 'tv'].concat(times('box', 4)),
     r2p: ['bed', 'wardrobe', 'fridge', 'carpet', 'sofa2', 'dresser', 'box', 'box', 'washer', 'nights', 'tv', 'suit'].concat(times('box', 5)),
-    r3: ['bed', 'wardrobeS', 'wardrobe', 'fridge', 'carpet', 'sofa2', 'table', 'dresser', 'box', 'box', 'box', 'washer', 'nights', 'armchair', 'tv', 'suit', 'suit'].concat(times('box', 6)),
+    r3: ['bed', 'wardrobeS', 'wardrobe', 'fridge', 'carpet', 'shelf', 'sofa2', 'table', 'dresser', 'box', 'box', 'box', 'washer', 'nights', 'armchair', 'tv', 'dresser', 'suit', 'suit']
+      .concat(times('box', 10)),
     r4: ['bed', 'wardrobe3', 'bedS', 'wardrobe', 'fridge', 'carpet', 'shelf', 'sofa', 'table', 'dresser', 'box', 'box', 'box', 'majlis', 'washer', 'nights', 'armchair', 'dresser', 'tv', 'suit', 'suit']
-      .concat(times('box', 9)),
+      .concat(times('box', 6), ['sofa2', 'armchair', 'nights'], times('box', 8)),
     r5: ['bed', 'wardrobe3', 'fridge', 'bed', 'wardrobe', 'bedS', 'wardrobe', 'carpet', 'bedS', 'wardrobeS', 'shelf', 'carpet', 'fridge', 'shelf',
       'sofa', 'sofa', 'table', 'majlis', 'dresser', 'box', 'box', 'box', 'box', 'washer', 'dresser', 'washer', 'nights', 'nights', 'armchair', 'armchair', 'tv', 'tv', 'table', 'majlis', 'suit', 'suit', 'suit']
       .concat(times('box', 16))
@@ -111,7 +113,7 @@
   function buildLayout(u) {
     var key = u.a + ':' + u.w + ':' + u.d; if (layoutCache[key]) return layoutCache[key];
     var out = [], w = u.w, d = u.d;
-    if (u.fits === 'r6' || u.open) {
+    if (u.fits === 'r6' || u.fits === 'r7' || u.open) {
       // goods on pallets in double rows, racks along the back wall of a unit
       var z = -d / 2 + .25, row = 0, x;
       if (!u.open) { for (x = -w / 2 + .2; x + 2 <= w / 2 - .2; x += 2.15) out.push(item('rack', x + 1, z + .3, 0, row++)); z += 2.4; }
@@ -220,7 +222,9 @@
       h += '<div class="fact"><dt>' + t('u.height') + '</dt><dd>' + D.height + ' ' + t('m') + '</dd></div>';
       h += '<div class="fact"><dt>' + t('u.volume') + '</dt><dd>' + fmt(Math.round(u.a * D.height)) + ' ' + t('m3') + '</dd></div></dl>';
     }
-    h += '<div class="fitsline">' + icon('i-box') + '<div><span class="tiny">' + t('u.fits') + '</span><b>' + t(fitsKey(u)) + '</b></div></div>';
+    var household = !u.open && u.fits !== 'r6' && u.fits !== 'r7';   // the note is about furniture, so it stays off the sizes for business stock
+    h += '<div class="fitsline">' + icon('i-box') + '<div><span class="tiny">' + t('u.fits') + '</span><b>' + t(fitsKey(u)) + '</b>' +
+      (household ? '<span class="tiny fitsline__n">' + t('fits.note') + '</span>' : '') + '</div></div>';
     // sizes without a listed monthly rent are priced on request, by phone or WhatsApp
     h += '<div class="pricebox"><span class="pricebox__l">' + t(u.price ? 'u.price' : 'u.priceAsk') + '</span>';
     if (u.price) h += '<span class="pricebox__v">' + fmt(u.price) + ' <small>' + t('cur') + ' / ' + t('perMonth') + '</small></span><span class="pricebox__d">' + t('u.otherTerms') + '</span>';
