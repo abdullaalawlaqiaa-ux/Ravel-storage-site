@@ -63,14 +63,13 @@ def main():
     rows = "".join('<tr data-a="%s" tabindex="0" aria-selected="false"><td>%s</td><td>%s</td><td>%s</td></tr>'
                    % (s["a"], s["a"], s["a"] * D["height"], format(s["price"], ","))
                    for s in D["sizes"] if s["price"])
-    # the size guide: neighbouring sizes that hold the same kind of load share a row, which leads to the smallest of them
-    groups = []
-    for s in D["sizes"]:
-        if groups and groups[-1][0] == s["fits"]:
-            groups[-1][1].append(s["a"])
-        else:
-            groups.append((s["fits"], [s["a"]]))
-    rows_guide = [(g[1][0], "%d – %d" % (g[1][0], g[1][-1]) if len(g[1]) > 1 else str(g[1][0]), g[0]) for g in groups]
+    # the size guide: its rows are listed in data.json as the owner worded them. Each row leads to a size
+    # whose own description is the row's, so the unit that opens says the same thing as the row that was tapped.
+    by_a = dict((s["a"], s) for s in D["sizes"])
+    rows_guide = []
+    for g in D["guide"]:
+        assert by_a[g["show"]]["fits"] == g["fits"], "guide row %s leads to a size described differently" % g
+        rows_guide.append((g["show"], "%d – %d" % (g["from"], g["to"]), g["fits"]))
     rows_guide.append(("big", "+%d" % D["sizes"][-1]["a"], "open"))
     guide = "".join('<li><a class="grow" href="#explorer" data-a="%s"><b class="grow__a"><span dir="ltr">%s</span> '
                     '<small data-i18n="m2">%s</small></b><span class="grow__t" data-i18n="fits.%s">%s</span>'

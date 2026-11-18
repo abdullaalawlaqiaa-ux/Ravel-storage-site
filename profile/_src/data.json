@@ -16,14 +16,24 @@
     {"a": 8,   "w": 2,   "d": 4,   "exact": true,  "price": 1000, "photo": null,       "fits": "r2p"},
     {"a": 9,   "w": 3,   "d": 3,   "exact": true,  "price": 1100, "photo": null,       "fits": "r3"},
     {"a": 10,  "w": 2.5, "d": 4,   "exact": true,  "price": 1200, "photo": null,       "fits": "r3"},
-    {"a": 12,  "w": 3,   "d": 4,   "exact": true,  "price": 1500, "photo": null,       "fits": "r4"},
+    {"a": 12,  "w": 3,   "d": 4,   "exact": true,  "price": 1500, "photo": null,       "fits": "r3"},
     {"a": 15,  "w": 3,   "d": 5,   "exact": true,  "price": null, "photo": "unit-15",  "fits": "r4"},
     {"a": 16,  "w": 4,   "d": 4,   "exact": true,  "price": 2000, "photo": null,       "fits": "r4"},
-    {"a": 20,  "w": 4,   "d": 5,   "exact": true,  "price": 2400, "photo": null,       "fits": "r5"},
+    {"a": 20,  "w": 4,   "d": 5,   "exact": true,  "price": 2400, "photo": null,       "fits": "r4"},
     {"a": 25,  "w": 5,   "d": 5,   "exact": true,  "price": 3000, "photo": "unit-25",  "fits": "r5"},
     {"a": 30,  "w": 5,   "d": 6,   "exact": true,  "price": 3500, "photo": null,       "fits": "r5"},
     {"a": 50,  "w": 5,   "d": 10,  "exact": true,  "price": null, "photo": null,       "fits": "r6"},
-    {"a": 100, "w": 10,  "d": 10,  "exact": true,  "price": null, "photo": "unit-100", "fits": "r6"}
+    {"a": 100, "w": 10,  "d": 10,  "exact": true,  "price": null, "photo": "unit-100", "fits": "r7"}
+  ],
+  "guide": [
+    {"from": 1,  "to": 2,   "fits": "r1",  "show": 1},
+    {"from": 4,  "to": 6,   "fits": "r2",  "show": 4},
+    {"from": 7,  "to": 8,   "fits": "r2p", "show": 7},
+    {"from": 9,  "to": 12,  "fits": "r3",  "show": 9},
+    {"from": 15, "to": 20,  "fits": "r4",  "show": 15},
+    {"from": 20, "to": 30,  "fits": "r5",  "show": 25},
+    {"from": 30, "to": 50,  "fits": "r6",  "show": 50},
+    {"from": 50, "to": 100, "fits": "r7",  "show": 100}
   ],
   "photos": {
     "unit-1": [1038, 1530],

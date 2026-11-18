@@ -298,6 +298,8 @@ main{position:relative;z-index:1;overflow-x:clip}
 .fitsline{display:flex;align-items:flex-start;gap:10px}
 .fitsline .ic{margin-top:4px}
 .fitsline b{display:block;font:700 16.5px/1.7 var(--f-display)}
+.fitsline b small,.grow__t small{display:block;color:var(--ink-muted);font:600 13px/1.7 var(--f-text)}
+.fitsline__n{display:block;margin-top:3px;color:var(--ink-muted)}
 .pricebox{display:grid;gap:1px;padding:15px 18px;border-radius:18px;background:var(--navy);color:#fff}
 .pricebox__l{color:var(--grey-300);font-size:13px}
 .pricebox__v{color:var(--cyan);font:800 36px/1.25 var(--f-num)}
@@ -365,6 +367,7 @@ main{position:relative;z-index:1;overflow-x:clip}
 .bigask__btns{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
 .callout{margin:14px 0 0;padding:10px 14px;border-radius:14px;background:#fff;color:var(--navy);font-size:14.5px;line-height:1.8}
 .callout b{font-family:var(--f-display);font-weight:800}
+.callout--note{margin:0 0 12px;background:var(--cyan-wash)}
 
 /* ---------- 04 features: a stack of cards with depth; drag the top one away ---------- */
 .deck{display:grid;gap:14px;margin-top:24px}
