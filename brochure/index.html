@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>رافل للتخزين | Ravel Storage</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- أيقونات مشتركة -->
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <symbol id="i-clock" viewBox="0 0 48 48"><circle cx="24" cy="24" r="18"/><path d="M24 13v11l7 5"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 48 48"><rect x="10" y="21" width="28" height="20" rx="4"/><path d="M16 21v-6a8 8 0 0 1 16 0v6M24 29v5"/></symbol>
+    <symbol id="i-cam" viewBox="0 0 48 48"><path d="M6 14l26-6 4 12-26 7zM30 23l8 3-2 6-7-2M12 26v12h8M6 38h8"/></symbol>
+    <symbol id="i-guard" viewBox="0 0 48 48"><path d="M24 5l16 6v11c0 10-7 17-16 21C15 39 8 32 8 22V11z"/><path d="M17 24l5 5 9-10"/></symbol>
+    <symbol id="i-fire" viewBox="0 0 48 48"><rect x="15" y="18" width="16" height="25" rx="5"/><path d="M19 18v-6h8v6M27 12h8l4 5M23 12V6M19 27h8"/></symbol>
+    <symbol id="i-fork" viewBox="0 0 48 48"><path d="M6 34V18h12l5 9v7M30 8v28h12"/><circle cx="11" cy="37" r="4"/><circle cx="22" cy="37" r="4"/><path d="M6 26h16"/></symbol>
+    <symbol id="i-clean" viewBox="0 0 48 48"><path d="M20 8c1 9 4 12 13 13-9 1-12 4-13 13-1-9-4-12-13-13 9-1 12-4 13-13zM36 28c.5 4 2 5.500 6 6-4 .5-5.500 2-6 6-.5-4-2-5.500-6-6 4-.5 5.500-2 6-6z"/></symbol>
+    <symbol id="i-snow" viewBox="0 0 48 48"><path d="M24 5v38M7.500 14.500l33 19M40.500 14.500l-33 19M19 8l5 5 5-5M19 40l5-5 5 5M8 21l2-7 7 2M40 27l-2 7-7-2M40 21l-2-7-7 2M8 27l2 7 7-2"/></symbol>
+    <symbol id="i-home" viewBox="0 0 48 48"><path d="M6 23L24 7l18 16M11 19v21h26V19M20 40V28h8v12"/></symbol>
+    <symbol id="i-biz" viewBox="0 0 48 48"><rect x="8" y="8" width="22" height="33" rx="2"/><path d="M30 20h10v21H30M14 16h4M20 16h4M14 23h4M20 23h4M14 30h4M20 30h4M17 41v-5h4v5"/></symbol>
+    <symbol id="i-wa" viewBox="0 0 48 48"><path d="M8 40l2.500-9A17 17 0 1 1 17 37.500z"/><path d="M18 17c0 7 5 12 12 13l2-3-4-2-1.500 1.500c-2-1-3.500-2.500-4.500-4.500L23.500 20.500l-2-4z"/></symbol>
+    <symbol id="i-web" viewBox="0 0 48 48"><circle cx="24" cy="24" r="18"/><path d="M6 24h36M24 6c-6 5-9 11-9 18s3 13 9 18c6-5 9-11 9-18s-3-13-9-18z"/></symbol>
+    <symbol id="i-mail" viewBox="0 0 48 48"><rect x="6" y="11" width="36" height="26" rx="4"/><path d="M7 14l17 13 17-13"/></symbol>
+    <symbol id="i-ig" viewBox="0 0 48 48"><rect x="8" y="8" width="32" height="32" rx="9"/><circle cx="24" cy="24" r="7.500"/><circle cx="33" cy="15" r="1.200"/></symbol>
+    <symbol id="i-pin" viewBox="0 0 48 48"><path d="M24 43S10 30 10 19a14 14 0 0 1 28 0c0 11-14 24-14 24z"/><circle cx="24" cy="19" r="5"/></symbol>
+  </defs>
+</svg>
+
+<!-- 1 · الغلاف -->
+<section class="page cover">
+  <img class="cover-photo" src="img/corridor.jpg" alt="">
+  <div class="cover-top"><img class="logo" src="img/logo-navy.png" alt="Ravel Storage"></div>
+  <div class="cover-panel">
+    <h1>مساحة إضافية،<br>وقت ما تحتاجها</h1>
+    <p>وحدات تخزين خاصة للأفراد والشركات في أبوظبي</p>
+    <ul class="chips">
+      <li>من <span class="n">1</span> إلى <span class="n">100</span> م²</li>
+      <li>مصفح والمفرق</li>
+      <li>دخول <span class="n">24/7</span></li>
+    </ul>
+  </div>
+</section>
+
+<!-- 2 · من نحن -->
+<section class="page">
+  <header class="head">
+    <span class="kicker">من نحن</span>
+    <h2>وحدتك الخاصة، بمفتاحك أنت</h2>
+  </header>
+  <p class="lead">رافل للتخزين توفر وحدات تخزين مقفلة داخل مستودعات منظمة في مصفح والمفرق. تستأجر المساحة التي تحتاجها فقط، تضع أغراضك، وتعود إليها متى شئت.</p>
+  <figure class="photo wide"><img src="img/u25.jpg" alt=""></figure>
+  <h3 class="sub">كيف تعمل الخدمة؟</h3>
+  <ol class="flow">
+    <li><span class="n">1</span><b>تختار المساحة</b><small>على قد أغراضك</small></li>
+    <li><span class="n">2</span><b>تخزّن أغراضك</b><small>في وحدة مقفلة</small></li>
+    <li><span class="n">3</span><b>تدخل متى شئت</b><small>على مدار الساعة</small></li>
+  </ol>
+  <footer class="foot"><img src="img/logo-navy.png" alt=""><span class="n">ravelstorage.com</span><span class="n pg">2</span></footer>
+</section>
+
+<!-- 3 · متى تحتاج -->
+<section class="page">
+  <header class="head">
+    <span class="kicker">لمن هذه الخدمة</span>
+    <h2>متى تحتاج مساحة تخزين؟</h2>
+  </header>
+  <div class="who">
+    <div class="who-card">
+      <div class="who-title"><svg class="ic"><use href="#i-home"/></svg><h3>للأفراد</h3></div>
+      <ul>
+        <li>انتقال إلى بيت جديد أو تجديد المنزل</li>
+        <li>سفر أو إجازة طويلة</li>
+        <li>أثاث وأغراض موسمية تزحم البيت</li>
+      </ul>
+    </div>
+    <div class="who-card">
+      <div class="who-title"><svg class="ic"><use href="#i-biz"/></svg><h3>للشركات</h3></div>
+      <ul>
+        <li>مخزون ومعدات المطاعم والمحلات</li>
+        <li>بضائع المتاجر الإلكترونية</li>
+        <li>أرشيف وملفات ومعدات شركات النقل والمقاولات</li>
+      </ul>
+    </div>
+  </div>
+  <figure class="photo wide tall"><img src="img/u100.jpg" alt=""><figcaption>وحدة <span class="n">100</span> م²</figcaption></figure>
+  <footer class="foot"><img src="img/logo-navy.png" alt=""><span class="n">ravelstorage.com</span><span class="n pg">3</span></footer>
+</section>
+
+<!-- 4 · الوحدات والمساحات -->
+<section class="page">
+  <header class="head">
+    <span class="kicker">وحداتنا ومساحاتنا</span>
+    <h2>ادفع لمساحتك فقط، لا أكثر</h2>
+  </header>
+  <p class="lead tight">ارتفاع الوحدات <span class="n">3</span> أمتار، فتستفيد من المساحة طولاً وعرضاً وارتفاعاً.</p>
+  <div class="units">
+    <figure class="photo"><img src="img/u1.jpg" alt=""><figcaption><span class="n">1</span> م²</figcaption></figure>
+    <figure class="photo"><img src="img/u6.jpg" alt=""><figcaption><span class="n">6</span> م²</figcaption></figure>
+    <figure class="photo"><img src="img/u15.jpg" alt=""><figcaption><span class="n">15</span> م²</figcaption></figure>
+  </div>
+  <table class="guide">
+    <thead><tr><th>المساحة</th><th>تناسب تقريباً</th></tr></thead>
+    <tbody>
+      <tr><td><span class="n">1</span> إلى <span class="n">2</span> م²</td><td>كراتين وحقائب وأغراض شخصية</td></tr>
+      <tr><td><span class="n">4</span> إلى <span class="n">6</span> م²</td><td>محتويات غرفة واحدة</td></tr>
+      <tr><td><span class="n">9</span> إلى <span class="n">10</span> م²</td><td>أثاث شقة غرفة وصالة</td></tr>
+      <tr><td><span class="n">12</span> إلى <span class="n">16</span> م²</td><td>أثاث شقة غرفتين</td></tr>
+      <tr><td><span class="n">20</span> إلى <span class="n">30</span> م²</td><td>شقة ثلاث غرف أو فيلا صغيرة</td></tr>
+      <tr><td><span class="n">50</span> إلى <span class="n">100</span> م²</td><td>مخزون وبضائع الشركات</td></tr>
+    </tbody>
+  </table>
+  <p class="note">غير متأكد من المساحة؟ أرسل لنا صور أو قائمة أغراضك على واتساب ونقترح لك الأنسب.</p>
+  <footer class="foot"><img src="img/logo-navy.png" alt=""><span class="n">ravelstorage.com</span><span class="n pg">4</span></footer>
+</section>
+
+<!-- 5 · لماذا رافل -->
+<section class="page">
+  <header class="head">
+    <span class="kicker">مميزاتنا</span>
+    <h2>لماذا رافل؟</h2>
+  </header>
+  <div class="feats">
+    <div class="feat"><svg class="ic"><use href="#i-clock"/></svg><h3>دخول <span class="n">24/7</span></h3><p>أغراضك متاحة لك في أي ساعة، دون انتظار دوام.</p></div>
+    <div class="feat"><svg class="ic"><use href="#i-lock"/></svg><h3>وحدة خاصة مقفلة</h3><p>باب وقفل لكل وحدة، ولا أحد يدخلها غيرك.</p></div>
+    <div class="feat"><svg class="ic"><use href="#i-cam"/></svg><h3>كاميرات مراقبة</h3><p>الممرات والمداخل مراقبة على مدار الساعة.</p></div>
+    <div class="feat"><svg class="ic"><use href="#i-guard"/></svg><h3>حارس أمن</h3><p>وجود بشري في الموقع، لا كاميرات فقط.</p></div>
+    <div class="feat"><svg class="ic"><use href="#i-fire"/></svg><h3>طفايات حريق</h3><p>تجهيزات سلامة داخل المستودع.</p></div>
+    <div class="feat"><svg class="ic"><use href="#i-fork"/></svg><h3>رافعة شوكية بالساعة</h3><p>لتحميل وتنزيل الأغراض الثقيلة بسهولة.</p></div>
+    <div class="feat"><svg class="ic"><use href="#i-clean"/></svg><h3>نظافة وصيانة مستمرة</h3><p>ممرات ووحدات نظيفة ومرتبة.</p></div>
+    <div class="feat"><svg class="ic"><use href="#i-snow"/></svg><h3>مكيفة وغير مكيفة</h3><p>اسأل عن المتوفر عند الحجز.</p></div>
+  </div>
+  <footer class="foot"><img src="img/logo-navy.png" alt=""><span class="n">ravelstorage.com</span><span class="n pg">5</span></footer>
+</section>
+
+<!-- 6 · الأسعار — لتحديث الأسعار عدّل الصفوف هنا -->
+<section class="page">
+  <header class="head">
+    <span class="kicker">الأسعار</span>
+    <h2>أسعار واضحة، إيجار شهري</h2>
+  </header>
+  <table class="prices">
+    <thead><tr><th>المساحة <small>م²</small></th><th>الحجم <small>م³</small></th><th>الإيجار الشهري <small>درهم</small></th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>3</td><td>300</td></tr>
+      <tr><td>2</td><td>6</td><td>400</td></tr>
+      <tr><td>4</td><td>12</td><td>600</td></tr>
+      <tr><td>5</td><td>15</td><td>700</td></tr>
+      <tr><td>6</td><td>18</td><td>800</td></tr>
+      <tr><td>7</td><td>21</td><td>900</td></tr>
+      <tr><td>8</td><td>24</td><td>1,000</td></tr>
+      <tr><td>9</td><td>27</td><td>1,100</td></tr>
+      <tr><td>10</td><td>30</td><td>1,200</td></tr>
+      <tr><td>12</td><td>36</td><td>1,500</td></tr>
+      <tr><td>16</td><td>48</td><td>2,000</td></tr>
+      <tr><td>20</td><td>60</td><td>2,400</td></tr>
+      <tr><td>25</td><td>75</td><td>3,000</td></tr>
+      <tr><td>30</td><td>90</td><td>3,500</td></tr>
+    </tbody>
+  </table>
+  <p class="note">للمساحات الأكبر (حتى <span class="n">100</span> م²) تواصل معنا لعرض سعر خاص.</p>
+  <footer class="foot"><img src="img/logo-navy.png" alt=""><span class="n">ravelstorage.com</span><span class="n pg">6</span></footer>
+</section>
+
+<!-- 7 · أسئلة سريعة -->
+<section class="page">
+  <header class="head">
+    <span class="kicker">أسئلة سريعة</span>
+    <h2>كل ما يهمك قبل الحجز</h2>
+  </header>
+  <div class="faq">
+    <div><h3>هل أحتاج مستودعاً كبيراً؟</h3><p>لا. الوحدات تبدأ من <span class="n">1</span> م².</p></div>
+    <div><h3>هل أستطيع الوصول لأغراضي؟</h3><p>نعم، في أي وقت، <span class="n">24/7</span>.</p></div>
+    <div><h3>كيف أعرف المساحة المناسبة؟</h3><p>أرسل لنا قائمة أو صور الأغراض ونقترح عليك.</p></div>
+    <div><h3>عندي أغراض ثقيلة؟</h3><p>يمكنك استئجار رافعة شوكية بالساعة.</p></div>
+    <div><h3>هل يجب أن أزور الفرع للحجز؟</h3><p>لا. يمكنك الحجز بإرسال المستندات عبر واتساب أو البريد.</p></div>
+  </div>
+  <footer class="foot"><img src="img/logo-navy.png" alt=""><span class="n">ravelstorage.com</span><span class="n pg">7</span></footer>
+</section>
+
+<!-- 8 · كيف تبدأ + تواصل -->
+<section class="page last">
+  <header class="head">
+    <span class="kicker">كيف تبدأ؟</span>
+    <h2>خمس خطوات ووحدتك جاهزة</h2>
+  </header>
+  <ol class="steps">
+    <li><span class="n">1</span><p>تواصل معنا واختر المساحة</p></li>
+    <li><span class="n">2</span><p>أرسل نسخة الهوية <small>والرخصة التجارية للشركات</small></p></li>
+    <li><span class="n">3</span><p>وقّع عقد الإيجار</p></li>
+    <li><span class="n">4</span><p>حوّل الإيجار</p></li>
+    <li><span class="n">5</span><p>ابدأ استخدام وحدتك</p></li>
+  </ol>
+  <div class="contact">
+    <img class="logo" src="img/logo-white.png" alt="Ravel Storage">
+    <h2>احجز وحدتك الآن</h2>
+    <a class="btn-wa" href="https://wa.me/971503250551"><svg class="ic"><use href="#i-wa"/></svg><span class="n">050 325 0551</span></a>
+    <div class="links">
+      <a href="https://ravelstorage.com"><svg class="ic"><use href="#i-web"/></svg><span class="n">ravelstorage.com</span></a>
+      <a href="mailto:info@ravelstorage.com"><svg class="ic"><use href="#i-mail"/></svg><span class="n">info@ravelstorage.com</span></a>
+      <a href="https://instagram.com/ravelstorage"><svg class="ic"><use href="#i-ig"/></svg><span class="n">@ravelstorage</span></a>
+      <span><svg class="ic"><use href="#i-pin"/></svg>أبوظبي · مصفح · المفرق</span>
+    </div>
+  </div>
+</section>
+
+</body>
+</html>
