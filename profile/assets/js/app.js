@@ -31,7 +31,7 @@
   var lang0 = params.lang || (hash0 === 'en' ? 'en' : '') || store.get('rv_lang') || 'ar';
   var state = {
     lang: lang0 === 'en' ? 'en' : 'ar', size: 6, big: 150, saved: null, branch: null, view: '3d', items: true,
-    lite: false, touched: false
+    lite: false, touched: false, who: null
   };
   (function () {
     var sv = store.get('rv_saved'); if (!sv) return;
@@ -245,11 +245,38 @@
   function unitTexts(u) { var p = u.exact ? '' : '≈ '; return { w: p + fmtDim(u.w) + ' ' + plain('m'), d: p + fmtDim(u.d) + ' ' + plain('m'), h: D.height + ' ' + plain('m') }; }
 
   var viewer = null;
-  // the figure in front of the unit wears a kandura on the Arabic page and a suit on the English one
-  function personKind() { return state.lang === 'ar' ? 'kandura' : 'suit'; }
+  // Two example customers stand in front of the unit: Rashid in a kandura (the Arabic page's default) and James in a
+  // suit (the English page's). The visitor can switch; his card floats above him in the 3D view.
+  function who() { return state.who || (state.lang === 'ar' ? 'rashid' : 'james'); }
+  function personKind() { return who() === 'rashid' ? 'kandura' : 'suit'; }
+  function renderWho() {
+    var w = who(), card = $('#whoCard'), desc = $('#whoDesc');
+    $$('#whoSel .who__btn').forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-who') === w); });
+    $('#whoName').textContent = plain(w === 'rashid' ? 'who.rashid' : 'who.james');
+    desc.innerHTML = t(w === 'rashid' ? 'who.rashidD' : 'who.jamesD');
+    desc.setAttribute('dir', w === 'james' ? 'ltr' : state.lang === 'ar' ? 'rtl' : 'ltr'); desc.setAttribute('lang', w === 'james' ? 'en' : state.lang);
+    $('#whoPlay').hidden = w !== 'james';
+    openCard();
+  }
+  // On a phone the card would hide part of the unit, so it opens for a few seconds and then folds to his name;
+  // a tap on it opens it again. Turning the model folds it at once.
+  var cardT = 0;
+  function openCard() {
+    var card = $('#whoCard'); clearTimeout(cardT);
+    card.classList.toggle('is-min', false);
+    card.classList.toggle('is-in', false); card.getBoundingClientRect(); card.classList.toggle('is-in', true);   // the soft entrance, again
+    cardT = setTimeout(foldCard, 6500);
+  }
+  function foldCard() { clearTimeout(cardT); $('#whoCard').classList.toggle('is-min', true); }
+  $('#whoCard').addEventListener('click', function (e) { if (e.target.closest && e.target.closest('#whoPlay')) return; if (this.classList.contains('is-min')) openCard(); else foldCard(); });
+  function selectWho(w, user) {
+    if (user && w === 'james') openFilm($('#whoPlay'));   // choosing James plays his story
+    if (w === who() && state.who) return;
+    state.who = w; renderWho(); updateViewer(true);
+  }
   function updateViewer(instant) {
     var u = currentUnit(), layout = state.items ? buildLayout(u) : [];
-    if (viewer) { viewer.setPerson(personKind()); viewer.setUnit(u, layout, unitTexts(u), instant); }
+    if (viewer) { viewer.setPerson(personKind()); if (viewer.setPhoto) viewer.setPhoto(who() === 'rashid' ? { src: imgUrl('char-rashid'), h: 1.78 } : { src: imgUrl('char-james'), h: 1.83 }); viewer.setUnit(u, layout, unitTexts(u), instant); }
     $('#unitPlan').innerHTML = planSvg(u, layout);
   }
   function nearestPhoto(u) {
@@ -433,14 +460,18 @@
     $('#' + id).addEventListener('input', function () { if (id === 'qSize') quoteTouched = true; else { state.branch = this.value || null; renderInfo(); updateDock(); } renderQuote(); });
   });
   $('#quoteForm').addEventListener('submit', function (e) { e.preventDefault(); });
-  $('#copyNum').addEventListener('click', function () {
-    var done = function () { toast(plain('c.copied')); };
-    try { navigator.clipboard.writeText(D.phoneDisplay).then(done, function () { selectNum(); }); } catch (e) { selectNum(); }
-    function selectNum() { var n = $('#waMain .num'), r = doc.createRange(); r.selectNodeContents(n); var s = window.getSelection(); s.removeAllRanges(); s.addRange(r); }
-  });
+  // copies what the node shows; without clipboard access the text is selected instead, so the system's own Copy is one tap away
+  function copyText(node, msg) {
+    function pick() {
+      var r = doc.createRange(), s = window.getSelection(); r.selectNodeContents(node); s.removeAllRanges(); s.addRange(r);
+      try { if (doc.execCommand('copy')) toast(msg); } catch (e) {}
+    }
+    try { navigator.clipboard.writeText(node.textContent).then(function () { toast(msg); }, pick); } catch (e) { pick(); }
+  }
+  $('#copyNum').addEventListener('click', function () { copyText($('#waMain .num'), plain('c.copied')); });
   function staticLinks() {
     var general = wa([plain('wa.hello'), plain('wa.general')]);
-    $('#heroContact').href = general; $('#waMain').href = general; $('#journeyWa').href = general;
+    $('#heroContact').href = general; $('#waMain').href = general; $('#journeyWa').href = general; $('#callSheetWa').href = general;
     var photos = wa([plain('wa.hello'), plain('wa.photos')]);
     $('#helperPhotos').href = photos; $('#journeyPhotos').href = photos;
     $('#bigWa').href = wa([plain('wa.hello'), plain('wa.bigAsk')]);
@@ -462,8 +493,79 @@
   menuBtn.addEventListener('click', function () { setMenu(true); });
   $('#menuClose').addEventListener('click', function () { setMenu(false); });
   menu.addEventListener('click', function (e) { if (e.target === menu || (e.target.closest && e.target.closest('.menu__nav a'))) { menu.hidden = true; menuBtn.setAttribute('aria-expanded', 'false'); } });
-  doc.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !menu.hidden) setMenu(false); });
+  doc.addEventListener('keydown', function (e) { if (e.key !== 'Escape') return; if (!sheet.hidden) closeSheet(); else if (!menu.hidden) setMenu(false); });
   $('#langBtn').addEventListener('click', function () { state.lang = state.lang === 'ar' ? 'en' : 'ar'; store.set('rv_lang', state.lang); renderAll(); });
+
+  /* ---------------- phone and mail links ---------------- */
+  // Each one stays a plain tel: or mailto: link: that is what Safari, Chrome and in-app browsers act on, and nothing
+  // here stops or replaces it. But some places cannot follow such a link (a page shown inside another app's viewer,
+  // a computer with no calling app) and the page is never told. So after a tap the page watches for a moment: a call
+  // or mail app covers the page or takes its place. If neither happened, the number itself is shown, large, with a
+  // copy button. Inside a frame the link usually does nothing, so there the sheet comes at once.
+  var sheet = $('#callSheet'), sheetT = 0, sheetFrom = null, awayAt = 0, hidAt = 0, framed = true;
+  try { framed = window.self !== window.top; } catch (e) {}
+  function openSheet(kind, from) {
+    var mail = kind === 'mail', n = $('#callSheetNum');
+    sheetFrom = from || null; sheet.setAttribute('data-kind', kind);
+    $('#callSheetH').textContent = plain(mail ? 'cs.mailH' : 'cs.telH'); $('#callSheetP').textContent = plain(mail ? 'cs.mailP' : 'cs.telP');
+    n.textContent = mail ? D.email : D.phoneDisplay; n.href = mail ? 'mailto:' + D.email : 'tel:' + D.phone;
+    $('#callSheetCopyText').textContent = plain(mail ? 'cs.copyMail' : 'c.copy');
+    sheet.hidden = false; $('#callSheetCopy').focus();
+  }
+  function closeSheet(quiet) { if (sheet.hidden) return; sheet.hidden = true; if (!quiet && sheetFrom) sheetFrom.focus(); sheetFrom = null; }
+  window.addEventListener('blur', function () { awayAt = Date.now(); });
+  window.addEventListener('pagehide', function () { hidAt = Date.now(); });
+  doc.addEventListener('visibilitychange', function () { if (doc.hidden) { hidAt = Date.now(); closeSheet(true); } });   // the call began: nothing left to offer
+  doc.addEventListener('click', function (e) {
+    var a = e.target.closest ? e.target.closest('a[href^="tel:"],a[href^="mailto:"]') : null;
+    if (!a || e.defaultPrevented || !sheet.hidden) return;
+    var kind = a.getAttribute('href').indexOf('tel:') === 0 ? 'tel' : 'mail', t0 = Date.now();
+    clearTimeout(sheetT);
+    sheetT = setTimeout(function () {
+      // hidden since the tap: the phone or mail app took over. Lost focus: a system prompt is asking (not trusted inside a frame)
+      if (doc.hidden || hidAt >= t0 || (!framed && awayAt >= t0)) return;
+      openSheet(kind, a);
+    }, framed ? 350 : 1500);
+  });
+  sheet.addEventListener('click', function (e) { if (e.target === sheet || (e.target.closest && e.target.closest('#callSheetClose'))) closeSheet(); });
+  sheet.addEventListener('keydown', function (e) {      // Tab stays inside the sheet while it is open
+    if (e.key !== 'Tab') return;
+    var f = $$('a[href],button', sheet), i = f.indexOf(doc.activeElement);
+    if (e.shiftKey && i <= 0) { e.preventDefault(); f[f.length - 1].focus(); } else if (!e.shiftKey && i === f.length - 1) { e.preventDefault(); f[0].focus(); }
+  });
+  $('#callSheetCopy').addEventListener('click', function () { copyText($('#callSheetNum'), plain(sheet.getAttribute('data-kind') === 'mail' ? 'cs.copiedMail' : 'c.copied')); });
+
+  /* ---------------- James's story: the TRAVEL -> RAVEL film (motion.js) ---------------- */
+  // Loaded only when asked for. It plays over the page in its own layer; the page's viewer and opening walk rest meanwhile.
+  var filmOpen = false, filmLoading = false;
+  function ensureFilm(cb) {
+    if (window.RVMotion) return cb(true);
+    if (filmLoading) return; filmLoading = true;
+    loadScript(ASSET + 'js/motion.js', function (ok) { filmLoading = false; cb(ok && !!window.RVMotion); });
+  }
+  function openFilm(opener) {
+    if (filmOpen) return;
+    stopAutoWalk(); if (!menu.hidden) setMenu(false);
+    var still = reduced || state.lite || !webglOk();
+    var go = function () {
+      ensureFilm(function (ok) {
+        if (!ok) return;
+        filmOpen = true; if (viewer) viewer.setActive(false);
+        window.RVMotion.open({
+          lang: state.lang, opener: opener || null,
+          items: buildLayout(unitFor(12)), unit: { w: unitFor(12).w, d: unitFor(12).d, h: D.height },
+          jamesImg: imgUrl('char-james'),
+          wa: wa([plain('wa.hello'), plain('wa.ask')]), tel: 'tel:' + D.phone,
+          reduced: still, low: !!lowEnd,
+          onExplore: function () { selectSize(12, true); setView('3d'); $('#explorer').scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' }); },
+          onClose: function () { filmOpen = false; lastY = -1; if (viewer) viewer.setActive(state.view === '3d' && viewerVisible && !state.lite); }
+        });
+      });
+    };
+    if (still) go(); else ensure3D(function (ok) { if (ok) go(); else { still = true; go(); } });
+  }
+  $('#whoSel').addEventListener('click', function (e) { var b = e.target.closest ? e.target.closest('[data-who]') : null; if (b) selectWho(b.getAttribute('data-who'), true); });
+  $('#whoPlay').addEventListener('click', function () { openFilm(this); });
 
   /* ---------------- 3D: loading, lite mode ---------------- */
   var stage = $('#stage'), poster = $('#poster'), corridor = null, viewerVisible = false, loading3d = false, cbs = [];
@@ -517,9 +619,10 @@
       try {
         viewer = window.RV3D.createUnitViewer($('#unitCanvas'), $('#unitLabels'), {
           still: reduced, dark: true, person: personKind(),
-          onUser: function () { $('#unitHint').classList.add('is-off'); },
+          onUser: function () { $('#unitHint').classList.add('is-off'); foldCard(); },
           onTap: function () { doorIntro = true; setDoor(!doorOpen); }
         });
+        if (viewer.setCard) viewer.setCard($('#whoCard'));
       }
       catch (e) { viewer = null; return; }
       $('#viewerStage').classList.remove('is-lite3d'); viewer.resize(); updateViewer(true); viewer.setLid(doorOpen, true);
@@ -690,7 +793,7 @@
       return;
     }
     // the corridor is drawn only while the opening scene is on screen
-    if (state.lite || !corridor || doc.hidden || y > heroLen + vh) return;
+    if (state.lite || !corridor || doc.hidden || filmOpen || y > heroLen + vh) return;
     var q = poseAt(p), f = 1 - Math.exp(-dt / 120);
     if (intro0 === 0) intro0 = now;
     var intro = reduced ? 0 : 2.4 * (1 - easeOut(seg(now - intro0, 0, 3200)));
@@ -725,7 +828,7 @@
 
   /* ---------------- boot ---------------- */
   function renderAll() {
-    applyLang(); syncViewLabel(); renderSizes(); renderItemsToggle(); renderPrices(); buildQuoteForm(); renderQuote(); staticLinks();
+    applyLang(); syncViewLabel(); renderWho(); renderSizes(); renderItemsToggle(); renderPrices(); buildQuoteForm(); renderQuote(); staticLinks();
     renderUnit(true); updateDock(); remeasureSoon();
     if (window.RVFX) window.RVFX.refresh();
   }
@@ -745,5 +848,5 @@
     var opening = function () { if (filmFits) startFilm(); else startCorridor(); };
     if (doc.readyState === 'complete') opening(); else { var kick = setTimeout(opening, 900); window.addEventListener('load', function () { clearTimeout(kick); opening(); }); }
   }
-  window.RV = { layout: buildLayout, unitFor: unitFor, state: state, measure: measure, setLite: setLite, selectSize: selectSize };
+  window.RV = { layout: buildLayout, unitFor: unitFor, state: state, measure: measure, setLite: setLite, selectSize: selectSize, openFilm: openFilm, selectWho: selectWho };
 })();

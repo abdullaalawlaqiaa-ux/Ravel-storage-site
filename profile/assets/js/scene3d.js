@@ -478,11 +478,19 @@
   // The figure standing in front of the unit, 1.75 m, for scale. On the Arabic page a man in a white kandura, ghutra and agal;
   // on the English page a man in a suit and tie. He always faces the viewer.
   function buildPerson(T, g, kind) {
-    while (g.children.length) { var old = g.children[0]; g.remove(old); old.geometry.dispose(); }
+    while (g.children.length) { var old = g.children[0]; g.remove(old); old.traverse(function (o) { if (o.geometry) o.geometry.dispose(); }); }
+    g.userData.wave = null;
     var mats = g.userData.mats || (g.userData.mats = {});
-    function add(geo, col, x, y, z, both) {
+    function add(geo, col, x, y, z, both, parent) {
       var key = col + (both ? 'd' : ''), m = mats[key] || (mats[key] = new T.MeshLambertMaterial({ color: col, side: both ? T.DoubleSide : T.FrontSide }));
-      var mesh = new T.Mesh(geo, m); mesh.position.set(x || 0, y || 0, z || 0); g.add(mesh); return mesh;
+      var mesh = new T.Mesh(geo, m); mesh.position.set(x || 0, y || 0, z || 0); (parent || g).add(mesh); return mesh;
+    }
+    // a round limb from point a to point b, in the given parent's space
+    var UP = new T.Vector3(0, 1, 0), va = new T.Vector3(), vb = new T.Vector3();
+    function limb(a, b, r0, r1, col, parent) {
+      va.fromArray(a); vb.fromArray(b); var len = va.distanceTo(vb);
+      var m = add(new T.CylinderGeometry(r1, r0, len, 12), col, (a[0] + b[0]) / 2, (a[1] + b[1]) / 2, (a[2] + b[2]) / 2, false, parent);
+      m.quaternion.setFromUnitVectors(UP, vb.sub(va).normalize()); return m;
     }
     var SKIN = 0xC99873, HAIR = 0x2A211B, EYE = 0x20242E, PI = Math.PI;
     add(new T.CylinderGeometry(.046, .05, .09, 12), SKIN, 0, 1.47, 0);
@@ -494,13 +502,24 @@
       add(new T.SphereGeometry(r + .004, 12, 10), col, s * .205, 1.365, 0);
       add(new T.SphereGeometry(.044, 10, 8), SKIN, s * .264, .765, 0);
     }
+    // his right arm raised in greeting: the upper arm out to the side, the forearm up from a pivot at the elbow that the
+    // viewer swings a little each frame (g.userData.wave). He faces +z, so his right is -x.
+    function waveArm(col, r) {
+      add(new T.SphereGeometry(r + .004, 12, 10), col, -.205, 1.365, 0);
+      limb([-.215, 1.36, 0], [-.42, 1.2, .04], r, r - .004, col);
+      var el = new T.Group(); el.position.set(-.42, 1.2, .04); g.add(el); g.userData.wave = el;
+      add(new T.SphereGeometry(r - .002, 10, 8), col, 0, 0, 0, false, el);
+      limb([0, 0, 0], [-.01, .3, .02], r - .004, r - .012, col, el);
+      add(new T.SphereGeometry(.046, 10, 8), SKIN, -.012, .355, .025, false, el).scale.set(.8, 1.15, .45);   // the open palm
+      add(new T.BoxGeometry(.03, .06, .02), SKIN, .03, .33, .025, false, el).rotation.z = -.6;               // the thumb
+    }
     if (kind === 'kandura') {
       // the whites are kept a shade under pure white, so the light can round them instead of flattening them
       var W = 0xE6E3DA, W2 = 0xC9C4B7, GH = 0xF1EFEA, AGAL = 0x14161B;
       add(new T.CylinderGeometry(.185, .235, 1.36, 22), W, 0, .76, 0).scale.z = .62;                        // the kandura, to the ankle
       add(new T.SphereGeometry(.2, 18, 10, 0, PI * 2, 0, PI / 2), W, 0, 1.4, 0).scale.set(1.04, .3, .66);    // shoulders
       [-1, 1].forEach(function (s) {
-        arm(s, W, .056);
+        if (s > 0) arm(s, W, .056); else waveArm(W, .056);
         add(new T.BoxGeometry(.09, .03, .22), 0x5A4632, s * .085, .016, .07);                               // sandal
         add(new T.BoxGeometry(.07, .034, .1), SKIN, s * .085, .046, .12);                                   // toes
       });
@@ -576,6 +595,25 @@
 
     // a 1.75 m person in front of the unit, for scale
     var person = new T.Group(); root.add(person); buildPerson(T, person, opts.person || 'kandura');
+    // The person as a photograph: a plane that turns with the camera (person.rotation.y = az), its feet on the floor.
+    // Cut out with alpha; alphaTest keeps it solid against the see-through walls, which never write depth.
+    // While the picture loads, or if it fails, the drawn figure stands in.
+    var photo = new T.Mesh(new T.PlaneGeometry(1, 1).translate(0, .5, 0), new T.MeshBasicMaterial({ transparent: false, alphaTest: .5, side: T.DoubleSide }));
+    photo.visible = false; photo.renderOrder = 5; root.add(photo);
+    var texLoader = new T.TextureLoader(), photoSrc = '';
+    function setPhoto(p) {
+      var src = p && p.src || '';
+      if (src === photoSrc) return; photoSrc = src;
+      photo.visible = false; person.visible = true;
+      if (!src) return;
+      texLoader.load(src, function (tex) {
+        if (photoSrc !== src) { tex.dispose(); return; }
+        if (photo.material.map) photo.material.map.dispose();
+        tex.anisotropy = 4; photo.material.map = tex; photo.material.needsUpdate = true;
+        var h = p.h || 1.78; photo.scale.set(h * tex.image.width / tex.image.height, h, 1);
+        photo.visible = true; person.visible = false;
+      }, undefined, function () { if (photoSrc === src) { photo.visible = false; person.visible = true; } });
+    }
 
     var itemMat = new T.MeshLambertMaterial({ vertexColors: true, transparent: true, opacity: 1 });
     var items = null;
@@ -648,7 +686,8 @@
         var n = m.userData.n, facing = n[0] * cx + n[1] * cz, target = facing > 0.12 && opened ? 0 : 0.97;
         m.material.opacity += (target - m.material.opacity) * 0.18; m.visible = !st.open && m.material.opacity > 0.02;
       });
-      person.rotation.y = az;
+      person.rotation.y = az; photo.position.copy(person.position); photo.rotation.y = az;
+      if (person.userData.wave) person.userData.wave.rotation.z = opts.still ? -.12 : -.12 + Math.sin(now / 240) * .26 * (Math.sin(now / 1900) > -.2 ? 1 : .15);
       // dimension lines sit on the sides that face the camera, and glide over when the unit is turned
       var sx = cx >= 0 ? 1 : -1, sz = cz >= 0 ? 1 : -1, tz = sz * (st.d / 2 + .68), tx = sx * (st.w / 2 + .4), hx = sx * sz * (st.w / 2 + .12);
       if (st.dimInit) { st.bz += (tz - st.bz) * .2; st.bx += (tx - st.bx) * .2; st.hx += (hx - st.hx) * .2; } else { st.bz = tz; st.bx = tx; st.hx = hx; st.dimInit = true; }
@@ -656,6 +695,14 @@
       renderer.render(scene, cam);
       place(labels[0], -st.w * .22, .02, st.bz); place(labels[1], st.bx, .02, 0); place(labels[2], st.hx, HH * .6, -st.d / 2 - .12);
       labels.forEach(function (lb) { lb.style.display = st.open ? 'none' : ''; });
+      // the character's card floats above his head, kept inside the stage
+      if (st.card) {
+        v3.set(person.position.x, photo.visible ? photo.scale.y + .12 : 2.05, person.position.z).project(cam);
+        var cw = st.card.offsetWidth, chh = st.card.offsetHeight, px = (v3.x * .5 + .5) * st.size.w, py = (-v3.y * .5 + .5) * st.size.h - chh - 6;
+        px = Math.max(cw / 2 + 8, Math.min(st.size.w - cw / 2 - 8, px)); py = Math.max(8, py);
+        st.card.style.transform = 'translate(' + (px - cw / 2).toFixed(1) + 'px,' + py.toFixed(1) + 'px)';
+        st.card.style.setProperty('--tip', Math.max(14, Math.min(cw - 14, (v3.x * .5 + .5) * st.size.w - (px - cw / 2))).toFixed(1) + 'px');
+      }
     }
     // drag to rotate (horizontal drag only on touch, so the page still scrolls); a short tap opens or closes the door
     canvasEl.addEventListener('pointerdown', function (e) { st.drag = { x: e.clientX, y: e.clientY, az: st.az, el: st.el, mouse: e.pointerType === 'mouse', t: performance.now(), moved: 0 }; st.user = performance.now(); try { canvasEl.setPointerCapture(e.pointerId); } catch (_) {} if (opts.onUser) opts.onUser(); });
@@ -682,6 +729,8 @@
         labels[0].textContent = texts.w; labels[1].textContent = texts.d; labels[2].textContent = texts.h;
       },
       setLabels: function (texts) { labels[0].textContent = texts.w; labels[1].textContent = texts.d; labels[2].textContent = texts.h; },
+      setCard: function (el) { st.card = el || null; },
+      setPhoto: setPhoto,
       setPerson: function (kind) { if (kind !== st.person) { st.person = kind; buildPerson(T, person, kind); } },
       setItems: function (on) { st.showItems = on; buildItems(); if (!on) st.pop = 1; },
       setLid: function (open, instant) { st.lidT = open ? 1 : 0; if (instant) st.lid = st.lidT; },
@@ -691,5 +740,8 @@
     };
   };
 
+  // shared with the TRAVEL -> RAVEL film (motion.js), so its storage unit is drawn by the same code as the viewer's
+  RV3D.BoxBatch = BoxBatch; RV3D.addItem = addItem; RV3D.buildPerson = buildPerson; RV3D.mk = mk; RV3D.rr = rr;
+  RV3D.paint = { ribs: ribs, steel: steel, floor: paintFloor };
   window.RV3D = RV3D;
 })();
