@@ -627,3 +627,47 @@ main{position:relative;z-index:1;overflow-x:clip}
 .qother label{font:700 15.5px/1.6 var(--f-display)}
 .qother textarea{width:100%;min-height:66px;padding:9px 14px;border:1.5px solid var(--grey-200);border-radius:var(--r-ctl);background:#fff;color:var(--navy);font:400 16px/1.6 var(--f-text);resize:vertical;transition:border-color .2s ease,box-shadow .2s ease}
 .qother textarea:focus{outline:0;border-color:var(--cyan);box-shadow:0 0 0 4px rgba(46,197,255,.22)}
+
+/* ---------- the opening film: on a phone held upright the scroll plays a filmed walk ---------- */
+.film .hero{height:340vh;height:340svh}
+.stage__film,.stage__real{position:absolute;inset:0;width:100%;height:100%;max-width:none;object-fit:cover;object-position:50% 38%;opacity:0;pointer-events:none}
+.stage__film{display:block;transform-origin:50% 34%;transition:opacity .5s ease;will-change:transform}
+.stage.is-film .stage__film{opacity:1}
+.stage.is-film .stage__poster{visibility:hidden;transition:visibility 0s .55s}
+/* the first frame stands still until the film takes over, so the two never disagree */
+@media (max-width:600px) and (orientation:portrait) and (prefers-reduced-motion:no-preference){.stage__poster{animation:none}}
+.filmbar{position:absolute;z-index:1;left:max(14px,env(safe-area-inset-left,0px));right:max(14px,env(safe-area-inset-right,0px));bottom:max(16px,env(safe-area-inset-bottom,0px));display:flex;align-items:center;gap:12px;padding:11px 12px 10px 16px;border-radius:22px;background:rgba(8,18,38,.82);color:#fff;opacity:0;will-change:opacity,transform}
+[dir="rtl"] .filmbar{padding:11px 16px 10px 12px}
+.filmbar__steps{flex:1;display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:0;padding:0;list-style:none}
+.filmbar__steps li{position:relative;padding-top:10px;color:rgba(255,255,255,.5);font:700 12.5px/1.5 var(--f-display);white-space:nowrap;transition:color .3s ease}
+.filmbar__steps li.is-on{color:#fff}
+.filmbar__steps li::before,.filmbar__steps li::after{content:"";position:absolute;top:0;left:0;right:0;height:3px;border-radius:3px;background:rgba(255,255,255,.2)}
+.filmbar__steps li::after{background:var(--cyan);transform:scaleX(var(--k,0));transform-origin:0 50%}
+[dir="rtl"] .filmbar__steps li::after{transform-origin:100% 50%}
+.filmbar__skip{flex:none;padding:5px 15px;border-radius:999px;background:rgba(255,255,255,.14);color:#fff;font:700 13px/1.7 var(--f-display);text-decoration:none}
+.filmbar__note{position:absolute;inset-inline-start:6px;bottom:calc(100% + 7px);padding:0 10px;border-radius:999px;background:rgba(8,18,38,.6);color:rgba(255,255,255,.86);font:600 11px/1.9 var(--f-text);transition:opacity .3s ease}
+.filmbar.is-real .filmbar__note{opacity:0}
+
+/* ---------- feature cards carry a photograph; the drawn scenes stay for visitors saving data ---------- */
+.fcard__ph{display:none}
+.deck__note{display:none;opacity:.75}
+.ph .deck__note{display:block}
+.ph .fcard{aspect-ratio:5/6}
+.ph .fcard__in{position:relative;justify-content:flex-end;padding:20px 20px 22px;background:var(--navy-deep);color:#fff;box-shadow:0 0 0 1px rgba(255,255,255,.16),0 26px 60px rgba(0,0,0,.42)}
+.ph .fcard__art{position:absolute;inset:0;aspect-ratio:auto;border-radius:28px;overflow:hidden}
+.ph .fcard__art .scene{display:none}
+.ph .fcard__ph{display:block;position:absolute;inset:0;width:100%;height:100%;max-width:none;object-fit:cover}
+.ph .fcard__art::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(8,18,38,0) 30%,rgba(8,18,38,.66) 58%,rgba(8,18,38,.95) 100%)}
+.ph .fcard__n{top:16px;inset-inline-end:16px}
+.ph .fcard__t,.ph .fcard__d,.ph .fcard .badge{position:relative}
+.ph .fcard__t{margin:0 0 4px}
+.ph .fcard__d{margin:0;color:rgba(255,255,255,.84)}
+.ph .fcard .badge{margin:10px 0 0;background:rgba(255,255,255,.16);color:#fff}
+.ph.fxdeck .fcard{aspect-ratio:auto}
+.ph.fxdeck .deck{height:clamp(430px,122vw,520px)}
+.ph.fxdeck .fcard__art{-webkit-transform:none;transform:none;box-shadow:none}
+.ph.fxdeck .fcard__t{-webkit-transform:translateZ(34px);transform:translateZ(34px)}
+.ph.fxdeck .fcard__d,.ph.fxdeck .fcard .badge{-webkit-transform:translateZ(22px);transform:translateZ(22px)}
+.ph.fxdeck .fcard.is-top .fcard__ph{animation:drift 14s ease-in-out infinite alternate}
+@keyframes drift{from{transform:scale(1)}to{transform:scale(1.09)}}
+@media (min-width:860px){.ph.fxdeck .deck{height:540px}}

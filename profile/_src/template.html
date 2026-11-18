@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="rtl" class="ph">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -18,7 +18,8 @@
 <meta property="og:locale:alternate" content="en_AE">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="assets/img/favicon.png">
-<link rel="preload" as="image" href="assets/img/corridor.webp" type="image/webp" fetchpriority="high">
+<link rel="preload" as="image" href="assets/img/film-poster.webp" type="image/webp" fetchpriority="high" media="(max-width:600px) and (orientation:portrait) and (prefers-reduced-motion:no-preference)">
+<link rel="preload" as="image" href="assets/img/corridor.webp" type="image/webp" fetchpriority="high" media="not all and (max-width:600px) and (orientation:portrait) and (prefers-reduced-motion:no-preference)">
 <link rel="preload" as="font" type="font/woff2" href="assets/fonts/kufi-ar.woff2" crossorigin>
 <link rel="stylesheet" href="assets/css/style.css">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"SelfStorage","name":"Ravel Storage","alternateName":"رافل للتخزين","url":"https://ravelstorage.com","telephone":"+971503250551","email":"info@ravelstorage.com","address":{"@type":"PostalAddress","addressLocality":"Abu Dhabi","addressCountry":"AE"},"areaServed":"Abu Dhabi","sameAs":["https://www.instagram.com/ravelstorage/"]}</script>
@@ -106,10 +107,13 @@
   <div class="hero__sticky">
     <div class="stage" id="stage" aria-hidden="true">
       <picture>
+        <source media="(max-width:600px) and (orientation:portrait) and (prefers-reduced-motion:no-preference)" srcset="assets/img/film-poster.webp" type="image/webp">
         <source srcset="assets/img/corridor.webp" type="image/webp">
         <img class="stage__poster" id="poster" src="assets/img/corridor.jpg" alt="" width="941" height="1672" decoding="async">
       </picture>
       <canvas class="stage__canvas" id="corridor"></canvas>
+      <canvas class="stage__film" id="film" width="720" height="1280"></canvas>
+      <img class="stage__real" id="filmReal" alt="" width="720" height="1280" decoding="async">
       <div class="stage__white" id="stageWhite"></div>
     </div>
     <div class="hero__top" id="heroTop">
@@ -128,6 +132,15 @@
         <a class="btn btn--wa" id="heroContact" href="#contact" target="_blank" rel="noopener"><svg class="ic"><use href="#i-chat"/></svg><span data-i18n="hero.cta2"></span></a>
       </div>
       <a class="hero__hint" href="#service"><span data-i18n="hero.hint"></span><svg class="ic"><use href="#i-chev"/></svg></a>
+    </div>
+    <div class="filmbar" id="filmBar" hidden>
+      <ol class="filmbar__steps" aria-hidden="true">
+        <li><span data-i18n="film.s1"></span></li>
+        <li><span data-i18n="film.s2"></span></li>
+        <li><span data-i18n="film.s3"></span></li>
+      </ol>
+      <a class="filmbar__skip" href="#service" data-i18n="film.skip"></a>
+      <span class="filmbar__note" data-i18n="film.note"></span>
     </div>
   </div>
 </section>
@@ -321,6 +334,7 @@
             <rect x="186" y="108" width="40" height="32" rx="6" fill="#2EC5FF"/>
             <circle cx="206" cy="121" r="4" fill="#152249"/><rect x="204.500" y="121" width="3" height="10" rx="1.500" fill="#152249"/>
             </svg>
+            <picture><source srcset="assets/img/feat-1.webp" type="image/webp"><img class="fcard__ph" src="assets/img/feat-1.jpg" alt="" width="720" height="900" loading="lazy" decoding="async"></picture>
           </div>
           <span class="fcard__n" aria-hidden="true">01 / 06</span>
           <h3 class="fcard__t" data-i18n="f.1t"></h3>
@@ -347,6 +361,7 @@
             <path d="M-16-16l32 32" stroke="#2EC5FF" stroke-width="3.500" stroke-linecap="round"/>
             </g>
             </svg>
+            <picture><source srcset="assets/img/feat-2.webp" type="image/webp"><img class="fcard__ph" src="assets/img/feat-2.jpg" alt="" width="720" height="900" loading="lazy" decoding="async"></picture>
           </div>
           <span class="fcard__n" aria-hidden="true">02 / 06</span>
           <h3 class="fcard__t" data-i18n="f.2t"></h3>
@@ -366,6 +381,7 @@
             <g class="sc3-sun" transform="translate(238 52)"><circle r="8" fill="#fff"/><path d="M0-16v-5M0 16v5M-16 0h-5M16 0h5M-11-11l-4-4M11-11l4-4M-11 11l-4 4M11 11l4 4" stroke="#fff" stroke-width="2.500" stroke-linecap="round"/></g>
             <path class="sc3-moon" d="M246 150a14 14 0 1 1-10-22 11 11 0 0 0 10 22z" fill="#fff"/>
             </svg>
+            <picture><source srcset="assets/img/feat-3.webp" type="image/webp"><img class="fcard__ph" src="assets/img/feat-3.jpg" alt="" width="720" height="900" loading="lazy" decoding="async"></picture>
           </div>
           <span class="fcard__n" aria-hidden="true">03 / 06</span>
           <h3 class="fcard__t" data-i18n="f.3t"></h3>
@@ -386,6 +402,7 @@
             <rect class="sc4-level" x="223" y="62" width="10" height="90" rx="5" fill="#2EC5FF"/>
             <path d="M248 52h10M248 76h7M248 100h10M248 124h7" stroke="#fff" stroke-opacity=".6" stroke-width="2.500" stroke-linecap="round"/>
             </svg>
+            <picture><source srcset="assets/img/feat-4.webp" type="image/webp"><img class="fcard__ph" src="assets/img/feat-4.jpg" alt="" width="720" height="900" loading="lazy" decoding="async"></picture>
           </div>
           <span class="fcard__n" aria-hidden="true">04 / 06</span>
           <h3 class="fcard__t" data-i18n="f.4t"></h3>
@@ -402,6 +419,7 @@
             <path d="M160 24l58 21v46c0 39-25 66-58 80-33-14-58-41-58-80V45z" fill="#152249" stroke="#fff" stroke-width="4" stroke-linejoin="round"/>
             <path class="sc5-check" d="M133 99l19 19 37-41" fill="none" stroke="#2EC5FF" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" pathLength="100"/>
             </svg>
+            <picture><source srcset="assets/img/feat-5.webp" type="image/webp"><img class="fcard__ph" src="assets/img/feat-5.jpg" alt="" width="720" height="900" loading="lazy" decoding="async"></picture>
           </div>
           <span class="fcard__n" aria-hidden="true">05 / 06</span>
           <h3 class="fcard__t" data-i18n="f.5t"></h3>
@@ -423,6 +441,7 @@
             <text x="274" y="35" font-size="13" font-weight="800" fill="#fff" class="scene__num">REC</text>
             <path d="M20 190h280" stroke="#fff" stroke-opacity=".5" stroke-width="2.500" stroke-linecap="round"/>
             </svg>
+            <picture><source srcset="assets/img/feat-6.webp" type="image/webp"><img class="fcard__ph" src="assets/img/feat-6.jpg" alt="" width="720" height="900" loading="lazy" decoding="async"></picture>
           </div>
           <span class="fcard__n" aria-hidden="true">06 / 06</span>
           <h3 class="fcard__t" data-i18n="f.6t"></h3>
@@ -436,6 +455,7 @@
       <button class="top__btn deck__btn" id="deckNext" type="button" data-i18n-attr="aria-label:f.next"><svg class="ic ic--dir"><use href="#i-arrow"/></svg></button>
     </div>
     <p class="tiny tiny--center deck__hint" data-i18n="f.hint"></p>
+    <p class="tiny tiny--center deck__note" data-i18n="f.note"></p>
     <h3 class="h3" data-i18n="f.more"></h3>
     <ul class="extras">
       <li class="card extra"><svg class="ic ic--lg"><use href="#i-fire"/></svg><b data-i18n="f.x1t"></b><span data-i18n="f.x1d"></span></li>

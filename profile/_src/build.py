@@ -5,9 +5,11 @@
   python3 _src/build.py --base https://example.com/profile/   (absolute URL for the share image)
   python3 _src/build.py --artifact OUT_DIR   -> also writes a single-file preview page into OUT_DIR
 
-The preview page is self-contained: images travel inside it as data URIs, the text fonts come
-from Google Fonts and Three.js from cdnjs, so it shows correctly in viewers that cannot load
-files published next to the page.
+The preview page is self-contained: images and the frames of the opening film travel inside it as
+data URIs, the text fonts come from Google Fonts and Three.js from cdnjs, so it shows correctly in
+viewers that cannot load files published next to the page.
+
+The opening film's frames are cut by _src/film.py, which also writes _src/film.json.
 """
 import argparse, base64, html, json, os, re
 
@@ -17,6 +19,8 @@ THREE_CDN = "https://cdnjs.cloudflare.com/ajax/libs/three.js/0.149.0/three.min.j
 EARLY = ("<script>(function(d){var l='ar';try{l=localStorage.getItem('rv_lang')||'ar'}catch(e){}"
          "if(location.hash==='#en'||/[?&]lang=en/.test(location.search))l='en';"
          "d.lang=l==='en'?'en':'ar';d.dir=l==='en'?'ltr':'rtl';d.classList.add('js');"
+         # the feature cards carry photographs, unless the visitor has asked the browser to save data
+         "var c=navigator.connection;d.classList.toggle('ph',!(c&&c.saveData));"
          # motion is switched on before the first paint, and off again if the motion script never arrives
          "if(!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)){d.classList.add('fx');"
          "setTimeout(function(){if(!window.RVFX)d.classList.remove('fx')},4000)}"
@@ -38,6 +42,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--base", default="")
     ap.add_argument("--artifact", default="")
+    ap.add_argument("--title", default="Ravel Storage Profile", help="title of the preview page")
     args = ap.parse_args()
 
     S = json.loads(read("_src/strings.json"))
@@ -71,6 +76,7 @@ def main():
 
     data = dict(D)
     data["strings"] = S
+    data["film"] = json.loads(read("_src/film.json"))
     data_js = "window.RV_DATA=" + json.dumps(data, ensure_ascii=False, separators=(",", ":")) + ";"
     write(os.path.join(ROOT, "assets/js/data.js"), data_js)
 
@@ -95,7 +101,7 @@ def main():
             return 'data-img="%s"' % m.group(1)
         body = re.sub(r'src="assets/img/([a-z0-9-]+)\.(?:png|jpg|webp)"', inline_img, body)
         names.update(s["photo"] for s in D["sizes"] if s["photo"])
-        names.add("logo-white")
+        names.update(("logo-white", "film-poster", "film-real"))
         # fonts: only the digits face is embedded; the text faces come from the same families on Google Fonts
         css = read("assets/css/style.css")
         css = re.sub(r'@font-face\{font-family:"RV (?:Kufi|Plex|Mont)";[^}]*\}\n', "", css)
@@ -106,8 +112,11 @@ def main():
         adata["threeCdn"] = THREE_CDN
         adata["threeFirst"] = True
         adata["img"] = dict((n, data_uri("assets/img/%s.webp" % n, "image/webp")) for n in sorted(names))
+        # the film's frames come last in the page, after the scripts, so the page shows before they arrive
+        adata["film"] = dict(data["film"], inline=True)
+        frames = [data_uri("assets/img/film/%03d.webp" % i, "image/webp") for i in range(data["film"]["n"])]
         out = "\n".join([
-            "<title>Ravel Storage Profile</title>",
+            "<title>%s</title>" % html.escape(args.title),
             '<meta name="claude:viewport-fit-sides" content="cover">',
             EARLY,
             '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;600&family=Montserrat:wght@600;700;800&family=Noto+Kufi+Arabic:wght@600;700;800&display=swap">',
@@ -117,10 +126,11 @@ def main():
             "<script>\n" + read("assets/js/scene3d.js") + "\n</script>",
             "<script>\n" + read("assets/js/app.js") + "\n</script>",
             "<script>\n" + read("assets/js/fx.js") + "\n</script>",
+            "<script>window.RV_FILM=" + json.dumps(frames, separators=(",", ":")) + ";if(window.RVfilmReady)window.RVfilmReady();</script>",
         ])
         p = os.path.join(args.artifact, "ravel-storage-profile.html")
         write(p, out)
-        print("artifact page", len(out.encode("utf-8")), "bytes;", len(names), "images inlined")
+        print("artifact page", len(out.encode("utf-8")), "bytes;", len(names), "images and", len(frames), "film frames inlined")
 
 
 if __name__ == "__main__":

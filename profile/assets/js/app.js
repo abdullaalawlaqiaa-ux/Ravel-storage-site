@@ -647,7 +647,7 @@
     $('#liteToggle').checked = on;
     stage.classList.toggle('is-lite', on); if (on) stage.classList.remove('is-3d');
     $('#viewerStage').classList.toggle('is-lite3d', on || !viewer);
-    if (on) { if (viewer) viewer.setActive(false); } else { startCorridor(); startViewer(); }
+    if (on) { if (viewer) viewer.setActive(false); if (film && film.on) filmOff(); } else { if (filmFits) startFilm(); else startCorridor(); startViewer(); }
     renderItemsToggle(); syncViewLabel(); lastY = -1;
   }
   // without the 3D model the first tab shows a floor plan, so it is named for what it shows
@@ -695,6 +695,64 @@
     new IntersectionObserver(function (es) { if (es[0].isIntersecting) { viewerSeen = true; if (viewer) doorFirstView(); } }, { threshold: .6 }).observe($('#viewerStage'));
   } else { viewerVisible = true; viewerSeen = true; }
 
+  /* ---------------- the opening film: on a phone held upright, the scroll plays a filmed walk frame by frame ---------------- */
+  var F = D.film, film = null, filmEl = $('#film'), realEl = $('#filmReal'), filmBar = $('#filmBar'), filmSteps = $$('#filmBar li');
+  var FILM_END = .8;   // the part of the opening scroll the film takes; the rest shows the real photo, then fades to white
+  var filmFits = !!(F && filmEl && filmEl.getContext && !reduced && params.film !== '0' && window.matchMedia && window.matchMedia('(max-width:600px) and (orientation:portrait)').matches);
+  // the single-file preview carries the film's first picture inside the page
+  if (filmFits && D.img && D.img['film-poster']) poster.src = D.img['film-poster'];
+  function filmSrc(k) { return window.RV_FILM ? window.RV_FILM[k] : ASSET + 'img/film/' + ('00' + k).slice(-3) + '.webp'; }
+  function filmNearest(k) {           // the closest frame that has arrived
+    if (film.imgs[k]) return k;
+    for (var d = 1; d < F.n; d++) { if (film.imgs[k - d]) return k - d; if (film.imgs[k + d]) return k + d; }
+    return -1;
+  }
+  function drawFilm(pos) {
+    var a = Math.floor(pos), fr = pos - a, A = film.imgs[a], B = film.imgs[a + 1], ctx = film.ctx, k;
+    if (A && B && fr > .04 && fr < .96) {       // between two frames the next one is laid over the first, part-way
+      k = a + Math.round(fr * 16) / 16; if (k === film.drawn) return;
+      ctx.globalAlpha = 1; ctx.drawImage(A, 0, 0, F.w, F.h); ctx.globalAlpha = k - a; ctx.drawImage(B, 0, 0, F.w, F.h); ctx.globalAlpha = 1;
+    } else {
+      k = filmNearest(Math.round(pos)); if (k < 0 || k === film.drawn) return;
+      ctx.drawImage(film.imgs[k], 0, 0, F.w, F.h);
+    }
+    film.drawn = k;
+  }
+  function showFilm() {
+    if (!film || !film.on) return;
+    drawFilm(film.pos); stage.classList.add('is-film'); filmBar.hidden = false;
+    if (!realEl.getAttribute('src')) realEl.src = imgUrl('film-real');
+    lastP = -1;
+  }
+  function filmOff() {                // back to the still picture
+    if (film) film.on = false;
+    rootEl.classList.remove('film'); stage.classList.remove('is-film'); filmBar.hidden = true; realEl.style.opacity = 0; filmEl.style.transform = '';
+    measure();
+  }
+  function startFilm() {
+    if (state.lite || !filmFits) return;
+    if (!rootEl.classList.contains('film')) { rootEl.classList.add('film'); measure(); }
+    if (film) { film.on = true; if (film.ready) showFilm(); return; }
+    film = { on: true, ready: false, imgs: [], count: 0, fails: 0, pos: 0, drawn: -1, idle: 0, ctx: filmEl.getContext('2d') };
+    var n = F.n, order = [], seen = {}, next = 0, live = 0, first, i;
+    function add(k) { if (k >= 0 && k < n && !seen[k]) { seen[k] = 1; order.push(k); } }
+    // the opening frames first, then the whole film in passes from coarse to fine, so it can be played early
+    for (i = 0; i < 12; i++) add(i);
+    add(n - 1);
+    [8, 4, 2, 1].forEach(function (st) { for (var k = 0; k < n; k += st) add(k); });
+    first = Math.min(order.length, 13 + Math.ceil(n / 8));
+    function fail() { if (!filmFits) return; filmFits = false; filmOff(); startCorridor(); }   // no film: the drawn corridor takes over
+    function pump() {
+      while (live < 6 && next < order.length && filmFits) (function (k) {
+        var im = new Image(); live++;
+        im.onload = function () { live--; film.imgs[k] = im; film.count++; film.drawn = -1; if (!film.ready && film.count >= first) { film.ready = true; showFilm(); } pump(); };
+        im.onerror = function () { live--; if (++film.fails > 3 && !film.ready) fail(); else pump(); };
+        im.src = filmSrc(k);
+      })(order[next++]);
+    }
+    if (F.inline && !window.RV_FILM) window.RVfilmReady = pump; else pump();
+  }
+
   /* ---------------- the opening walk: scrolling the first section takes the camera to a door and through it ---------------- */
   var heroEl = $('#top'), heroTop = $('#heroTop'), heroPanel = $('#heroPanel'), whiteEl = $('#stageWhite');
   var vh = window.innerHeight, docH = 1, heroLen = 0, contactTop = 1e9, narrow = true;
@@ -740,17 +798,40 @@
       $('#topbar').classList.toggle('is-solid', y > heroLen + vh * .4);
       dock.classList.toggle('is-on', y > heroLen + vh * .5 && y < contactTop - vh * .45);
     }
-    if (!reduced && y < 12 && creep < CREEP_MAX && !doc.hidden && (state.lite || intro0 > 0)) { creep = Math.min(CREEP_MAX, creep + dt * 0.00017); lastP = -1; }
+    if (!reduced && y < 12 && creep < CREEP_MAX && !doc.hidden && (state.lite || intro0 > 0 || (film && film.on && film.ready))) { creep = Math.min(CREEP_MAX, creep + dt * 0.00017); lastP = -1; }
     if (p !== lastP) {
       lastP = p;
       // the headline panel and the logo lift away as the walk begins; the last stretch fades to white
-      var hp = seg(p, 0, .2);
+      var fo = film && film.on, hp = seg(p, 0, fo ? .085 : .2);
       heroPanel.style.transform = hp ? 'translate3d(0,' + (-80 * hp).toFixed(1) + 'px,0)' : '';
       heroPanel.style.opacity = hp ? (1 - hp).toFixed(3) : ''; heroPanel.style.pointerEvents = hp > .5 ? 'none' : '';
       heroTop.style.transform = hp ? 'translate3d(0,' + (-46 * hp).toFixed(1) + 'px,0)' : '';
       heroTop.style.opacity = hp ? (1 - hp).toFixed(3) : '';
-      whiteEl.style.opacity = seg(p, .84, .98).toFixed(3);
+      whiteEl.style.opacity = (fo ? seg(p, .93, 1) : seg(p, .84, .98)).toFixed(3);
+      if (fo) {
+        // the film closes on the real photo of the unit, then the steps under it leave
+        realEl.style.opacity = film.ready ? seg(p, FILM_END, FILM_END + .05).toFixed(3) : 0;
+        var bo = seg(p, .05, .1) * (1 - seg(p, .9, .95));
+        filmBar.style.opacity = bo.toFixed(3); filmBar.style.transform = 'translate3d(0,' + ((1 - bo) * 14).toFixed(1) + 'px,0)'; filmBar.style.pointerEvents = bo > .5 ? '' : 'none'; filmBar.style.visibility = bo > 0 ? '' : 'hidden';
+        filmBar.classList.toggle('is-real', p > FILM_END + .03);
+      }
       if (state.lite && !reduced) poster.style.transform = 'scale(' + (1 + creep / CREEP_MAX * .14 + ease(p) * 1.25).toFixed(4) + ')';
+    }
+    if (film && film.on) {
+      if (!film.ready || doc.hidden || y > heroLen + vh) return;
+      // the film follows the scroll with a little weight; at rest it settles on a whole frame
+      var ft = (F.n - 1) * seg(p, .075, FILM_END);
+      film.idle = y === film.y ? film.idle + dt : 0; film.y = y;
+      if (film.idle > 140) ft = Math.round(ft);
+      film.pos += (ft - film.pos) * (1 - Math.exp(-dt / 100)); if (Math.abs(ft - film.pos) < .015) film.pos = ft;
+      drawFilm(film.pos);
+      // resting on the first screen, the picture drifts slowly toward the door
+      var fz = 1 + .06 * (creep / CREEP_MAX) * (1 - seg(p, 0, .1));
+      if (fz !== film.z) { film.z = fz; filmEl.style.transform = fz > 1.0005 ? 'scale(' + fz.toFixed(4) + ')' : ''; }
+      // the three steps under the film fill as it plays
+      var fc = F.cuts, fk = [seg(film.pos, 0, fc[0]), seg(film.pos, fc[0], fc[1]), seg(film.pos, fc[1], F.n - 1)], fn = fk[1] <= 0 ? 0 : fk[2] <= 0 ? 1 : 2, key = fn + ':' + Math.round(fk[fn] * 100);
+      if (key !== film.bar) { film.bar = key; filmSteps.forEach(function (li, i) { li.style.setProperty('--k', i < fn ? 1 : i > fn ? 0 : fk[i].toFixed(3)); li.classList.toggle('is-on', i === fn); }); }
+      return;
     }
     // the corridor is drawn only while the opening scene is on screen
     if (state.lite || !corridor || doc.hidden || y > heroLen + vh) return;
@@ -797,11 +878,16 @@
   var storedLite = store.get('rv_lite');
   var wantLite = params.lite === '1' || (params.lite !== '0' && (storedLite === '1' || (storedLite !== '0' && (reduced || !webglOk() || (navigator.connection && navigator.connection.saveData) || (navigator.deviceMemory && navigator.deviceMemory <= 2)))));
   state.lite = wantLite; $('#liteToggle').checked = wantLite; stage.classList.toggle('is-lite', wantLite); $('#viewerStage').classList.add('is-lite3d');
+  // the film needs a longer scroll than the drawn corridor; the room is made before anything is loaded
+  if (filmFits && !wantLite) rootEl.classList.add('film');
   renderAll(); setView('3d'); measure();
   window.addEventListener('resize', remeasureSoon); window.addEventListener('orientationchange', remeasureSoon); window.addEventListener('load', measure);
   if (doc.fonts && doc.fonts.ready) doc.fonts.ready.then(remeasureSoon);
   if ('ResizeObserver' in window) new ResizeObserver(remeasureSoon).observe($('#main'));
   requestAnimationFrame(tick);
-  if (!wantLite) { if (doc.readyState === 'complete') startCorridor(); else { var kick = setTimeout(startCorridor, 900); window.addEventListener('load', function () { clearTimeout(kick); startCorridor(); }); } }
+  if (!wantLite) {
+    var opening = function () { if (filmFits) startFilm(); else startCorridor(); };
+    if (doc.readyState === 'complete') opening(); else { var kick = setTimeout(opening, 900); window.addEventListener('load', function () { clearTimeout(kick); opening(); }); }
+  }
   window.RV = { layout: buildLayout, unitFor: unitFor, state: state, measure: measure, setLite: setLite, selectSize: selectSize };
 })();

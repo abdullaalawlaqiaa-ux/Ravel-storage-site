@@ -30,6 +30,11 @@
   "hero.cta1": ["اكتشف وحدتك المناسبة", "Find your unit"],
   "hero.cta2": ["تواصل معنا", "Contact us"],
   "hero.hint": ["اسحب وامشِ في الممر", "Scroll to walk the corridor"],
+  "film.s1": ["الدخول", "Entrance"],
+  "film.s2": ["الممر", "Corridor"],
+  "film.s3": ["وحدتك", "Your unit"],
+  "film.skip": ["تخطي", "Skip"],
+  "film.note": ["مشهد توضيحي", "Illustrative scene"],
 
   "s.eyebrow": ["من نحن", "About us"],
   "s.h2": ["وحدتك الخاصة، بمفتاحك أنت", "Your private unit, your own key"],
@@ -279,6 +284,7 @@
   "f.hint": ["اسحب البطاقة لترى الميزة التالية", "Drag the card to see the next feature"],
   "f.prev": ["السابق", "Previous"],
   "f.next": ["التالي", "Next"],
+  "f.note": ["الصور توضيحية", "Illustrative images"],
 
   "j.eyebrow": ["كيف تبدأ؟", "Getting started"],
   "j.h2": ["أربع مراحل ووحدتك جاهزة", "Four stages and your unit is ready"],
