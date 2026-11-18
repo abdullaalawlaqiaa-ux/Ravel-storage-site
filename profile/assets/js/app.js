@@ -276,7 +276,7 @@
   }
   function updateViewer(instant) {
     var u = currentUnit(), layout = state.items ? buildLayout(u) : [];
-    if (viewer) { viewer.setPerson(personKind()); viewer.setUnit(u, layout, unitTexts(u), instant); }
+    if (viewer) { viewer.setPerson(personKind()); if (viewer.setPhoto) viewer.setPhoto(who() === 'rashid' ? { src: imgUrl('char-rashid'), h: 1.78 } : { src: imgUrl('char-james'), h: 1.83 }); viewer.setUnit(u, layout, unitTexts(u), instant); }
     $('#unitPlan').innerHTML = planSvg(u, layout);
   }
   function nearestPhoto(u) {
@@ -554,7 +554,7 @@
         window.RVMotion.open({
           lang: state.lang, opener: opener || null,
           items: buildLayout(unitFor(12)), unit: { w: unitFor(12).w, d: unitFor(12).d, h: D.height },
-          jamesImg: D.img && D.img['char-james'] ? D.img['char-james'] : null,
+          jamesImg: imgUrl('char-james'),
           wa: wa([plain('wa.hello'), plain('wa.ask')]), tel: 'tel:' + D.phone,
           reduced: still, low: !!lowEnd,
           onExplore: function () { selectSize(12, true); setView('3d'); $('#explorer').scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' }); },

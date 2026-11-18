@@ -595,6 +595,25 @@
 
     // a 1.75 m person in front of the unit, for scale
     var person = new T.Group(); root.add(person); buildPerson(T, person, opts.person || 'kandura');
+    // The person as a photograph: a plane that turns with the camera (person.rotation.y = az), its feet on the floor.
+    // Cut out with alpha; alphaTest keeps it solid against the see-through walls, which never write depth.
+    // While the picture loads, or if it fails, the drawn figure stands in.
+    var photo = new T.Mesh(new T.PlaneGeometry(1, 1).translate(0, .5, 0), new T.MeshBasicMaterial({ transparent: false, alphaTest: .5, side: T.DoubleSide }));
+    photo.visible = false; photo.renderOrder = 5; root.add(photo);
+    var texLoader = new T.TextureLoader(), photoSrc = '';
+    function setPhoto(p) {
+      var src = p && p.src || '';
+      if (src === photoSrc) return; photoSrc = src;
+      photo.visible = false; person.visible = true;
+      if (!src) return;
+      texLoader.load(src, function (tex) {
+        if (photoSrc !== src) { tex.dispose(); return; }
+        if (photo.material.map) photo.material.map.dispose();
+        tex.anisotropy = 4; photo.material.map = tex; photo.material.needsUpdate = true;
+        var h = p.h || 1.78; photo.scale.set(h * tex.image.width / tex.image.height, h, 1);
+        photo.visible = true; person.visible = false;
+      }, undefined, function () { if (photoSrc === src) { photo.visible = false; person.visible = true; } });
+    }
 
     var itemMat = new T.MeshLambertMaterial({ vertexColors: true, transparent: true, opacity: 1 });
     var items = null;
@@ -667,7 +686,7 @@
         var n = m.userData.n, facing = n[0] * cx + n[1] * cz, target = facing > 0.12 && opened ? 0 : 0.97;
         m.material.opacity += (target - m.material.opacity) * 0.18; m.visible = !st.open && m.material.opacity > 0.02;
       });
-      person.rotation.y = az;
+      person.rotation.y = az; photo.position.copy(person.position); photo.rotation.y = az;
       if (person.userData.wave) person.userData.wave.rotation.z = opts.still ? -.12 : -.12 + Math.sin(now / 240) * .26 * (Math.sin(now / 1900) > -.2 ? 1 : .15);
       // dimension lines sit on the sides that face the camera, and glide over when the unit is turned
       var sx = cx >= 0 ? 1 : -1, sz = cz >= 0 ? 1 : -1, tz = sz * (st.d / 2 + .68), tx = sx * (st.w / 2 + .4), hx = sx * sz * (st.w / 2 + .12);
@@ -678,7 +697,7 @@
       labels.forEach(function (lb) { lb.style.display = st.open ? 'none' : ''; });
       // the character's card floats above his head, kept inside the stage
       if (st.card) {
-        v3.set(person.position.x, 2.05, person.position.z).project(cam);
+        v3.set(person.position.x, photo.visible ? photo.scale.y + .12 : 2.05, person.position.z).project(cam);
         var cw = st.card.offsetWidth, chh = st.card.offsetHeight, px = (v3.x * .5 + .5) * st.size.w, py = (-v3.y * .5 + .5) * st.size.h - chh - 6;
         px = Math.max(cw / 2 + 8, Math.min(st.size.w - cw / 2 - 8, px)); py = Math.max(8, py);
         st.card.style.transform = 'translate(' + (px - cw / 2).toFixed(1) + 'px,' + py.toFixed(1) + 'px)';
@@ -711,6 +730,7 @@
       },
       setLabels: function (texts) { labels[0].textContent = texts.w; labels[1].textContent = texts.d; labels[2].textContent = texts.h; },
       setCard: function (el) { st.card = el || null; },
+      setPhoto: setPhoto,
       setPerson: function (kind) { if (kind !== st.person) { st.person = kind; buildPerson(T, person, kind); } },
       setItems: function (on) { st.showItems = on; buildItems(); if (!on) st.pop = 1; },
       setLid: function (open, instant) { st.lidT = open ? 1 : 0; if (instant) st.lid = st.lidT; },
