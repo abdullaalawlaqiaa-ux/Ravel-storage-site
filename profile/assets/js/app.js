@@ -230,7 +230,7 @@
     if (u.price) h += '<span class="pricebox__v">' + fmt(u.price) + ' <small>' + t('cur') + ' / ' + t('perMonth') + '</small></span><span class="pricebox__d">' + t('u.otherTerms') + '</span>';
     else h += '<span class="pricebox__q">' + t('u.quote') + '</span><span class="pricebox__d">' + t('u.quoteNote') + '</span>';
     h += '</div>';
-    h += '<p class="tiny">' + (u.price ? t('u.priceNote') + ' ' : '') + t('u.ac') + '</p>';
+    if (u.price) h += '<p class="tiny">' + t('u.priceNote') + '</p>';
     h += '<div class="unitinfo__actions"><a class="btn btn--wa" id="unitWa" target="_blank" rel="noopener" href="' + wa(unitLines(u)) + '">' + icon('i-chat') + '<span>' + t('u.cta') + '</span></a>';
     h += '<button class="btn btn--ghost btn--save" id="saveBtn" type="button" aria-pressed="' + saved + '">' + icon('i-save') + '<span>' + t(saved ? 'u.saved' : 'u.save') + '</span></button>';
     if (!u.price) h += '<a class="btn btn--line unitinfo__call" href="tel:' + D.phone + '">' + icon('i-phone') + '<span>' + t('u.callAsk') + '</span><span class="num" dir="ltr">' + D.phoneDisplay + '</span></a>';
@@ -626,6 +626,24 @@
     else if (e.pointerType === 'mouse') lookT = clamp((.5 - e.clientX / Math.max(1, window.innerWidth)) * .14, -.07, .07);
   });
   ['pointerup', 'pointercancel', 'pointerleave'].forEach(function (n) { stage.addEventListener(n, function () { lookFrom = null; lookT = 0; }); });
+  // Tapping the scroll cue takes the walk for the visitor: the page scrolls through the opening section at walking pace.
+  // Any touch, wheel or key hands the scroll back at once.
+  var autoWalk = 0;
+  function stopAutoWalk() { if (!autoWalk) return; cancelAnimationFrame(autoWalk); autoWalk = 0; rootEl.style.scrollBehavior = ''; }
+  $('#heroHint').addEventListener('click', function (e) {
+    if (reduced || heroLen < 40) return;   // with no walk to show, the link simply leads to the next section
+    e.preventDefault(); stopAutoWalk();
+    var y0 = window.pageYOffset || rootEl.scrollTop || 0, y1 = $('#service').getBoundingClientRect().top + y0, t0 = 0;
+    var dur = clamp((y1 - y0) / vh * 2400, 1200, 8000);
+    rootEl.style.scrollBehavior = 'auto';
+    autoWalk = requestAnimationFrame(function step(now) {
+      if (!t0) t0 = now;
+      var k = Math.min(1, (now - t0) / dur), e2 = k < .15 ? k * k / .255 : k > .85 ? 1 - (1 - k) * (1 - k) / .255 : (k - .075) / .85;
+      window.scrollTo(0, y0 + (y1 - y0) * e2);
+      if (k < 1) autoWalk = requestAnimationFrame(step); else { autoWalk = 0; rootEl.style.scrollBehavior = ''; }
+    });
+  });
+  ['touchstart', 'wheel', 'keydown', 'mousedown'].forEach(function (n) { window.addEventListener(n, stopAutoWalk, { passive: true }); });
   function tick(now) {
     requestAnimationFrame(tick);
     var y = window.pageYOffset || rootEl.scrollTop || 0, dt = Math.min(80, now - (lastT || now)); lastT = now;

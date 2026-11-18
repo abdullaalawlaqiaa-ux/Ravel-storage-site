@@ -133,16 +133,22 @@ main{position:relative;z-index:1;overflow-x:clip}
 @keyframes walkin{from{transform:scale(1)}to{transform:scale(1.28)}}
 .hero__top,.hero__panel{position:relative;z-index:1;will-change:transform,opacity}
 .hero__top{display:flex;justify-content:center;padding-top:64px}
-.hero__logo{display:block;width:clamp(132px,38vw,190px);height:auto;padding:12px 20px 10px;border-radius:20px;background:#fff;box-shadow:0 18px 44px rgba(11,31,58,.2);animation:drop .8s var(--ease) both}
-.hero__panel{margin-bottom:10px;padding:24px 22px 10px;border-radius:var(--r-sheet);background:var(--navy);color:#fff;box-shadow:0 26px 60px rgba(11,31,58,.38);animation:rise .9s var(--ease) .1s both}
+.hero__logo{display:block;width:clamp(128px,36vw,184px);height:auto;filter:drop-shadow(0 0 1.5px #fff) drop-shadow(0 0 7px #fff) drop-shadow(0 0 22px rgba(255,255,255,.9));animation:drop .8s var(--ease) both}
+.hero__panel{margin-bottom:10px;padding:24px 22px 16px;border-radius:var(--r-sheet);background:var(--navy);color:#fff;box-shadow:0 26px 60px rgba(11,31,58,.38);animation:rise .9s var(--ease) .1s both}
 .hero__h1{margin:0 0 8px;font:800 clamp(27px,7.9vw,52px)/1.45 var(--f-display)}
 .hero__sub{margin:0 0 14px;max-width:48ch;color:var(--grey-300);font-size:15.5px;line-height:1.8}
 .chips{list-style:none;display:flex;flex-wrap:wrap;gap:6px;margin:0 0 14px;padding:0}
 .chip{padding:3px 10px;border:1px solid rgba(255,255,255,.3);border-radius:999px;font:600 13px/1.7 var(--f-text);white-space:nowrap}
 .chip b{color:var(--cyan);font:800 14px/1 var(--f-num)}
 .hero__cta{display:grid;grid-template-columns:1fr;gap:9px}
-.hero__hint{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:6px;padding:8px;color:var(--grey-300);font-size:13.5px;text-decoration:none}
-.hero__hint .ic{width:18px;height:18px;animation:nudge 1.6s ease-in-out infinite}
+/* the scroll cue is the loudest thing on the panel after the headline: a visitor who does not know the page scrolls
+   would otherwise leave by the contact button without seeing the walk */
+.hero__hint{position:relative;display:flex;align-items:center;justify-content:center;gap:10px;min-height:50px;margin-top:11px;padding:8px 16px;border:1.5px solid var(--cyan);border-radius:999px;background:rgba(46,197,255,.16);color:#fff;font:700 16px/1.5 var(--f-display);text-decoration:none;-webkit-tap-highlight-color:transparent}
+.hero__hint::after{content:"";position:absolute;inset:-2px;border:2px solid var(--cyan);border-radius:inherit;opacity:0;pointer-events:none;animation:breathe 2.2s ease-out 1.6s infinite}
+.hero__hint-ic{flex:none;display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--cyan);color:var(--navy);overflow:hidden}
+.hero__hint-ic .ic{grid-area:1/1;width:19px;height:19px;stroke-width:2.6;animation:hintdown 1.5s cubic-bezier(.4,0,.6,1) infinite}
+.hero__hint-ic .ic + .ic{animation-delay:.75s}
+@keyframes hintdown{0%{opacity:0;transform:translateY(-9px)}35%,65%{opacity:1}100%{opacity:0;transform:translateY(9px)}}
 /* the panel's contents arrive one after another once the headline has risen */
 .fx .hero__sub,.fx .chips .chip,.fx .hero__cta,.fx .hero__hint{opacity:0;transform:translateY(14px);transition:opacity .6s ease,transform .7s var(--ease-out)}
 .fx .hero.is-in .hero__sub{opacity:1;transform:none;transition-delay:.55s}
@@ -150,6 +156,7 @@ main{position:relative;z-index:1;overflow-x:clip}
 .fx .hero.is-in .hero__cta{opacity:1;transform:none;transition-delay:1s}
 .fx .hero.is-in .hero__hint{opacity:1;transform:none;transition-delay:1.25s}
 @media (min-width:360px){.hero__cta{grid-template-columns:1.42fr 1fr}.hero__cta .btn{padding-inline:8px;font-size:14.5px;white-space:nowrap}}
+@media (min-width:360px) and (max-width:389px){.hero__cta .btn{padding-inline:6px;font-size:13px}}
 @media (max-height:640px){.hero__top{padding-top:58px}.hero__sub{display:none}.hero__logo{width:124px}}
 @media (min-width:860px){
   .hero__sticky{padding-left:max(32px,env(safe-area-inset-left,0px));padding-right:max(32px,env(safe-area-inset-right,0px))}
@@ -298,7 +305,6 @@ main{position:relative;z-index:1;overflow-x:clip}
 .fitsline{display:flex;align-items:flex-start;gap:10px}
 .fitsline .ic{margin-top:4px}
 .fitsline b{display:block;font:700 16.5px/1.7 var(--f-display)}
-.fitsline b small,.grow__t small{display:block;color:var(--ink-muted);font:600 13px/1.7 var(--f-text)}
 .fitsline__n{display:block;margin-top:3px;color:var(--ink-muted)}
 .pricebox{display:grid;gap:1px;padding:15px 18px;border-radius:18px;background:var(--navy);color:#fff}
 .pricebox__l{color:var(--grey-300);font-size:13px}
