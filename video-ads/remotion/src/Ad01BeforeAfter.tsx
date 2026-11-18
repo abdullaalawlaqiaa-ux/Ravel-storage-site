@@ -65,7 +65,7 @@ export const Ad01BeforeAfter: React.FC = () => {
       <Video src={staticFile("ad01/bg.mp4")} muted />
 
       {/* Hook — top safe zone (y 260+), above the man's head */}
-      <AbsoluteFill style={{ alignItems: "center", paddingTop: 250, opacity: hookOut }}>
+      <AbsoluteFill style={{ alignItems: "center", paddingTop: 290, opacity: hookOut }}>
         <Pill style={{ paddingBottom: 12, paddingTop: 8 }}>
           <div style={{ fontSize: 150, fontWeight: 800, color: NAVY, lineHeight: 1.1, textAlign: "center" }}>
             <Stretched before="زحـ" after="مة؟" count={hookK} />
@@ -92,7 +92,7 @@ export const Ad01BeforeAfter: React.FC = () => {
           <Pill style={{ padding: "14px 40px 20px" }}>
             <div style={{ fontSize: 100, fontWeight: 800, color: NAVY, display: "flex", gap: 22, alignItems: "baseline" }}>
               <span>البيت</span>
-              <span style={{ display: "inline-block", scale: `${squeeze} 1`, transformOrigin: "center" }}>ضاق</span>
+              <span style={{ display: "inline-block", scale: `${squeeze} 1`, transformOrigin: "center", marginInline: (squeeze - 1) * 75 }}>ضاق</span>
               <span>عليك؟</span>
             </div>
           </Pill>
@@ -100,7 +100,7 @@ export const Ad01BeforeAfter: React.FC = () => {
       </AbsoluteFill>
 
       {/* End card — line at top, logo card on the floor below the sofa */}
-      <AbsoluteFill style={{ alignItems: "center", paddingTop: 250, opacity: endOut }}>
+      <AbsoluteFill style={{ alignItems: "center", paddingTop: 290, opacity: endOut }}>
         <div style={{ opacity: endIn, translate: `0px ${interpolate(endIn, [0, 1], [26, 0])}px` }}>
           <Pill>
             <div style={{ fontSize: 100, fontWeight: 800, color: NAVY, display: "flex", gap: 24, alignItems: "baseline" }}>
@@ -111,7 +111,7 @@ export const Ad01BeforeAfter: React.FC = () => {
           </Pill>
         </div>
       </AbsoluteFill>
-      <AbsoluteFill style={{ alignItems: "center", paddingTop: 1250, opacity: endOut }}>
+      <AbsoluteFill style={{ alignItems: "center", paddingTop: 1160, opacity: endOut }}>
         <div style={{ opacity: logoIn, translate: `0px ${interpolate(logoIn, [0, 1], [20, 0])}px` }}>
           <div
             style={{
@@ -124,7 +124,7 @@ export const Ad01BeforeAfter: React.FC = () => {
               boxShadow: "0 18px 50px rgba(21,34,73,0.14)",
             }}
           >
-            <Img src={staticFile("ad01/logo.png")} style={{ width: 300 }} />
+            <Img src={staticFile("ad01/logo.png")} style={{ width: 260 }} />
             <div style={{ marginTop: 14, fontSize: 44, fontWeight: 500, color: NAVY, direction: "ltr" }}>
               WhatsApp 050 325 0551
             </div>
