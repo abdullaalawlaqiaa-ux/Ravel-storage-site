@@ -231,15 +231,26 @@ def build(unit, fac, cam_cfg):
     sc.world = world
 
     # ---------------------------------------------------------------- camera
+    # Same method for every unit: standing in the corridor, eye height, gentle downward tilt
+    # (like a hand-held photo). The annotated image only adds sensor area ABOVE the clean frame
+    # (lens shift), so every pixel of the clean photo is identical in both versions.
     h, dist = cam_cfg["eye_height_m"], cam_cfg["distance_from_facade_m"]
-    f = cam_cfg["focal_length_mm_ff_equiv"]
+    f, tilt = cam_cfg["focal_length_mm_ff_equiv"], math.radians(cam_cfg["tilt_down_deg"])
     cw, ch = cam_cfg["clean_width_px"], cam_cfg["clean_height_px"]
+    C = Vector((cam_cfg["lateral_offset_m"], -t - dist, h))
+    fwd = Vector((0, math.cos(tilt), -math.sin(tilt)))
+    up = Vector((0, math.sin(tilt), math.cos(tilt)))
+
+    def slope(p):
+        v = Vector(p) - C
+        return v.dot(up) / v.dot(fwd)
+
     vrange_clean = 36.0 / f                                   # slope range of the long (vertical) side
     px_per_slope = ch / vrange_clean
-    s_bot = -h / dist - cam_cfg["floor_margin_slope"]          # corridor floor at the façade is in view
+    s_bot = slope((C.x, -t, 0.0)) - cam_cfg["floor_margin_slope"]   # floor right at the door is in view
     s_top_clean = s_bot + vrange_clean
-    D_back = dist + t + D
-    s_top_ann = (unit["allowed_height_m"] + cam_cfg["annotated_extra_top_m_above_allowed"] - h) / D_back
+    top_ann = unit["allowed_height_m"] + cam_cfg["annotated_extra_top_m_above_allowed"]
+    s_top_ann = slope((C.x, D, top_ann))
     tall_h = max(ch, int(math.ceil((s_top_ann - s_bot) * px_per_slope)))
     s_top_tall = s_bot + tall_h / px_per_slope
     vrange_tall = s_top_tall - s_bot
@@ -249,18 +260,18 @@ def build(unit, fac, cam_cfg):
     cam_data.sensor_height = vrange_tall * f
     cam_data.shift_y = ((s_top_tall + s_bot) / 2) / vrange_tall
     cam = bpy.data.objects.new("RS_Camera", cam_data)
-    cam.location = (cam_cfg["lateral_offset_m"], -t - dist, h)
-    cam.rotation_euler = (math.radians(90), 0, 0)               # level: verticals stay vertical
+    cam.location = C
+    cam.rotation_euler = (math.radians(90) - tilt, 0, 0)
     sc.collection.objects.link(cam)
     sc.camera = cam
     sc.render.resolution_x, sc.render.resolution_y = cw, tall_h
 
     camera_info = {
-        "position_m": list(cam.location), "level": True, "focal_mm_ff_equiv": f,
-        "vertical_fov_clean_deg": math.degrees(2 * math.atan(vrange_clean / 2)),
+        "position_m": list(C), "tilt_down_deg": cam_cfg["tilt_down_deg"], "focal_mm_ff_equiv": f,
+        "vertical_fov_clean_deg": math.degrees(math.atan(s_top_clean) - math.atan(s_bot)),
         "horizontal_fov_deg": math.degrees(2 * math.atan(vrange_clean * cw / ch / 2)),
         "tall_height_px": tall_h, "clean_crop_rows": [tall_h - ch, tall_h],
-        "slope_bottom": s_bot, "slope_top_clean": s_top_clean, "slope_top_tall": s_top_tall,
+        "clean_shows_back_wall_top": slope((C.x, D, H)) < s_top_clean,
     }
     return {"W": W, "D": D, "H": H, "t": t, "camera": camera_info}
 
@@ -332,7 +343,7 @@ def render(path, samples, percent):
     sc.render.resolution_percentage = percent
     sc.view_settings.view_transform = "AgX"
     sc.view_settings.look = "AgX - Medium High Contrast"
-    sc.view_settings.exposure = 0.35
+    sc.view_settings.exposure = 0.0
     sc.render.image_settings.file_format = "PNG"
     sc.render.image_settings.color_depth = "8"
     sc.render.filepath = path

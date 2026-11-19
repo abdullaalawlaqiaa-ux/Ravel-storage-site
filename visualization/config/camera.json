@@ -1,12 +1,13 @@
 {
-  "_note": "One camera method for every unit. Level camera (vertical lines stay vertical) with lens shift, human eye height, standing in the corridor facing the door. Lens = 26 mm full-frame equivalent (a normal phone main camera, same as the reference photo). Not wide-angle, no fisheye.",
-  "eye_height_m": 1.60,
-  "distance_from_facade_m": 1.75,
-  "lateral_offset_m": -0.12,
-  "focal_length_mm_ff_equiv": 26,
+  "_note": "One camera method for every unit: hand-held photo position in the corridor facing the open door, eye height, gentle downward tilt, normal 32 mm full-frame-equivalent lens (slightly longer than a phone's main camera so depth is not exaggerated). No wide-angle, no fisheye.",
+  "eye_height_m": 1.7,
+  "distance_from_facade_m": 1.9,
+  "lateral_offset_m": 0.0,
+  "focal_length_mm_ff_equiv": 32,
   "aspect": "3:4 portrait",
   "clean_width_px": 3000,
   "clean_height_px": 4000,
-  "floor_margin_slope": 0.02,
-  "annotated_extra_top_m_above_allowed": 0.30
+  "floor_margin_slope": 0.03,
+  "annotated_extra_top_m_above_allowed": 0.3,
+  "tilt_down_deg": 15
 }
