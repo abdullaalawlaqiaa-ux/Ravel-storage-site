@@ -7,8 +7,7 @@
   var W = window, doc = document;
 
   /* ============================== time and easing ============================== */
-  var DUR = 25.4, SC = [0, 3.4, 11.2, 13.6, 20.0], SKIP_TO = 24.5;
-  function clamp(x, a, b) { return x < a ? a : x > b ? b : x; }
+    function clamp(x, a, b) { return x < a ? a : x > b ? b : x; }
   function seg(x, a, b) { return clamp((x - a) / (b - a), 0, 1); }
   function lerp(a, b, f) { return a + (b - a) * f; }
   function io(x) { return x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; }
@@ -17,7 +16,7 @@
   function back(x) { var c = 1.4; return 1 + (c + 1) * Math.pow(x - 1, 3) + c * Math.pow(x - 1, 2); }
   function bell(x) { return Math.sin(Math.PI * clamp(x, 0, 1)); }
   function tw(t, a, b, e) { return (e || io)(seg(t, a, b)); }
-  function sceneOf(t) { var s = 0; for (var i = 1; i < SC.length; i++) if (t >= SC[i] - 1e-6) s = i; return s; }
+  function sceneOf(t, sc) { var s = 0; for (var i = 1; i < sc.length; i++) if (t >= sc[i] - 1e-6) s = i; return s; }
 
   /* ============================== Montserrat 800 outlines (cap height = 1), SIL OFL ============================== */
   var GLY = {"T":{"adv":0.9071,"c":[["M",0.3123,0.0,"L",0.3123,0.7758,"L",0.0057,0.7758,"L",0.0057,1.0,"L",0.902,1.0,"L",0.902,0.7758,"L",0.5954,0.7758,"L",0.5954,0.0]]},"R":{"adv":1.0571,"c":[["M",0.1,0.0,"L",0.1,1.0,"L",0.5471,1.0,"Q",0.7657,1.0,0.8836,0.9007,"Q",1.0014,0.8014,1.0014,0.63,"Q",1.0014,0.5171,0.9471,0.4343,"Q",0.8971,0.3571,0.8057,0.3143,"L",1.0214,0.0,"L",0.7186,0.0,"L",0.5371,0.2657,"L",0.3829,0.2657,"L",0.3829,0.0],["M",0.3829,0.4843,"L",0.54,0.4843,"Q",0.6286,0.4843,0.6721,0.5229,"Q",0.7157,0.5614,0.7157,0.63,"Q",0.7157,0.7,0.6721,0.7386,"Q",0.6286,0.7771,0.54,0.7771,"L",0.3829,0.7771]]},"A":{"adv":1.1229,"c":[["M",-0.02,0.0,"L",0.4214,1.0,"L",0.7,1.0,"L",1.1429,0.0,"L",0.8486,0.0,"L",0.77,0.1943,"L",0.3471,0.1943,"L",0.2686,0.0],["M",0.6871,0.4029,"L",0.5586,0.7229,"L",0.43,0.4029]]},"V":{"adv":1.0943,"c":[["M",0.4071,0.0,"L",-0.02,1.0,"L",0.2857,1.0,"L",0.5571,0.3486,"L",0.8343,1.0,"L",1.1143,1.0,"L",0.6857,0.0]]},"E":{"adv":0.96,"c":[["M",0.1,0.0,"L",0.1,1.0,"L",0.8843,1.0,"L",0.8843,0.7814,"L",0.38,0.7814,"L",0.38,0.6129,"L",0.8243,0.6129,"L",0.8243,0.4014,"L",0.38,0.4014,"L",0.38,0.2186,"L",0.9029,0.2186,"L",0.9029,0.0]]},"L":{"adv":0.8714,"c":[["M",0.1005,0.0,"L",0.1005,1.0,"L",0.3835,1.0,"L",0.3835,0.2242,"L",0.8602,0.2242,"L",0.8602,0.0]]}};
@@ -188,6 +187,158 @@
     return out;
   }
 
+  function frame(f, A) {
+    var vf = f.fov * Math.PI / 360, hf = Math.atan(Math.tan(vf) * A), az = f.az || 0, el = f.el || 0;
+    var wEff = f.w * Math.abs(Math.cos(az)) + (f.d || 0) * Math.abs(Math.sin(az));
+    var dist = Math.max(wEff / 2 / Math.tan(hf), f.h / 2 / Math.tan(vf)) / (f.fill || .8);
+    var up = (f.oy || 0) * 2 * dist * Math.tan(vf), right = (f.ox || 0) * 2 * dist * Math.tan(hf);
+    var lx = f.c[0] - right * Math.cos(az), ly = f.c[1] - up, lz = f.c[2] + right * Math.sin(az);
+    return [lx + Math.sin(az) * Math.cos(el) * dist, ly + Math.sin(el) * dist, lz + Math.cos(az) * Math.cos(el) * dist, lx, ly, lz, f.fov];
+  }
+  function blend(L, P, q) {
+    var out = {}, k;
+    for (k in L) { if (L[k] instanceof Array) out[k] = L[k].map(function (v, i) { return lerp(P[k] ? P[k][i] : v, v, q); }); else out[k] = lerp(P[k] != null ? P[k] : L[k], L[k], q); }
+    for (k in P) if (!(k in out)) out[k] = P[k] instanceof Array ? P[k] : lerp(P[k], 0, q);
+    return out;
+  }
+  // the Ravel storage unit: white ribbed walls, light grey floor, steel frame, white double door, hasp and a yellow padlock, cyan seal
+  function makeUnit(X, parent, dims, items) {
+    var T = X.T, R = X.R, canvasTex = X.canvasTex, radial = X.radial, quad = X.quad, addMat = X.addMat, softTex = X.softTex;
+    if (!Q_INV) Q_INV = new T.Quaternion();
+    var UW = dims.w, UD = dims.d, UH = dims.h, ZF = UD / 2 + .035;
+    var DW = Math.min(1.8, UW - .8), DH = Math.min(2.3, UH - .55);
+    function panelTex(w, h, m) {
+      var c = R.mk(w, h), g = c.getContext('2d'); g.fillStyle = '#F3F5F6'; g.fillRect(0, 0, w, h); R.paint.ribs(g, 0, 0, w, h, w / (m / .104), .05);
+      var ao = g.createLinearGradient(0, 0, 0, h); ao.addColorStop(0, 'rgba(30,40,52,.10)'); ao.addColorStop(.1, 'rgba(30,40,52,0)'); ao.addColorStop(.86, 'rgba(30,40,52,0)'); ao.addColorStop(1, 'rgba(30,40,52,.16)');
+      g.fillStyle = ao; g.fillRect(0, 0, w, h); var t = canvasTex(c); t.anisotropy = 4; return t;
+    }
+    var wTex = panelTex(512, 512, 3.2);
+    var wallMat = new T.MeshLambertMaterial({ map: wTex }), inMat = new T.MeshLambertMaterial({ map: wTex, color: 0xE4E8EC, side: T.BackSide });
+    var whiteMat = new T.MeshLambertMaterial({ color: 0xF4F6F8 }), steelMat = new T.MeshPhongMaterial({ color: 0x8F979F, specular: 0xffffff, shininess: 90 });
+    var fc = R.mk(256, 256), fg = fc.getContext('2d'); fg.fillStyle = '#D9DDE0'; fg.fillRect(0, 0, 256, 256);
+    var fr = fg.createRadialGradient(128, 160, 20, 128, 128, 190); fr.addColorStop(0, 'rgba(255,255,255,.55)'); fr.addColorStop(.6, 'rgba(255,255,255,0)'); fr.addColorStop(1, 'rgba(40,50,64,.3)'); fg.fillStyle = fr; fg.fillRect(0, 0, 256, 256);
+    var slabG = new T.Group(); parent.add(slabG);
+    var fl = new T.Mesh(new T.PlaneGeometry(UW, UD), new T.MeshBasicMaterial({ map: canvasTex(fc) })); fl.rotation.x = -Math.PI / 2; fl.position.y = .014; slabG.add(fl);
+    var plinth = new T.Mesh(merge(T, [
+      { g: new T.BoxGeometry(UW + .16, .06, .02), m: new T.Matrix4().makeTranslation(0, .03, -UD / 2 - .075), c: NAVY },
+      { g: new T.BoxGeometry(.02, .06, UD + .16), m: new T.Matrix4().makeTranslation(-UW / 2 - .075, .03, 0), c: NAVY },
+      { g: new T.BoxGeometry(.02, .06, UD + .16), m: new T.Matrix4().makeTranslation(UW / 2 + .075, .03, 0), c: NAVY },
+      { g: new T.BoxGeometry((UW - DW) / 2 - .06, .06, .02), m: new T.Matrix4().makeTranslation(-(UW + DW) / 4 - .05, .03, UD / 2 + .075), c: NAVY },
+      { g: new T.BoxGeometry((UW - DW) / 2 - .06, .06, .02), m: new T.Matrix4().makeTranslation((UW + DW) / 4 + .05, .03, UD / 2 + .075), c: NAVY }
+    ]), new T.MeshLambertMaterial({ vertexColors: true })); slabG.add(plinth);
+    var walls = [];
+    function wall(w, h, d, x, z, mat) { var g = new T.BoxGeometry(w, h, d); g.translate(0, h / 2, 0); var m = new T.Mesh(g, mat || wallMat); m.position.set(x, 0, z); parent.add(m); walls.push(m); return m; }
+    var shellG = new T.BoxGeometry(UW, UH, UD); shellG.translate(0, UH / 2, 0); var shell = new T.Mesh(shellG, inMat); parent.add(shell);
+    wall(UW, UH, .07, 0, -UD / 2 - .035);
+    wall(.07, UH, UD + .14, -UW / 2 - .035, 0); wall(.07, UH, UD + .14, UW / 2 + .035, 0);
+    wall((UW - DW) / 2, UH, .07, -(UW + DW) / 4, ZF); wall((UW - DW) / 2, UH, .07, (UW + DW) / 4, ZF);
+    var header = new T.Mesh(new T.BoxGeometry(DW, UH - DH, .07), wallMat); header.position.set(0, (UH + DH) / 2, ZF); parent.add(header);
+    var roof = new T.Mesh(new T.BoxGeometry(UW + .14, .08, UD + .14), whiteMat); roof.position.y = UH + .04; parent.add(roof);
+    var frame = new T.Mesh(merge(T, [
+      { g: new T.BoxGeometry(.06, DH, .1), m: new T.Matrix4().makeTranslation(-DW / 2 - .03, DH / 2, 0), c: 0xAEB5BC },
+      { g: new T.BoxGeometry(.06, DH, .1), m: new T.Matrix4().makeTranslation(DW / 2 + .03, DH / 2, 0), c: 0xAEB5BC },
+      { g: new T.BoxGeometry(DW + .12, .06, .1), m: new T.Matrix4().makeTranslation(0, DH + .03, 0), c: 0xAEB5BC },
+      { g: new T.BoxGeometry(.56, .2, .02), m: new T.Matrix4().makeTranslation(0, DH + .38, .05), c: NAVY },
+      { g: new T.BoxGeometry(DW + .12, .014, .012), m: new T.Matrix4().makeTranslation(0, DH + .085, .045), c: CYAN }
+    ]), new T.MeshPhongMaterial({ vertexColors: true, specular: 0x888888, shininess: 80 })); frame.position.z = ZF + .01; parent.add(frame);
+    function leafTex(flip) {
+      var c = R.mk(256, 512), g = c.getContext('2d'); g.fillStyle = '#F4F5F6'; g.fillRect(0, 0, 256, 512); R.paint.ribs(g, 0, 0, 256, 512, 32, .05);
+      var sh = g.createLinearGradient(0, 0, 0, 512); sh.addColorStop(0, 'rgba(0,0,0,.05)'); sh.addColorStop(.12, 'rgba(0,0,0,0)'); sh.addColorStop(.86, 'rgba(0,0,0,0)'); sh.addColorStop(1, 'rgba(0,0,0,.09)');
+      g.fillStyle = sh; g.fillRect(0, 0, 256, 512); g.fillStyle = '#9299A0'; [70, 256, 440].forEach(function (y) { g.fillRect(flip ? 248 : 0, y - 16, 8, 32); });
+      g.strokeStyle = 'rgba(21,34,73,.22)'; g.lineWidth = 3; g.strokeRect(1.5, 1.5, 253, 509); return canvasTex(c);
+    }
+    function leaf(side) {
+      var piv = new T.Group(); piv.position.set(side * DW / 2, 0, ZF + .05); parent.add(piv);
+      var lm = new T.MeshLambertMaterial({ map: leafTex(side > 0) });
+      var m = new T.Mesh(new T.BoxGeometry(DW / 2 - .006, DH - .02, .045), lm); m.position.set(-side * (DW / 4), DH / 2, 0); piv.add(m); return piv;
+    }
+    var doorL = leaf(-1), doorR = leaf(1);
+    // the lock: staple on the left leaf, hasp on the right leaf, a yellow padlock through the staple
+    var LY = 1.12, LZ = ZF + .05 + .0225;
+    var lockG = new T.Group(); lockG.position.set(0, LY, LZ); parent.add(lockG);
+    var staple = new T.Mesh(merge(T, [
+      { g: new T.BoxGeometry(.05, .09, .006), m: new T.Matrix4().makeTranslation(-.07, 0, .003), c: 0xAEB5BC },
+      { g: new T.TorusGeometry(.018, .005, 8, 16, Math.PI), m: new T.Matrix4().makeRotationX(Math.PI / 2).premultiply(new T.Matrix4().makeTranslation(-.07, 0, .008)), c: 0xC3C9CF }
+    ]), new T.MeshPhongMaterial({ vertexColors: true, specular: 0xffffff, shininess: 90 })); lockG.add(staple);
+    var haspBase = new T.Mesh(new T.BoxGeometry(.045, .075, .006), steelMat); haspBase.position.set(.085, 0, .003); lockG.add(haspBase);
+    var haspPiv = new T.Group(); haspPiv.position.set(.07, 0, .012); lockG.add(haspPiv);
+    var haspArmG = new T.BoxGeometry(.15, .036, .005); haspArmG.translate(-.07, 0, 0);
+    var haspArm = new T.Mesh(haspArmG, steelMat); haspPiv.add(haspArm);
+    var padG = new T.Group(); lockG.add(padG);
+    var padShape = new T.Shape(), px0 = -.05, py0 = -.045, pw = .1, ph = .09, prr = .016;
+    padShape.moveTo(px0 + prr, py0); padShape.lineTo(px0 + pw - prr, py0); padShape.quadraticCurveTo(px0 + pw, py0, px0 + pw, py0 + prr); padShape.lineTo(px0 + pw, py0 + ph - prr); padShape.quadraticCurveTo(px0 + pw, py0 + ph, px0 + pw - prr, py0 + ph);
+    padShape.lineTo(px0 + prr, py0 + ph); padShape.quadraticCurveTo(px0, py0 + ph, px0, py0 + ph - prr); padShape.lineTo(px0, py0 + prr); padShape.quadraticCurveTo(px0, py0, px0 + prr, py0);
+    var bodyG = new T.ExtrudeGeometry(padShape, { depth: .03, bevelEnabled: true, bevelThickness: .006, bevelSize: .006, bevelSegments: 3, curveSegments: 6 }); bodyG.translate(0, 0, -.015);
+    var padBody = new T.Mesh(bodyG, new T.MeshPhongMaterial({ color: 0xFFC83D, specular: 0xffffff, shininess: 85, emissive: 0x3A2A00, emissiveIntensity: .25 }));
+    padBody.position.set(0, -.075, 0); padG.add(padBody);
+    var keyhole = new T.Mesh(new T.CircleGeometry(.007, 12), new T.MeshBasicMaterial({ color: 0x2A2A2A })); keyhole.position.set(0, -.085, .022); padG.add(keyhole);
+    var shackle = new T.Group(); shackle.position.set(-.03, -.03, 0); padG.add(shackle);
+    var shG = merge(T, [
+      { g: new T.TorusGeometry(.03, .0075, 10, 20, Math.PI), m: new T.Matrix4().makeTranslation(.03, .045, 0), c: 0xC9CED3 },
+      { g: new T.CylinderGeometry(.0075, .0075, .06, 10), m: new T.Matrix4().makeTranslation(0, .015, 0), c: 0xC9CED3 },
+      { g: new T.CylinderGeometry(.0075, .0075, .06, 10), m: new T.Matrix4().makeTranslation(.06, .015, 0), c: 0xC9CED3 }
+    ]);
+    var shMesh = new T.Mesh(shG, new T.MeshPhongMaterial({ vertexColors: true, specular: 0xffffff, shininess: 100 })); shackle.add(shMesh);
+    padG.position.set(-.07, -.005, .016);
+    var star = (function () { var c = R.mk(128, 128), g = c.getContext('2d'), gr = g.createRadialGradient(64, 64, 0, 64, 64, 64); gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(.18, 'rgba(255,255,255,.5)'); gr.addColorStop(.5, 'rgba(255,255,255,0)'); g.fillStyle = gr; g.fillRect(0, 0, 128, 128); g.fillStyle = 'rgba(255,255,255,.9)'; g.beginPath(); g.moveTo(64, 0); g.lineTo(67, 61); g.lineTo(128, 64); g.lineTo(67, 67); g.lineTo(64, 128); g.lineTo(61, 67); g.lineTo(0, 64); g.lineTo(61, 61); g.closePath(); g.fill(); return canvasTex(c); })();
+    var glint = quad(addMat({ map: star, fog: false }), 8); parent.add(glint);
+    // furniture, drawn by the viewer's own code
+    var itemsMesh = null;
+    if (items && items.length) { var b = new R.BoxBatch(T); items.forEach(function (it) { R.addItem(b, it); }); itemsMesh = b.mesh(new T.MeshLambertMaterial({ vertexColors: true })); parent.add(itemsMesh); }
+    var led = new T.Mesh(new T.BoxGeometry(.1, .02, Math.min(1.6, UD * .5)), new T.MeshBasicMaterial({ color: 0xffffff })); led.position.set(0, UH - .02, 0); parent.add(led);
+    var inside = new T.PointLight(0xffffff, .55, 9, 1.4); inside.position.set(0, UH - .4, .2); parent.add(inside);
+    var inGlow = quad(addMat({ map: softTex, color: 0xFFFFFF, opacity: 0 }), 4); inGlow.rotation.x = -Math.PI / 2; inGlow.position.set(0, .02, ZF + 1.0); inGlow.scale.set(DW * 1.5, 2.4, 1); parent.add(inGlow);
+    var ush = quad(new T.MeshBasicMaterial({ map: radial(128, [[0, 'rgba(21,34,73,.42)'], [.45, 'rgba(21,34,73,.26)'], [1, 'rgba(21,34,73,0)']]), transparent: true, depthWrite: false }), 2);
+    ush.rotation.x = -Math.PI / 2; ush.position.y = .008; ush.scale.set(UW + 3, UD + 3, 1); parent.add(ush);
+    // the seal: a thin cyan line runs from the lock out to the frame, up both sides and meets at the top
+    var sealMat = new T.MeshBasicMaterial({ color: CYAN, transparent: true, opacity: 0, depthWrite: false, fog: false }), sx = DW / 2 + .12, sy = DH + .12, segs = [];
+    function sline(x0, y0, x1, y1, z) { var m = new T.Mesh(new T.PlaneGeometry(1, 1), sealMat); m.renderOrder = 7; m.userData = { a: [x0, y0], b: [x1, y1], z: z, len: Math.abs(x1 - x0) + Math.abs(y1 - y0) }; parent.add(m); segs.push(m); return m; }
+    [-1, 1].forEach(function (s) { sline(s * .14, LY, s * sx, LY, LZ + .004); sline(s * sx, LY, s * sx, sy, ZF + .07); sline(s * sx, sy, 0, sy, ZF + .07); });
+    var ring = quad(new T.MeshBasicMaterial({ map: (function () { var c = R.mk(256, 256), g = c.getContext('2d'); g.strokeStyle = '#2EC5FF'; g.lineWidth = 5; g.shadowColor = '#2EC5FF'; g.shadowBlur = 10; g.beginPath(); g.arc(128, 128, 112, 0, Math.PI * 2); g.stroke(); return canvasTex(c); })(), transparent: true, depthWrite: false, opacity: 0, fog: false }), 3);
+    ring.rotation.x = -Math.PI / 2; ring.position.y = .02; parent.add(ring);
+    return { group: parent, ZF: ZF, UW: UW, UD: UD, UH: UH, slabG: slabG, walls: walls, shell: shell, header: header, roof: roof, frame: frame, doorL: doorL, doorR: doorR, lockG: lockG, haspPiv: haspPiv, padG: padG, padBody: padBody, shackle: shackle, glint: glint,
+      items: itemsMesh, led: led, inside: inside, inGlow: inGlow, ush: ush, segs: segs, sealMat: sealMat, ring: ring, staple: staple, haspBase: haspBase, DW: DW, DH: DH, LY: LY, LZ: LZ };
+  }
+  // the unit's own moves, from a schedule: b build, o doors open, i contents rise, c doors close, l lock (hasp, padlock, click, glint, seal, ring)
+  function animUnit(U4, t, S, cam) {
+    var b0 = S.b, i, ub = seg(t, b0, b0 + .35);
+    U4.slabG.scale.set(out3(ub) || .001, 1, out3(ub) || .001);
+    U4.walls.forEach(function (m, n) { var g = out3(seg(t, b0 + .2 + n * .08, b0 + .7 + n * .08)); m.scale.y = g || .001; m.visible = g > 0; });
+    var sg = out3(seg(t, b0 + .2, b0 + .9)); U4.shell.scale.y = sg || .001; U4.shell.visible = sg > 0;
+    var hg = out3(seg(t, b0 + .5, b0 + .9)); U4.header.visible = U4.frame.visible = hg > 0; U4.header.scale.y = U4.frame.scale.y = hg || .001;
+    var rg = tw(t, b0 + .7, b0 + 1.15, out3); U4.roof.visible = rg > 0; U4.roof.position.z = (1 - rg) * -(U4.UD + 1); U4.roof.position.y = U4.UH + .04 + (1 - rg) * .6;
+    var c0 = S.c, dOpen = tw(t, S.o, S.o + .7, out3), cL = tw(t, c0, c0 + .9), cR = tw(t, c0 + .25, c0 + 1.15);
+    var setL = .035 * Math.sin(Math.PI * seg(t, c0 + .7, c0 + 1.05)), setR = .035 * Math.sin(Math.PI * seg(t, c0 + .95, c0 + 1.3));
+    U4.doorL.visible = U4.doorR.visible = hg > .98;
+    var ang = S.ang || 1.85; U4.doorL.rotation.y = -(dOpen * (1 - cL) * ang - setL); U4.doorR.rotation.y = dOpen * (1 - cR) * ang - setR;
+    if (U4.items) { var it = tw(t, S.i, S.i + .6, out3); U4.items.visible = it > 0; U4.items.scale.set(1, it || .001, 1); }
+    var inL = dOpen * (1 - cR); U4.inside.intensity = .55 * Math.max(.15, inL); U4.inGlow.visible = inL > .01 && S.glow !== 0; U4.inGlow.material.opacity = .45 * inL;
+    U4.led.visible = rg > 0;
+    var l0 = S.l, hasp = tw(t, l0, l0 + .25, out3), arrive = tw(t, l0 + .3, l0 + .55, out3), swing = tw(t, l0 + .55, l0 + .7), home = tw(t, l0 + .7, l0 + .8, back);
+    U4.staple.visible = U4.haspBase.visible = U4.haspPiv.visible = cR >= 1 || t > l0 - .05;
+    U4.haspPiv.rotation.z = (1 - hasp) * -Math.PI / 2;
+    U4.padG.visible = arrive > 0;
+    U4.padG.position.set(-.07, -.005 + .12 * (1 - arrive), .016 + .12 * (1 - arrive));
+    U4.shackle.position.y = -.03 + .028 * (1 - home); U4.shackle.rotation.y = -(1 - swing) * 1.9;
+    U4.padG.rotation.z = .021 * Math.sin(Math.PI * 2 * seg(t, l0 + .72, l0 + 1.0)) * (1 - seg(t, l0 + .72, l0 + 1.0));
+    var gl = bell(seg(t, l0 + .75, l0 + 1.05)); U4.glint.visible = gl > 0;
+    if (gl > 0) { U4.glint.position.set(-.04, U4.LY + .03, U4.LZ + .06); U4.glint.quaternion.copy(cam.quaternion); if (U4.group.parent) U4.glint.quaternion.premultiply(Q_INV.copy(U4.group.quaternion).invert()); U4.glint.material.opacity = gl; U4.glint.scale.setScalar(.12 + .1 * gl); }
+    var sl = seg(t, l0 + .8, l0 + 1.4), sf = 1 - seg(t, l0 + 1.5, l0 + 2.0);
+    U4.sealMat.opacity = sf * (sl > 0 ? .95 : 0);
+    var total = U4.segs[0].userData.len + U4.segs[1].userData.len + U4.segs[2].userData.len, run = sl * total;
+    for (i = 0; i < 6; i++) {
+      var sm = U4.segs[i], u2 = sm.userData, before = 0; for (var q = i - (i % 3); q < i; q++) before += U4.segs[q].userData.len;
+      var f2 = clamp((run - before) / u2.len, 0, 1); sm.visible = f2 > 0 && sf > 0;
+      if (f2 > 0) {
+        var x1 = lerp(u2.a[0], u2.b[0], f2), y1 = lerp(u2.a[1], u2.b[1], f2), hz = u2.a[1] === u2.b[1];
+        sm.position.set((u2.a[0] + x1) / 2, (u2.a[1] + y1) / 2, u2.z); sm.scale.set(hz ? Math.abs(x1 - u2.a[0]) + .012 : .012, hz ? .012 : Math.abs(y1 - u2.a[1]) + .012, 1);
+      }
+    }
+    var rs = seg(t, l0 + .9, l0 + 1.9); U4.ring.visible = rs > 0 && rs < 1; U4.ring.material.opacity = .7 * Math.sin(Math.PI * Math.min(1, rs * 1.6)) * (1 - rs);
+    U4.ring.scale.setScalar(lerp(5.4, 11, out3(rs)));
+    return { door: dOpen * (1 - Math.max(cL, cR)), lock: home };
+  }
+  var Q_INV = null;
   /* ============================== the 3D film ============================== */
   function createEngine(host, o) {
     var T = W.THREE, R = W.RV3D;
@@ -374,105 +525,10 @@
     var UW = o.unit && o.unit.w || 3, UD = o.unit && o.unit.d || 4, UH = o.unit && o.unit.h || 3;
     var UX = RAVEL_R + .85 + UW / 2, ZF = UD / 2 + .035, UZ = 1.5 - ZF, ZFW = 1.5;
     var unit = new T.Group(); unit.position.set(UX, 0, UZ); scene.add(unit);
-    var U4 = {};
-    (function buildUnit() {
-      var DW = Math.min(1.8, UW - .8), DH = Math.min(2.3, UH - .55);
-      function panelTex(w, h, m) {
-        var c = R.mk(w, h), g = c.getContext('2d'); g.fillStyle = '#F3F5F6'; g.fillRect(0, 0, w, h); R.paint.ribs(g, 0, 0, w, h, w / (m / .104), .05);
-        var ao = g.createLinearGradient(0, 0, 0, h); ao.addColorStop(0, 'rgba(30,40,52,.10)'); ao.addColorStop(.1, 'rgba(30,40,52,0)'); ao.addColorStop(.86, 'rgba(30,40,52,0)'); ao.addColorStop(1, 'rgba(30,40,52,.16)');
-        g.fillStyle = ao; g.fillRect(0, 0, w, h); var t = canvasTex(c); t.anisotropy = 4; return t;
-      }
-      var wTex = panelTex(512, 512, 3.2);
-      var wallMat = new T.MeshLambertMaterial({ map: wTex }), inMat = new T.MeshLambertMaterial({ map: wTex, color: 0xE4E8EC, side: T.BackSide });
-      var whiteMat = new T.MeshLambertMaterial({ color: 0xF4F6F8 }), steelMat = new T.MeshPhongMaterial({ color: 0x8F979F, specular: 0xffffff, shininess: 90 });
-      var fc = R.mk(256, 256), fg = fc.getContext('2d'); fg.fillStyle = '#D9DDE0'; fg.fillRect(0, 0, 256, 256);
-      var fr = fg.createRadialGradient(128, 160, 20, 128, 128, 190); fr.addColorStop(0, 'rgba(255,255,255,.55)'); fr.addColorStop(.6, 'rgba(255,255,255,0)'); fr.addColorStop(1, 'rgba(40,50,64,.3)'); fg.fillStyle = fr; fg.fillRect(0, 0, 256, 256);
-      var slabG = new T.Group(); unit.add(slabG);
-      var fl = new T.Mesh(new T.PlaneGeometry(UW, UD), new T.MeshBasicMaterial({ map: canvasTex(fc) })); fl.rotation.x = -Math.PI / 2; fl.position.y = .014; slabG.add(fl);
-      var plinth = new T.Mesh(merge(T, [
-        { g: new T.BoxGeometry(UW + .16, .06, .02), m: new T.Matrix4().makeTranslation(0, .03, -UD / 2 - .075), c: NAVY },
-        { g: new T.BoxGeometry(.02, .06, UD + .16), m: new T.Matrix4().makeTranslation(-UW / 2 - .075, .03, 0), c: NAVY },
-        { g: new T.BoxGeometry(.02, .06, UD + .16), m: new T.Matrix4().makeTranslation(UW / 2 + .075, .03, 0), c: NAVY },
-        { g: new T.BoxGeometry((UW - DW) / 2 - .06, .06, .02), m: new T.Matrix4().makeTranslation(-(UW + DW) / 4 - .05, .03, UD / 2 + .075), c: NAVY },
-        { g: new T.BoxGeometry((UW - DW) / 2 - .06, .06, .02), m: new T.Matrix4().makeTranslation((UW + DW) / 4 + .05, .03, UD / 2 + .075), c: NAVY }
-      ]), new T.MeshLambertMaterial({ vertexColors: true })); slabG.add(plinth);
-      var walls = [];
-      function wall(w, h, d, x, z, mat) { var g = new T.BoxGeometry(w, h, d); g.translate(0, h / 2, 0); var m = new T.Mesh(g, mat || wallMat); m.position.set(x, 0, z); unit.add(m); walls.push(m); return m; }
-      var shellG = new T.BoxGeometry(UW, UH, UD); shellG.translate(0, UH / 2, 0); var shell = new T.Mesh(shellG, inMat); unit.add(shell);
-      wall(UW, UH, .07, 0, -UD / 2 - .035);
-      wall(.07, UH, UD + .14, -UW / 2 - .035, 0); wall(.07, UH, UD + .14, UW / 2 + .035, 0);
-      wall((UW - DW) / 2, UH, .07, -(UW + DW) / 4, ZF); wall((UW - DW) / 2, UH, .07, (UW + DW) / 4, ZF);
-      var header = new T.Mesh(new T.BoxGeometry(DW, UH - DH, .07), wallMat); header.position.set(0, (UH + DH) / 2, ZF); unit.add(header);
-      var roof = new T.Mesh(new T.BoxGeometry(UW + .14, .08, UD + .14), whiteMat); roof.position.y = UH + .04; unit.add(roof);
-      var frame = new T.Mesh(merge(T, [
-        { g: new T.BoxGeometry(.06, DH, .1), m: new T.Matrix4().makeTranslation(-DW / 2 - .03, DH / 2, 0), c: 0xAEB5BC },
-        { g: new T.BoxGeometry(.06, DH, .1), m: new T.Matrix4().makeTranslation(DW / 2 + .03, DH / 2, 0), c: 0xAEB5BC },
-        { g: new T.BoxGeometry(DW + .12, .06, .1), m: new T.Matrix4().makeTranslation(0, DH + .03, 0), c: 0xAEB5BC },
-        { g: new T.BoxGeometry(.56, .2, .02), m: new T.Matrix4().makeTranslation(0, DH + .38, .05), c: NAVY },
-        { g: new T.BoxGeometry(DW + .12, .014, .012), m: new T.Matrix4().makeTranslation(0, DH + .085, .045), c: CYAN }
-      ]), new T.MeshPhongMaterial({ vertexColors: true, specular: 0x888888, shininess: 80 })); frame.position.z = ZF + .01; unit.add(frame);
-      function leafTex(flip) {
-        var c = R.mk(256, 512), g = c.getContext('2d'); g.fillStyle = '#F4F5F6'; g.fillRect(0, 0, 256, 512); R.paint.ribs(g, 0, 0, 256, 512, 32, .05);
-        var sh = g.createLinearGradient(0, 0, 0, 512); sh.addColorStop(0, 'rgba(0,0,0,.05)'); sh.addColorStop(.12, 'rgba(0,0,0,0)'); sh.addColorStop(.86, 'rgba(0,0,0,0)'); sh.addColorStop(1, 'rgba(0,0,0,.09)');
-        g.fillStyle = sh; g.fillRect(0, 0, 256, 512); g.fillStyle = '#9299A0'; [70, 256, 440].forEach(function (y) { g.fillRect(flip ? 248 : 0, y - 16, 8, 32); });
-        g.strokeStyle = 'rgba(21,34,73,.22)'; g.lineWidth = 3; g.strokeRect(1.5, 1.5, 253, 509); return canvasTex(c);
-      }
-      function leaf(side) {
-        var piv = new T.Group(); piv.position.set(side * DW / 2, 0, ZF + .05); unit.add(piv);
-        var lm = new T.MeshLambertMaterial({ map: leafTex(side > 0) });
-        var m = new T.Mesh(new T.BoxGeometry(DW / 2 - .006, DH - .02, .045), lm); m.position.set(-side * (DW / 4), DH / 2, 0); piv.add(m); return piv;
-      }
-      var doorL = leaf(-1), doorR = leaf(1);
-      // the lock: staple on the left leaf, hasp on the right leaf, a yellow padlock through the staple
-      var LY = 1.12, LZ = ZF + .05 + .0225;
-      var lockG = new T.Group(); lockG.position.set(0, LY, LZ); unit.add(lockG);
-      var staple = new T.Mesh(merge(T, [
-        { g: new T.BoxGeometry(.05, .09, .006), m: new T.Matrix4().makeTranslation(-.07, 0, .003), c: 0xAEB5BC },
-        { g: new T.TorusGeometry(.018, .005, 8, 16, Math.PI), m: new T.Matrix4().makeRotationX(Math.PI / 2).premultiply(new T.Matrix4().makeTranslation(-.07, 0, .008)), c: 0xC3C9CF }
-      ]), new T.MeshPhongMaterial({ vertexColors: true, specular: 0xffffff, shininess: 90 })); lockG.add(staple);
-      var haspBase = new T.Mesh(new T.BoxGeometry(.045, .075, .006), steelMat); haspBase.position.set(.085, 0, .003); lockG.add(haspBase);
-      var haspPiv = new T.Group(); haspPiv.position.set(.07, 0, .012); lockG.add(haspPiv);
-      var haspArmG = new T.BoxGeometry(.15, .036, .005); haspArmG.translate(-.07, 0, 0);
-      var haspArm = new T.Mesh(haspArmG, steelMat); haspPiv.add(haspArm);
-      var padG = new T.Group(); lockG.add(padG);
-      var padShape = new T.Shape(), px0 = -.05, py0 = -.045, pw = .1, ph = .09, prr = .016;
-      padShape.moveTo(px0 + prr, py0); padShape.lineTo(px0 + pw - prr, py0); padShape.quadraticCurveTo(px0 + pw, py0, px0 + pw, py0 + prr); padShape.lineTo(px0 + pw, py0 + ph - prr); padShape.quadraticCurveTo(px0 + pw, py0 + ph, px0 + pw - prr, py0 + ph);
-      padShape.lineTo(px0 + prr, py0 + ph); padShape.quadraticCurveTo(px0, py0 + ph, px0, py0 + ph - prr); padShape.lineTo(px0, py0 + prr); padShape.quadraticCurveTo(px0, py0, px0 + prr, py0);
-      var bodyG = new T.ExtrudeGeometry(padShape, { depth: .03, bevelEnabled: true, bevelThickness: .006, bevelSize: .006, bevelSegments: 3, curveSegments: 6 }); bodyG.translate(0, 0, -.015);
-      var padBody = new T.Mesh(bodyG, new T.MeshPhongMaterial({ color: 0xFFC83D, specular: 0xffffff, shininess: 85, emissive: 0x3A2A00, emissiveIntensity: .25 }));
-      padBody.position.set(0, -.075, 0); padG.add(padBody);
-      var keyhole = new T.Mesh(new T.CircleGeometry(.007, 12), new T.MeshBasicMaterial({ color: 0x2A2A2A })); keyhole.position.set(0, -.085, .022); padG.add(keyhole);
-      var shackle = new T.Group(); shackle.position.set(-.03, -.03, 0); padG.add(shackle);
-      var shG = merge(T, [
-        { g: new T.TorusGeometry(.03, .0075, 10, 20, Math.PI), m: new T.Matrix4().makeTranslation(.03, .045, 0), c: 0xC9CED3 },
-        { g: new T.CylinderGeometry(.0075, .0075, .06, 10), m: new T.Matrix4().makeTranslation(0, .015, 0), c: 0xC9CED3 },
-        { g: new T.CylinderGeometry(.0075, .0075, .06, 10), m: new T.Matrix4().makeTranslation(.06, .015, 0), c: 0xC9CED3 }
-      ]);
-      var shMesh = new T.Mesh(shG, new T.MeshPhongMaterial({ vertexColors: true, specular: 0xffffff, shininess: 100 })); shackle.add(shMesh);
-      padG.position.set(-.07, -.005, .016);
-      var star = (function () { var c = R.mk(128, 128), g = c.getContext('2d'), gr = g.createRadialGradient(64, 64, 0, 64, 64, 64); gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(.18, 'rgba(255,255,255,.5)'); gr.addColorStop(.5, 'rgba(255,255,255,0)'); g.fillStyle = gr; g.fillRect(0, 0, 128, 128); g.fillStyle = 'rgba(255,255,255,.9)'; g.beginPath(); g.moveTo(64, 0); g.lineTo(67, 61); g.lineTo(128, 64); g.lineTo(67, 67); g.lineTo(64, 128); g.lineTo(61, 67); g.lineTo(0, 64); g.lineTo(61, 61); g.closePath(); g.fill(); return canvasTex(c); })();
-      var glint = quad(addMat({ map: star, fog: false }), 8); unit.add(glint);
-      // furniture, drawn by the viewer's own code
-      var b = new R.BoxBatch(T), items = o.items && o.items.length ? o.items : fallbackItems(UW, UD);
-      items.forEach(function (it) { R.addItem(b, it); });
-      var itemsMesh = b.mesh(new T.MeshLambertMaterial({ vertexColors: true })); unit.add(itemsMesh);
-      var led = new T.Mesh(new T.BoxGeometry(.1, .02, Math.min(1.6, UD * .5)), new T.MeshBasicMaterial({ color: 0xffffff })); led.position.set(0, UH - .02, 0); unit.add(led);
-      var inside = new T.PointLight(0xffffff, .55, 9, 1.4); inside.position.set(0, UH - .4, .2); unit.add(inside);
-      var inGlow = quad(addMat({ map: softTex, color: 0xFFFFFF, opacity: 0 }), 4); inGlow.rotation.x = -Math.PI / 2; inGlow.position.set(0, .02, ZF + 1.0); inGlow.scale.set(DW * 1.5, 2.4, 1); unit.add(inGlow);
-      var ush = quad(new T.MeshBasicMaterial({ map: radial(128, [[0, 'rgba(21,34,73,.42)'], [.45, 'rgba(21,34,73,.26)'], [1, 'rgba(21,34,73,0)']]), transparent: true, depthWrite: false }), 2);
-      ush.rotation.x = -Math.PI / 2; ush.position.y = .008; ush.scale.set(UW + 3, UD + 3, 1); unit.add(ush);
-      // the seal: a thin cyan line runs from the lock out to the frame, up both sides and meets at the top
-      var sealMat = new T.MeshBasicMaterial({ color: CYAN, transparent: true, opacity: 0, depthWrite: false, fog: false }), sx = DW / 2 + .12, sy = DH + .12, segs = [];
-      function sline(x0, y0, x1, y1, z) { var m = new T.Mesh(new T.PlaneGeometry(1, 1), sealMat); m.renderOrder = 7; m.userData = { a: [x0, y0], b: [x1, y1], z: z, len: Math.abs(x1 - x0) + Math.abs(y1 - y0) }; unit.add(m); segs.push(m); return m; }
-      [-1, 1].forEach(function (s) { sline(s * .14, LY, s * sx, LY, LZ + .004); sline(s * sx, LY, s * sx, sy, ZF + .07); sline(s * sx, sy, 0, sy, ZF + .07); });
-      var ring = quad(new T.MeshBasicMaterial({ map: (function () { var c = R.mk(256, 256), g = c.getContext('2d'); g.strokeStyle = '#2EC5FF'; g.lineWidth = 5; g.shadowColor = '#2EC5FF'; g.shadowBlur = 10; g.beginPath(); g.arc(128, 128, 112, 0, Math.PI * 2); g.stroke(); return canvasTex(c); })(), transparent: true, depthWrite: false, opacity: 0, fog: false }), 3);
-      ring.rotation.x = -Math.PI / 2; ring.position.y = .02; unit.add(ring);
-      U4 = { slabG: slabG, walls: walls, shell: shell, header: header, roof: roof, frame: frame, doorL: doorL, doorR: doorR, lockG: lockG, haspPiv: haspPiv, padG: padG, padBody: padBody, shackle: shackle, glint: glint,
-        items: itemsMesh, led: led, inside: inside, inGlow: inGlow, ush: ush, segs: segs, sealMat: sealMat, ring: ring, staple: staple, haspBase: haspBase, DW: DW, DH: DH, LY: LY, LZ: LZ };
-    })();
+    var U4 = makeUnit({ T: T, R: R, canvasTex: canvasTex, radial: radial, quad: quad, addMat: addMat, softTex: softTex }, unit, { w: UW, d: UD, h: UH }, o.items && o.items.length ? o.items : fallbackItems(UW, UD));
 
     /* ---------- camera keys (framings), resolved for the screen's shape ---------- */
-    var CX_RU = (RAVEL_L + UX + UW / 2) / 2, W_RU = UX + UW / 2 - RAVEL_L;
+    var CX_RU = (RAVEL_L + UX + UW / 2) / 2, W_RU = UX + UW / 2 - RAVEL_L, OXS = o.rtl ? -1 : 1;
     function camKeys() {
       planeState(10.7, tmpS); var pf = tmpS.p.clone(); planeState(5.45, tmpS); var p1 = tmpS.p.clone(); planeState(6.1, tmpS); var p2 = tmpS.p.clone();
       return [
@@ -500,25 +556,11 @@
         { t: 19.0, pos: [UX + .22, 1.24, ZFW + 1.2], look: [UX - .07, 1.06, ZFW + .08], fovL: 30, fovP: 38, hold: 1 },
         { t: 19.3, pos: [UX + .21, 1.24, ZFW + 1.16], look: [UX - .07, 1.06, ZFW + .08], fovL: 30, fovP: 38 },
         { t: 20.05, pos: [UX + 1.0, 1.75, ZFW + 5.6], look: [UX, 1.4, ZFW], fovL: 36, fovP: 48 },
-        { t: 21.0, L: { c: [CX_RU + .4, 2.0, -.3], w: W_RU, h: 4.2, d: UD, az: .2, el: .14, fill: .5, ox: .2, oy: .03, fov: 30 }, P: { c: [UX - 4.3, 2.0, -.2], w: 15, h: 5, d: UD, az: .7, el: .14, fill: .97, oy: .2, fov: 42 } },
-        { t: 25.4, L: { c: [CX_RU + .4, 2.0, -.3], w: W_RU, h: 4.2, d: UD, az: .24, el: .15, fill: .5, ox: .2, oy: .03, fov: 30 }, P: { c: [UX - 4.3, 2.0, -.2], w: 15, h: 5, d: UD, az: .75, el: .15, fill: .97, oy: .2, fov: 42 }, hold: 1 }
+        { t: 21.0, L: { c: [CX_RU + .4, 2.0, -.3], w: W_RU, h: 4.2, d: UD, az: .2, el: .14, fill: .5, ox: .2 * OXS, oy: .03, fov: 30 }, P: { c: [UX - 4.3, 2.0, -.2], w: 15, h: 5, d: UD, az: .7, el: .14, fill: .97, ox: .2, oy: .2, fov: 42 } },
+        { t: 25.4, L: { c: [CX_RU + .4, 2.0, -.3], w: W_RU, h: 4.2, d: UD, az: .24, el: .15, fill: .5, ox: .2 * OXS, oy: .03, fov: 30 }, P: { c: [UX - 4.3, 2.0, -.2], w: 15, h: 5, d: UD, az: .75, el: .15, fill: .97, ox: .2, oy: .2, fov: 42 }, hold: 1 }
       ];
     }
     var CAMS = [], aspect = 1, jFace = 0;
-    function frame(f, A) {
-      var vf = f.fov * Math.PI / 360, hf = Math.atan(Math.tan(vf) * A), az = f.az || 0, el = f.el || 0;
-      var wEff = f.w * Math.abs(Math.cos(az)) + (f.d || 0) * Math.abs(Math.sin(az));
-      var dist = Math.max(wEff / 2 / Math.tan(hf), f.h / 2 / Math.tan(vf)) / (f.fill || .8);
-      var up = (f.oy || 0) * 2 * dist * Math.tan(vf), right = (f.ox || 0) * 2 * dist * Math.tan(hf);
-      var lx = f.c[0] - right * Math.cos(az), ly = f.c[1] - up, lz = f.c[2] + right * Math.sin(az);
-      return [lx + Math.sin(az) * Math.cos(el) * dist, ly + Math.sin(el) * dist, lz + Math.cos(az) * Math.cos(el) * dist, lx, ly, lz, f.fov];
-    }
-    function blend(L, P, q) {
-      var out = {}, k;
-      for (k in L) { if (L[k] instanceof Array) out[k] = L[k].map(function (v, i) { return lerp(P[k] ? P[k][i] : v, v, q); }); else out[k] = lerp(P[k] != null ? P[k] : L[k], L[k], q); }
-      for (k in P) if (!(k in out)) out[k] = P[k] instanceof Array ? P[k] : lerp(P[k], 0, q);
-      return out;
-    }
     function resolveCams() {
       var q = clamp((aspect - .8) / .4, 0, 1), list = camKeys(), segs = [], cur = [];
       list.forEach(function (k) {
@@ -630,49 +672,9 @@
         jShadow.material.opacity = .5 + .3 * reveal;
       }
       // the storage unit
-      var ub = seg(t, 13.6, 13.95);
       unit.visible = t > 13.6;
-      if (unit.visible) {
-        U4.slabG.scale.set(out3(ub) || .001, 1, out3(ub) || .001);
-        U4.walls.forEach(function (m, n) { var g = out3(seg(t, 13.8 + n * .08, 14.3 + n * .08)); m.scale.y = g || .001; m.visible = g > 0; });
-        var sg = out3(seg(t, 13.8, 14.5)); U4.shell.scale.y = sg || .001; U4.shell.visible = sg > 0;
-        var hg = out3(seg(t, 14.1, 14.5)); U4.header.visible = U4.frame.visible = hg > 0; U4.header.scale.y = U4.frame.scale.y = hg || .001;
-        var rg = tw(t, 14.3, 14.75, out3); U4.roof.visible = rg > 0; U4.roof.position.z = (1 - rg) * -(UD + 1); U4.roof.position.y = UH + .04 + (1 - rg) * .6;
-        var dOpen = tw(t, 14.3, 15.0, out3), cL = tw(t, 17.3, 18.2), cR = tw(t, 17.55, 18.45);
-        var setL = .035 * Math.sin(Math.PI * seg(t, 18.0, 18.35)), setR = .035 * Math.sin(Math.PI * seg(t, 18.25, 18.6));
-        var legs = hg > .98;
-        U4.doorL.visible = U4.doorR.visible = legs;
-        U4.doorL.rotation.y = -(dOpen * (1 - cL) * 1.85 - setL); U4.doorR.rotation.y = dOpen * (1 - cR) * 1.85 - setR;
-        var it = tw(t, 14.4, 15.0, out3); U4.items.visible = it > 0; U4.items.scale.set(1, it || .001, 1);
-        var inL = dOpen * (1 - cR); U4.inside.intensity = .55 * Math.max(.15, inL); U4.inGlow.visible = inL > .01; U4.inGlow.material.opacity = .45 * inL;
-        U4.led.visible = rg > 0;
-        // the lock
-        var hasp = tw(t, 18.5, 18.75, out3), arrive = tw(t, 18.8, 19.05, out3), swing = tw(t, 19.05, 19.2), home = tw(t, 19.2, 19.3, back);
-        var shut = cR >= 1;
-        U4.staple.visible = U4.haspBase.visible = U4.haspPiv.visible = shut || t > 18.45;
-        U4.haspPiv.rotation.z = (1 - hasp) * -Math.PI / 2;
-        U4.padG.visible = arrive > 0;
-        U4.padG.position.set(-.07, -.005 + .12 * (1 - arrive), .016 + .12 * (1 - arrive));
-        U4.shackle.position.y = -.03 + .028 * (1 - home); U4.shackle.rotation.y = -(1 - swing) * 1.9;
-        U4.padG.rotation.z = .021 * Math.sin(Math.PI * 2 * seg(t, 19.22, 19.5)) * (1 - seg(t, 19.22, 19.5));
-        var gl = bell(seg(t, 19.25, 19.55)); U4.glint.visible = gl > 0;
-        if (gl > 0) { U4.glint.position.set(-.04, U4.LY + .03, U4.LZ + .06); U4.glint.quaternion.copy(cam.quaternion); U4.glint.material.opacity = gl; U4.glint.scale.setScalar(.12 + .1 * gl); }
-        // seal line and ring
-        var sl = seg(t, 19.3, 19.9), sf = 1 - seg(t, 20.0, 20.5);
-        U4.sealMat.opacity = sf * (sl > 0 ? .95 : 0);
-        var total = U4.segs[0].userData.len + U4.segs[1].userData.len + U4.segs[2].userData.len, run = sl * total;
-        for (i = 0; i < 6; i++) {
-          var sm = U4.segs[i], u2 = sm.userData, before = 0; for (var q = i - (i % 3); q < i; q++) before += U4.segs[q].userData.len;
-          var f2 = clamp((run - before) / u2.len, 0, 1); sm.visible = f2 > 0 && sf > 0;
-          if (f2 > 0) {
-            var x1 = lerp(u2.a[0], u2.b[0], f2), y1 = lerp(u2.a[1], u2.b[1], f2), hz = u2.a[1] === u2.b[1];
-            sm.position.set((u2.a[0] + x1) / 2, (u2.a[1] + y1) / 2, u2.z); sm.scale.set(hz ? Math.abs(x1 - u2.a[0]) + .012 : .012, hz ? .012 : Math.abs(y1 - u2.a[1]) + .012, 1);
-          }
-        }
-        var rs = seg(t, 19.4, 20.4); U4.ring.visible = rs > 0 && rs < 1; U4.ring.material.opacity = .7 * Math.sin(Math.PI * Math.min(1, rs * 1.6)) * (1 - rs);
-        U4.ring.scale.setScalar(lerp(5.4, 11, out3(rs)));
-        info.door = dOpen * (1 - Math.max(cL, cR)); info.lock = home;
-      } else { info.door = 0; info.lock = 0; }
+      if (unit.visible) { var ur = animUnit(U4, t, { b: 13.6, o: 14.3, i: 14.4, c: 17.3, l: 18.5 }, cam); info.door = ur.door; info.lock = ur.lock; }
+      else { info.door = 0; info.lock = 0; }
       info.k = k; info.sub = K; info.wipe = wp; info.close = tw(t, 11.6, 12.54, out3); info.plane = [stP.p.x, stP.p.y, stP.p.z]; info.day = day;
       renderer.render(scene, cam);
       info.calls = renderer.info.render.calls; info.tris = renderer.info.render.triangles;
@@ -694,6 +696,314 @@
     var api = { draw: draw, resize: resize, dispose: dispose, info: info, canvas: canvas, renderer: renderer,
       solid: function (k2) { PL.build(sched(k2)); lastK = -1; return PL.solid(); }, hasPhoto: function () { return !!photo; }, wipeOK: function () { return wipeOK; } };
     return api;
+  }
+
+  /* ============================== Rashid: a full room, the extras packed and moved to a Ravel unit ============================== */
+  // World: the room is a cut-away set (no front wall, no ceiling), floor at y = 0, x across, z toward the viewer.
+  // Its door is in the right wall; a Ravel unit stands outside, its doorway facing the room's door.
+  var RTM = { wrap: 4.1, wrapGap: .17, move: 6.2, moveGap: .32, moveDur: 3.0, close: 12.45, lock: 13.75, back: 15.4 };
+  function createRashid(host, o) {
+    var T = W.THREE, R = W.RV3D;
+    var canvas = doc.createElement('canvas'); canvas.className = 'mfilm__gl'; host.appendChild(canvas);
+    var renderer = new T.WebGLRenderer({ canvas: canvas, antialias: !o.low, alpha: false, powerPreference: 'high-performance', preserveDrawingBuffer: !!o.manual });
+    renderer.setClearColor(0x1C2552, 1);
+    var scene = new T.Scene(), cam = new T.PerspectiveCamera(36, 1, .05, 1500);
+    scene.fog = new T.Fog(0xE7A06A, 40, 220);
+    var extra = [], dead = false, info = {};
+    var V1 = new T.Vector3(), cA = new T.Color(), cB = new T.Color(), tmpC = new T.Color();
+    function mixHex(a, b, k) { return cA.setHex(a).lerp(cB.setHex(b), k).getHex(); }
+    function canvasTex(c) { var t = new T.CanvasTexture(c); extra.push(t); return t; }
+    function radial(size, stops) {
+      var c = R.mk(size, size), g = c.getContext('2d'), gr = g.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
+      stops.forEach(function (s) { gr.addColorStop(s[0], s[1]); }); g.fillStyle = gr; g.fillRect(0, 0, size, size); return canvasTex(c);
+    }
+    function quad(mat, ro) { var m = new T.Mesh(new T.PlaneGeometry(1, 1), mat); if (ro != null) m.renderOrder = ro; return m; }
+    function addMat(o2) { var p = { transparent: true, blending: T.AdditiveBlending, depthWrite: false }; for (var k in o2) p[k] = o2[k]; return new T.MeshBasicMaterial(p); }
+    function M(x, y, z, ry) { var m = new T.Matrix4().makeRotationY(ry || 0); m.setPosition(x, y, z); return m; }
+    var glowTex = radial(128, [[0, 'rgba(255,255,255,1)'], [.3, 'rgba(255,255,255,.45)'], [1, 'rgba(255,255,255,0)']]);
+    var softTex = radial(128, [[0, 'rgba(255,255,255,1)'], [.55, 'rgba(255,255,255,.35)'], [1, 'rgba(255,255,255,0)']]);
+    var blobTex = radial(128, [[0, 'rgba(20,16,30,.5)'], [.5, 'rgba(20,16,30,.24)'], [1, 'rgba(20,16,30,0)']]);
+
+    /* ---------- light: dusk, a lamp switched on, then a bright clean evening ---------- */
+    var hemi = new T.HemisphereLight(0xFFD7B0, 0x3A3050, .5), key = new T.DirectionalLight(0xFFE3C2, .6);
+    key.position.set(-5, 9, 8);
+    var lamp = new T.PointLight(0xFFB06A, 0, 9, 1.3);
+    scene.add(hemi); scene.add(key); scene.add(lamp);
+    var domeGeo = new T.SphereGeometry(600, 32, 16), domeCol = new Float32Array(domeGeo.attributes.position.count * 3), skyKey = '';
+    domeGeo.setAttribute('color', new T.BufferAttribute(domeCol, 3));
+    var dome = new T.Mesh(domeGeo, new T.MeshBasicMaterial({ vertexColors: true, side: T.BackSide, fog: false, depthWrite: false })); dome.renderOrder = -10; scene.add(dome);
+    var cz = new T.Color(), chz = new T.Color();
+    function sky(zen, hor) {
+      var k2 = zen + ':' + hor; if (k2 === skyKey) return; skyKey = k2;
+      cz.setHex(zen); chz.setHex(hor); var p = domeGeo.attributes.position;
+      for (var i = 0; i < p.count; i++) { var e = clamp(p.getY(i) / 600, 0, 1), k = Math.pow(e, .5); tmpC.copy(chz).lerp(cz, k); domeCol[i * 3] = tmpC.r; domeCol[i * 3 + 1] = tmpC.g; domeCol[i * 3 + 2] = tmpC.b; }
+      domeGeo.attributes.color.needsUpdate = true;
+    }
+    var groundMat = new T.MeshBasicMaterial({ color: 0x8A8290, map: radial(256, [[0, '#ffffff'], [.18, '#e9e9ee'], [.5, '#b9bac6'], [1, '#9a9bab']]) });
+    var ground = new T.Mesh(new T.CircleGeometry(300, 64), groundMat); ground.rotation.x = -Math.PI / 2; ground.position.y = -.2; scene.add(ground);
+
+    /* ---------- the room ---------- */
+    var RW = 6.4, RD = 4.8, RH = 3.0, WT = .14, DZ = .4, DWD = 1.1, DHT = 2.4, X0 = -RW / 2, X1 = RW / 2, Z0 = -RD / 2, Z1 = RD / 2;
+    var WALL = 0xF1E9DE, EDGE = 0xD9CFC2, SKIRT = 0xCDBFAE;
+    var room = new T.Group(); scene.add(room);
+    var wallsG = merge(T, [
+      { g: new T.BoxGeometry(RW + 2 * WT, RH, WT), m: M(0, RH / 2, Z0 - WT / 2), c: WALL },
+      { g: new T.BoxGeometry(WT, RH, RD), m: M(X0 - WT / 2, RH / 2, 0), c: WALL },
+      { g: new T.BoxGeometry(WT, RH, DZ - DWD / 2 - Z0), m: M(X1 + WT / 2, RH / 2, (Z0 + DZ - DWD / 2) / 2), c: WALL },
+      { g: new T.BoxGeometry(WT, RH, Z1 - DZ - DWD / 2), m: M(X1 + WT / 2, RH / 2, (Z1 + DZ + DWD / 2) / 2), c: WALL },
+      { g: new T.BoxGeometry(WT, RH - DHT, DWD), m: M(X1 + WT / 2, (RH + DHT) / 2, DZ), c: WALL },
+      { g: new T.BoxGeometry(RW, .1, .02), m: M(0, .05, Z0 + .01), c: SKIRT },
+      { g: new T.BoxGeometry(.02, .1, RD), m: M(X0 + .01, .05, 0), c: SKIRT },
+      { g: new T.BoxGeometry(RW + 2 * WT + .02, .02, WT + .02), m: M(0, RH + .01, Z0 - WT / 2), c: EDGE },
+      { g: new T.BoxGeometry(WT + .02, .02, RD), m: M(X0 - WT / 2, RH + .01, 0), c: EDGE },
+      { g: new T.BoxGeometry(RW + 2 * WT + .3, .24, RD + WT + .3), m: M(0, -.12, -WT / 2), c: 0xCFC4B4 },
+      // the door's frame and the window's frame (bronze)
+      { g: new T.BoxGeometry(WT + .04, DHT + .05, .05), m: M(X1 + WT / 2, (DHT + .05) / 2, DZ - DWD / 2 - .025), c: 0x7A6650 },
+      { g: new T.BoxGeometry(WT + .04, DHT + .05, .05), m: M(X1 + WT / 2, (DHT + .05) / 2, DZ + DWD / 2 + .025), c: 0x7A6650 },
+      { g: new T.BoxGeometry(WT + .04, .05, DWD + .1), m: M(X1 + WT / 2, DHT + .025, DZ), c: 0x7A6650 },
+      { g: new T.BoxGeometry(1.7, .06, .08), m: M(1.6, 2.35, Z0 + .03), c: 0x6B5A48 }, { g: new T.BoxGeometry(1.7, .06, .08), m: M(1.6, .95, Z0 + .03), c: 0x6B5A48 },
+      { g: new T.BoxGeometry(.06, 1.46, .08), m: M(.78, 1.65, Z0 + .03), c: 0x6B5A48 }, { g: new T.BoxGeometry(.06, 1.46, .08), m: M(2.42, 1.65, Z0 + .03), c: 0x6B5A48 },
+      { g: new T.BoxGeometry(.04, 1.4, .06), m: M(1.6, 1.65, Z0 + .03), c: 0x6B5A48 }
+    ]);
+    var walls = new T.Mesh(wallsG, new T.MeshLambertMaterial({ vertexColors: true })); room.add(walls);
+    // floor: pale stone tiles with a soft painted falloff
+    var fc = R.mk(512, 512), fg = fc.getContext('2d'); fg.fillStyle = '#ECE4D7'; fg.fillRect(0, 0, 512, 512);
+    fg.strokeStyle = 'rgba(140,120,96,.18)'; fg.lineWidth = 1.5; for (var gx = 0; gx <= 512; gx += 512 / 8) { fg.beginPath(); fg.moveTo(gx, 0); fg.lineTo(gx, 512); fg.stroke(); fg.beginPath(); fg.moveTo(0, gx); fg.lineTo(512, gx); fg.stroke(); }
+    var fgr = fg.createRadialGradient(256, 230, 40, 256, 256, 380); fgr.addColorStop(0, 'rgba(255,255,255,.25)'); fgr.addColorStop(1, 'rgba(90,70,50,.18)'); fg.fillStyle = fgr; fg.fillRect(0, 0, 512, 512);
+    var floorTex = canvasTex(fc); floorTex.anisotropy = 4;
+    var floorMat = new T.MeshLambertMaterial({ map: floorTex, color: 0xD8CEC0 });
+    var floorM = new T.Mesh(new T.PlaneGeometry(RW, RD), floorMat); floorM.rotation.x = -Math.PI / 2; floorM.position.y = .002; room.add(floorM);
+    // a rug in navy and sand, a window holding the dusk
+    var rc = R.mk(512, 352), rg = rc.getContext('2d'); rg.fillStyle = '#22346E'; rg.fillRect(0, 0, 512, 352); rg.strokeStyle = '#D8C29A'; rg.lineWidth = 10; rg.strokeRect(22, 22, 468, 308); rg.lineWidth = 3; rg.strokeRect(42, 42, 428, 268);
+    rg.fillStyle = 'rgba(216,194,154,.85)'; for (var ri = 0; ri < 5; ri++) { rg.save(); rg.translate(108 + ri * 74, 176); rg.rotate(Math.PI / 4); rg.fillRect(-16, -16, 32, 32); rg.restore(); }
+    var rug = new T.Mesh(new T.PlaneGeometry(3.4, 2.3), new T.MeshLambertMaterial({ map: canvasTex(rc) })); rug.rotation.x = -Math.PI / 2; rug.position.set(-.6, .006, -1.05); room.add(rug);
+    var wc = R.mk(64, 128), wg = wc.getContext('2d'), wgr = wg.createLinearGradient(0, 0, 0, 128); wgr.addColorStop(0, '#2A3466'); wgr.addColorStop(.55, '#B7708A'); wgr.addColorStop(1, '#F2A66A'); wg.fillStyle = wgr; wg.fillRect(0, 0, 64, 128);
+    var winMat = new T.MeshBasicMaterial({ map: canvasTex(wc), color: 0xffffff });
+    var win = new T.Mesh(new T.PlaneGeometry(1.64, 1.4), winMat); win.position.set(1.6, 1.65, Z0 + .005); room.add(win);
+    // furniture that stays: a sofa, a coffee table, a side table with a lamp, a plant
+    var fb = new R.BoxBatch(T), SOFA = '#3A4A72', SOFA_L = '#4A5C88', WOOD = '#6A4630', WOOD_D = '#4A2F1E';
+    (function () {
+      var sx = -.6, sz = Z0 + .5, sw = 2.3;
+      fb.add(sx, .2, sz + .05, sw, .4, .86, SOFA, 0, .95); fb.add(sx, .62, sz - .3, sw, .5, .24, SOFA, 0, 1.08);
+      fb.add(sx - sw / 2 + .1, .42, sz + .03, .2, .44, .9, SOFA, 0, 1.12); fb.add(sx + sw / 2 - .1, .42, sz + .03, .2, .44, .9, SOFA, 0, 1.12);
+      [-1, 0, 1].forEach(function (k) { fb.add(sx + k * .66, .46, sz + .1, .64, .12, .64, SOFA_L, 0, 1.1); fb.add(sx + k * .66, .7, sz - .14, .6, .34, .14, SOFA_L, 0, 1.15); });
+      fb.add(sx - .85, .66, sz - .03, .34, .3, .1, '#D8C29A', .2, 1); fb.add(sx + .9, .66, sz - .03, .34, .3, .1, '#D8C29A', -.2, 1);
+      var tx = -.6, tz = -.75; fb.add(tx, .4, tz, 1.1, .05, .6, WOOD, 0, 1.05); [[-1, -1], [1, -1], [-1, 1], [1, 1]].forEach(function (q) { fb.add(tx + q[0] * .5, .19, tz + q[1] * .25, .05, .38, .05, WOOD_D, 0, 1); });
+      fb.add(tx, .12, tz, 1.0, .03, .5, WOOD, 0, .95);
+      var ex = -2.35, ez = Z0 + .35; fb.add(ex, .27, ez, .5, .54, .45, WOOD, 0, 1); fb.add(ex, .55, ez, .52, .03, .47, WOOD_D, 0, 1);
+      fb.add(2.75, .17, 1.9, .42, .34, .42, '#C9BBA6', 0, 1);
+    })();
+    var furn = fb.mesh(new T.MeshLambertMaterial({ vertexColors: true })); room.add(furn);
+    var decor = new T.Mesh(merge(T, [
+      { g: new T.CylinderGeometry(.012, .012, .5, 8), m: M(-2.35, .82, Z0 + .35), c: 0x8A7A62 },
+      { g: new T.CylinderGeometry(.13, .19, .26, 24, 1, true), m: M(-2.35, 1.16, Z0 + .35), c: 0xF6E7CC },
+      { g: new T.SphereGeometry(.34, 18, 12), m: M(2.75, .62, 1.9), c: 0x4E6B4A }, { g: new T.SphereGeometry(.26, 16, 10), m: M(2.62, .9, 1.82), c: 0x5D7C56 }, { g: new T.SphereGeometry(.22, 16, 10), m: M(2.9, .86, 1.98), c: 0x47613F }
+    ]), new T.MeshLambertMaterial({ vertexColors: true, side: T.DoubleSide })); room.add(decor);
+    var lampGlow = quad(addMat({ map: glowTex, color: 0xFFB872, fog: false }), 6); lampGlow.position.set(-2.35, 1.16, Z0 + .45); lampGlow.scale.set(1.4, 1.4, 1); room.add(lampGlow);
+    lamp.position.set(-2.2, 1.5, Z0 + .7);
+    // the soft light that crosses the clear floor (painted, not a light: no extra cost per pixel)
+    var sweepQ = quad(addMat({ map: softTex, color: 0xFFF1DA, opacity: 0, fog: false }), 3); sweepQ.rotation.x = -Math.PI / 2; sweepQ.position.y = .01; sweepQ.scale.set(2.4, 3.6, 1); room.add(sweepQ);
+
+    /* ---------- the unit outside ---------- */
+    // a unit as deep as the page's and a little wider, so its open leaves fold flat against its front
+    var UW = Math.max(3.6, o.unit && o.unit.w || 3), UD = o.unit && o.unit.d || 4, UH = o.unit && o.unit.h || 3, ZF = UD / 2 + .035;
+    var UPX = X1 + WT + 3.6 + ZF, UPZ = DZ, URY = -Math.PI / 2;
+    var unitG = new T.Group(); unitG.position.set(UPX, 0, UPZ); unitG.rotation.y = URY; scene.add(unitG);
+    var U4 = makeUnit({ T: T, R: R, canvasTex: canvasTex, radial: radial, quad: quad, addMat: addMat, softTex: softTex }, unitG, { w: UW, d: UD, h: UH }, []);
+    function uw(lx, lz, out) { return out.set(UPX - lz, 0, UPZ + lx); }      // unit-local floor point -> world
+    var LOCKW = uw(-.07, U4.LZ + .02, new T.Vector3()); LOCKW.y = U4.LY - .08;
+    var UDOOR = uw(0, ZF, new T.Vector3());
+
+    /* ---------- the extras: each one clutter first, then wrapped, then carried out in a line ---------- */
+    // [kind, start x, start y, start z, start yaw, slot x, slot z, slot yaw, extra fields]  (slots in unit-local metres, back rows first)
+    var CAT = { box: [.5, .45, .42, '#C69D70'], wardrobeS: [1.0, .58, 1.95, '#7A5236'], carpet: [.56, .5, 2.0, '#8E2F3A'], majlis: [1.9, .7, .8, '#8E2F3A'], dresser: [.9, .45, .8, '#7A5236'], tv: [1.25, .2, .78, '#C69D70'], suit: [.5, .3, .72, '#4A5A73'] };
+    var LIST = [
+      ['carpet', 2.75, 0, -1.95, 0, -1.15, -1.68, 0],
+      ['box', 2.3, 0, -1.05, .15, -.55, -1.7, 0, { n: 3 }],
+      ['dresser', 1.45, 0, -.45, -.25, .25, -1.72, 0, { top: true }],
+      ['box', .25, .44, -1.92, .08, 1.15, -1.7, 0, { n: 2 }],
+      ['tv', 1.25, 0, .95, -.35, .85, -.95, 0],
+      ['box', -.45, .43, -.75, -.12, -1.15, -.95, 0, { n: 1 }],
+      ['box', -1.2, .44, -1.9, .1, -.6, -.95, 0, { n: 2, small: true }],
+      ['suit', .25, 0, 1.05, .3, -1.15, -.2, 0, { v: 1 }],
+      ['suit', -.25, 0, 1.25, -.2, -.75, -.2, 0, { v: 0 }],
+      ['majlis', -2.3, 0, -.3, Math.PI / 2, .45, -.2, 0],
+      ['wardrobeS', -2.6, 0, .5, Math.PI / 2, -.9, .75, 0]
+    ];
+    function plainBatch(kind, w, d, h, c, ex) {
+      var b = new R.BoxBatch(T), i;
+      if (kind === 'box') { for (i = 0; i < ex.n; i++) { var top = i === ex.n - 1 && ex.small; b.add(i % 2 ? .03 : -.02, .21 + i * .42, 0, top ? .38 : .48, top ? .3 : .4, top ? .36 : .43, '#C69D70', (i % 2 ? .12 : -.08), .95 + (i % 3) * .03); } var fy = ex.n * .42; b.add(-.12, fy + .05, -.12, .2, .1, .02, '#B38A5E', .3); b.add(.12, fy + .05, .1, .2, .1, .02, '#B38A5E', -.2); }
+      else if (kind === 'wardrobeS') { b.add(0, h / 2, 0, w, h, d, c); b.add(0, h / 2 + .04, d / 2 + .004, .012, h - .14, .008, '#4A2F1E'); b.add(-.1, h / 2, d / 2 + .014, .022, .2, .022, '#F1E6D6'); b.add(.1, h / 2, d / 2 + .014, .022, .2, .022, '#F1E6D6'); b.add(0, .05, d / 2 + .003, w, .1, .006, '#4A2F1E'); }
+      else if (kind === 'dresser') { b.add(0, h / 2, 0, w, h, d, c); [.2, .45, .7].forEach(function (f) { b.add(0, h * f, d / 2 + .004, w - .1, .012, .008, '#4A2F1E'); }); [.32, .57, .84].forEach(function (f) { b.add(0, h * f, d / 2 + .012, .12, .02, .02, '#F1E6D6'); }); b.add(-.2, h + .1, 0, .3, .2, .25, '#E7D9C2', .2); b.add(.18, h + .06, .02, .26, .12, .2, '#22346E', -.1); }
+      else if (kind === 'tv') { b.add(0, .44, 0, w, .7, .05, '#121722'); b.add(0, .44, .028, w - .04, .66, .004, '#1E2533'); b.add(0, .05, 0, .5, .03, .22, '#2A2F3A'); b.add(0, .09, 0, .06, .1, .04, '#2A2F3A'); }
+      else return null;
+      return b.mesh(itemMat);
+    }
+    var itemMat = new T.MeshLambertMaterial({ vertexColors: true }), filmMat = new T.MeshLambertMaterial({ color: 0xF4F8FC, transparent: true, opacity: .55, depthWrite: false });
+    var filmGeo = new T.BoxGeometry(1, 1, 1); filmGeo.translate(0, .5, 0);
+    var movers = [], ri = 0;
+    LIST.forEach(function (L2, i) {
+      var c = CAT[L2[0]], ex = L2[8] || {}, it = { kind: L2[0], x: 0, z: 0, w: c[0], d: c[1], h: c[2], c: c[3], yaw: 0, v: ex.v != null ? ex.v : i };
+      for (var k in ex) it[k] = ex[k];
+      var hh = it.kind === 'box' ? it.n * .42 : it.kind === 'dresser' && it.top ? it.h + .4 : it.h;
+      var b = new R.BoxBatch(T); R.addItem(b, it); var wrapped = b.mesh(itemMat); scene.add(wrapped);
+      var plain = plainBatch(it.kind, it.w, it.d, it.h, it.c, it); if (plain) scene.add(plain);
+      var film = new T.Mesh(filmGeo, filmMat.clone()); film.renderOrder = 4; scene.add(film);
+      var sw = uw(L2[5], L2[6], new T.Vector3()), syaw = L2[7] + URY;
+      var hy = Math.max(0, Math.min(1.0, DHT - .06 - hh));
+      // waypoints: lifted over the start, inside the room's door, outside it, inside the unit's doorway, the slot
+      var P = [[L2[1], L2[2] + hy * .5, L2[3]], [X1 - .75, hy, DZ], [X1 + WT + .9, Math.min(hy, .25), DZ], [UDOOR.x + .5, .04, UDOOR.z], [sw.x, 0, sw.z]];
+      var lens = [], tot = 0; for (var j = 0; j < P.length - 1; j++) { var dx = P[j + 1][0] - P[j][0], dy = P[j + 1][1] - P[j][1], dz = P[j + 1][2] - P[j][2], l = Math.sqrt(dx * dx + dy * dy + dz * dz) * (j === 2 ? 2.4 : j === 1 ? 1.4 : 1); lens.push(l); tot += l; }   // weighted: the pieces slow down between the two doors, so the line reads
+      var footR = Math.max(it.w, it.d) * .9;
+      var shadow = quad(new T.MeshBasicMaterial({ map: blobTex, transparent: true, depthWrite: false, opacity: 0 }), 2); shadow.rotation.x = -Math.PI / 2; scene.add(shadow);
+      movers.push({ it: it, wrapped: wrapped, plain: plain, film: film, shadow: shadow, hh: hh, start: [L2[1], L2[2], L2[3]], yaw0: L2[4], syaw: syaw, P: P, lens: lens, tot: tot, foot: footR,
+        tw: RTM.wrap + i * RTM.wrapGap, tm: RTM.move + i * RTM.moveGap });
+    });
+    function moverAt(m, t, out) {
+      var u = io(seg(t, m.tm, m.tm + RTM.moveDur)), lift = tw(t, m.tm - .35, m.tm + .05, out3);
+      out.yaw = m.yaw0; out.x = m.start[0]; out.z = m.start[2]; out.y = m.start[1] + lift * (m.P[0][1] - m.start[1]);
+      if (u <= 0) { out.u = 0; return out; }
+      var d = u * m.tot, j = 0; while (j < m.lens.length - 1 && d > m.lens[j]) { d -= m.lens[j]; j++; }
+      var f = m.lens[j] ? clamp(d / m.lens[j], 0, 1) : 1, A = m.P[j], B = m.P[j + 1];
+      out.x = lerp(A[0], B[0], f); out.y = lerp(A[1], B[1], f); out.z = lerp(A[2], B[2], f);
+      var travelled = u * m.tot, first = m.lens[0], last = m.lens[m.lens.length - 1];
+      out.yaw = lerp(m.yaw0, 0, io(clamp(travelled / Math.max(first, .4), 0, 1)));
+      out.yaw = lerp(out.yaw, m.syaw, io(clamp((travelled - (m.tot - last - .3)) / (last + .3), 0, 1)));
+      out.u = u; return out;
+    }
+
+    /* ---------- Rashid ---------- */
+    var RM = new T.Vector3(-1.75, 0, 1.45);
+    var rashid = new T.Group(); rashid.position.copy(RM); scene.add(rashid);
+    var rShadow = quad(new T.MeshBasicMaterial({ map: blobTex, transparent: true, depthWrite: false, opacity: .7 }), 2); rShadow.rotation.x = -Math.PI / 2; rShadow.position.y = .008; rShadow.scale.set(1.0, .55, 1); rashid.add(rShadow);
+    var rGlow = quad(addMat({ map: softTex, color: 0xFFC890, opacity: 0, fog: false }), 3); rGlow.position.set(0, 1.0, -.25); rGlow.scale.set(1.9, 2.6, 1); rashid.add(rGlow);
+    var silMat = new T.MeshPhongMaterial({ vertexColors: true, specular: 0x333333, shininess: 18 });
+    var sil = new T.Mesh(buildKandura(T), silMat); rashid.add(sil);
+    var photo = null, photoMat = null, rFace = 0;
+    if (o.rashidImg) {
+      var img = new Image();
+      if (!/^data:/.test(o.rashidImg)) img.crossOrigin = 'anonymous';
+      img.onload = function () {
+        if (dead || !api) return;
+        var tex = new T.Texture(img); tex.needsUpdate = true; tex.anisotropy = 4; extra.push(tex);
+        var asp = img.naturalWidth / img.naturalHeight || .422;
+        photoMat = new T.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false, alphaTest: .02, side: T.DoubleSide, color: 0x2A2F4A });
+        var g = new T.PlaneGeometry(1, 1); g.translate(0, .5, 0);
+        photo = new T.Mesh(g, photoMat); photo.scale.set(1.78 * asp, 1.78, 1); photo.renderOrder = 5; rashid.add(photo); sil.visible = false;
+        if (api.onReady) api.onReady();
+      };
+      img.src = o.rashidImg;
+    }
+
+    /* ---------- camera keys ---------- */
+    var OXS = o.rtl ? -1 : 1, CAMS = [], aspect = 1, camV = [0, 0, 0, 0, 0, 0, 0];
+    function camKeys() {
+      var room0 = { c: [-.3, 1.0, -.1], w: 6.6, h: 3, d: RD, az: -.28, el: .3, fill: .88, fov: 34 }, roomP0 = { c: [-.85, 1.0, 0], w: 4.1, h: 3.4, d: RD, az: -.3, el: .3, fill: .92, fov: 44 };
+      var endL = { c: [-.25, 1.1, -.4], w: 6.6, h: 3, d: RD, az: .16, el: .2, fill: .6, ox: .19 * OXS, oy: .04, fov: 34 }, endP = { c: [-.6, 1.1, -.4], w: 4.6, h: 3, d: RD, az: .18, el: .24, fill: .98, ox: .19, oy: .22, fov: 46 };
+      function ext(a, b) { var r = {}, k; for (k in a) r[k] = a[k]; for (k in b) r[k] = b[k]; return r; }
+      return [
+        { t: 0, L: room0, P: roomP0 },
+        { t: 3.9, L: ext(room0, { c: [-.15, 1.0, -.3], az: -.17, fill: .94 }), P: ext(roomP0, { c: [-.5, 1.0, -.25], w: 3.9, az: -.18, fill: .95 }) },
+        { t: 6.0, L: ext(room0, { c: [.7, 1.0, -.45], w: 5.6, h: 2.8, az: -.04, el: .24, fill: .92 }), P: ext(roomP0, { c: [1.0, 1.0, -.35], w: 3.8, az: .04, el: .2, fill: .95 }) },
+        { t: 8.4, L: { c: [4.6, .8, .3], w: 8.6, h: 3, d: 3, az: -.04, el: .46, fill: .95, fov: 34 }, P: { c: [4.9, .7, .4], w: 4.8, h: 3, d: 2, az: -.02, el: .5, fill: .98, fov: 46 } },
+        { t: 11.2, L: { c: [5.5, .9, .4], w: 7.4, h: 3, d: 3, az: -.12, el: .4, fill: .95, fov: 34 }, P: { c: [UDOOR.x - .6, .9, .4], w: 4.0, h: 3, d: 2, az: -.42, el: .38, fill: .98, fov: 46 } },
+        { t: 12.6, pos: [UDOOR.x - 3.2, 2.3, UDOOR.z + 4.6], look: [UDOOR.x, 1.25, UDOOR.z], fovL: 40, fovP: 54 },
+        { t: 13.45, pos: [UDOOR.x - 3.0, 2.2, UDOOR.z + 4.3], look: [UDOOR.x, 1.22, UDOOR.z], fovL: 40, fovP: 54 },
+        { t: 14.15, pos: [LOCKW.x - 1.0, LOCKW.y + .18, LOCKW.z + .32], look: [LOCKW.x, LOCKW.y - .02, LOCKW.z], fovL: 32, fovP: 40, hold: 1 },
+        { t: 14.6, pos: [LOCKW.x - .97, LOCKW.y + .18, LOCKW.z + .31], look: [LOCKW.x, LOCKW.y - .02, LOCKW.z], fovL: 32, fovP: 40 },
+        { t: 15.3, pos: [UDOOR.x - 3.0, 1.8, UDOOR.z + 3.0], look: [UDOOR.x, 1.3, UDOOR.z], fovL: 40, fovP: 54 },
+        { t: 16.7, L: endL, P: endP },
+        { t: 20.0, L: ext(endL, { az: .21 }), P: ext(endP, { az: .23 }), hold: 1 }
+      ];
+    }
+    function resolveCams() {
+      var q = clamp((aspect - .8) / .4, 0, 1), list = camKeys(), K = [];
+      list.forEach(function (k) { K.push({ t: k.t, v: k.pos ? k.pos.concat(k.look, [lerp(k.fovP, k.fovL, q)]) : frame(blend(k.L, k.P || k.L, q), aspect), hold: k.hold }); });
+      tangents(K); CAMS = K;
+      herm(K, 1.4, camV); rFace = Math.atan2(camV[0] - RM.x, camV[2] - RM.z);
+    }
+    function camera(t) {
+      herm(CAMS, t, camV);
+      var dx = .008 * Math.sin(1.7 * t), dy = .008 * Math.sin(2.3 * t + 1);
+      cam.position.set(camV[0] + dx, camV[1] + dy, camV[2]); cam.lookAt(camV[3] + dx, camV[4] + dy, camV[5]);
+      if (cam.fov !== camV[6] || cam.aspect !== aspect) { cam.fov = camV[6]; cam.aspect = aspect; cam.updateProjectionMatrix(); }
+      cam.updateMatrixWorld();
+    }
+
+    /* ---------- one frame, a pure function of t ---------- */
+    var st = {};
+    function draw(t) {
+      camera(t);
+      var clean = tw(t, RTM.back, RTM.back + 1.4), on = tw(t, .5, 1.5);
+      var zen = mixHex(0x1C2552, 0xFFFFFF, clean), hor = mixHex(0xE7A06A, 0xE6E9EB, clean);
+      sky(zen, hor); scene.fog.color.setHex(hor); renderer.setClearColor(hor, 1);
+      groundMat.color.setHex(mixHex(mixHex(0x8A8290, 0xB9BAC6, tw(t, 7.5, 9.5)), 0xF2F4F6, clean));
+      var outside = tw(t, 7.0, 9.0) * (1 - tw(t, RTM.back, RTM.back + 1.0)), wl = Math.max(clean, outside);
+      hemi.color.setHex(mixHex(0xFFD7B0, 0xFFFFFF, wl)); hemi.groundColor.setHex(mixHex(0x3A3050, 0xD9DEE6, wl)); hemi.intensity = lerp(.42 + .1 * on, lerp(.66, .9, outside), wl);
+      key.intensity = lerp(.5, .75, wl); key.color.setHex(mixHex(0xFFD9B0, 0xFFFAF2, wl));
+      lamp.intensity = on * lerp(1.0, .55, clean); lampGlow.material.opacity = on * lerp(.85, .5, clean);
+      floorMat.color.setHex(mixHex(0xCFC3B2, 0xF4EEE6, clean));
+      winMat.color.setHex(mixHex(0xFFFFFF, 0xF3F6FA, clean));
+      var sw = seg(t, RTM.back + 1.2, RTM.back + 2.8); sweepQ.visible = sw > 0 && sw < 1; sweepQ.material.opacity = .4 * bell(sw); sweepQ.position.x = lerp(-2.6, 2.6, sw); sweepQ.position.z = -.2;
+      // Rashid: found by the lamp's light; his frame warms when the room is clear
+      rashid.rotation.y = rFace;
+      var tint = mixHex(mixHex(0x2A2F4A, 0xFFFFFF, tw(t, .7, 1.8)), 0xFFF2E0, clean);
+      if (photo) photoMat.color.setHex(tint); else silMat.color.setHex(tint);
+      rGlow.material.opacity = .32 * tw(t, .7, 1.8) * (1 - clean) + .5 * clean;
+      // the extras
+      var wrappedN = 0, gone = 0;
+      for (var i = 0; i < movers.length; i++) {
+        var m = movers[i], wu = seg(t, m.tw, m.tw + .5), isW = wu >= 1 || !m.plain, p = moverAt(m, t, st);
+        if (wu >= 1) wrappedN++;
+        if (m.plain) m.plain.visible = !isW;
+        m.wrapped.visible = isW;
+        var cur = isW ? m.wrapped : m.plain;
+        cur.position.set(p.x, p.y, p.z); cur.rotation.y = p.yaw;
+        var fv = wu > 0 && t < m.tw + .85;
+        m.film.visible = fv;
+        if (fv) { m.film.position.set(p.x, p.y - .01, p.z); m.film.rotation.y = p.yaw; m.film.scale.set(m.it.w + .05, (m.hh + .04) * out3(wu) + .001, m.it.d + .05); m.film.material.opacity = .55 * (1 - seg(t, m.tw + .5, m.tw + .85)); }
+        var inUnit = p.u >= 1; if (inUnit) gone++;
+        m.shadow.visible = p.u > 0 && !inUnit; m.shadow.material.opacity = .55 / (1 + p.y * 2); m.shadow.position.set(p.x, .012, p.z); m.shadow.scale.set(m.foot * 1.6, m.foot * 1.6, 1);
+        // once the unit is shut, the stored pieces are hidden (they cannot be seen) and cost no draw calls
+        if (inUnit && t > RTM.close + 1.3) cur.visible = false;
+      }
+      var ur = animUnit(U4, t, { b: -10, o: RTM.move - 1.2, i: 0, c: RTM.close, l: RTM.lock, ang: 2.95, glow: 0 }, cam);
+      info.door = ur.door; info.lock = ur.lock; info.wrapped = wrappedN; info.stored = gone; info.clean = clean;
+      renderer.render(scene, cam);
+      info.calls = renderer.info.render.calls; info.tris = renderer.info.render.triangles;
+    }
+    function resize(w, h, pr) { renderer.setPixelRatio(pr); renderer.setSize(w, h, false); canvas.style.width = w + 'px'; canvas.style.height = h + 'px'; aspect = w / h; resolveCams(); }
+    function dispose() {
+      dead = true;
+      scene.traverse(function (ob) {
+        if (ob.geometry) ob.geometry.dispose();
+        if (ob.material) (ob.material instanceof Array ? ob.material : [ob.material]).forEach(function (m) { if (m.map) m.map.dispose(); m.dispose(); });
+      });
+      extra.forEach(function (t2) { t2.dispose(); });
+      renderer.dispose(); try { renderer.forceContextLoss(); } catch (e) { /* already lost */ }
+      if (canvas.parentNode) canvas.parentNode.removeChild(canvas);
+    }
+    var api = { draw: draw, resize: resize, dispose: dispose, info: info, canvas: canvas, renderer: renderer, hasPhoto: function () { return !!photo; }, wipeOK: function () { return null; } };
+    return api;
+  }
+
+  // Rashid without a photograph: a standing man in a white kandura, ghutra and black agal, right hand raised (one mesh)
+  function buildKandura(T) {
+    var L = [], ROBE = 0xF3F2EE, GHUT = 0xFAFAF7, AGAL = 0x15161A, SKIN = 0x9A7458, SHOE = 0x3A2A20;
+    function M(x, y, z, sx, sy, sz) { return new T.Matrix4().compose(new T.Vector3(x, y, z), new T.Quaternion(), new T.Vector3(sx || 1, sy || 1, sz || 1)); }
+    function lathe(pts, n) { return new T.LatheGeometry(pts.map(function (p) { return new T.Vector2(p[0], p[1]); }), n || 32); }
+    function limb(a, b, r, col) { var d = new T.Vector3().subVectors(b, a), len = d.length(); L.push({ g: new T.CapsuleGeometry(r, Math.max(.001, len), 6, 16), m: new T.Matrix4().compose(a.clone().add(b).multiplyScalar(.5), new T.Quaternion().setFromUnitVectors(new T.Vector3(0, 1, 0), d.normalize()), new T.Vector3(1, 1, 1)), c: col }); }
+    L.push({ g: lathe([[0, .03], [.2, .035], [.215, .1], [.2, .4], [.185, .7], [.175, .95], [.18, 1.15], [.2, 1.3], [.21, 1.38], [.2, 1.43], [.15, 1.46], [.07, 1.49], [0, 1.5]], 36), m: M(0, 0, 0, 1, 1, .62), c: ROBE });
+    [-1, 1].forEach(function (s) { L.push({ g: new T.SphereGeometry(1, 16, 10), m: M(s * .08, .03, .06, .05, .035, .11), c: SHOE }); });
+    L.push({ g: new T.CylinderGeometry(.048, .052, .1, 16), m: M(0, 1.53, .01), c: SKIN });
+    L.push({ g: new T.SphereGeometry(1, 22, 16), m: M(0, 1.64, .02, .088, .11, .1), c: SKIN });
+    L.push({ g: lathe([[0, 1.79], [.06, 1.785], [.105, 1.755], [.118, 1.7], [.13, 1.6], [.16, 1.46], [.2, 1.38], [.0, 1.37]], 30), m: M(0, 0, -.02, 1, 1, .95), c: GHUT });
+    L.push({ g: new T.TorusGeometry(.098, .014, 10, 28), m: new T.Matrix4().compose(new T.Vector3(0, 1.735, -.012), new T.Quaternion().setFromAxisAngle(new T.Vector3(1, 0, 0), Math.PI / 2 - .12), new T.Vector3(1, 1, 1)), c: AGAL });
+    var shL = new T.Vector3(-.2, 1.4, 0), elL = new T.Vector3(-.235, 1.12, .02), wrL = new T.Vector3(-.235, .88, .05);
+    limb(shL, elL, .055, ROBE); limb(elL, wrL, .046, ROBE); L.push({ g: new T.SphereGeometry(1, 12, 8), m: M(wrL.x, wrL.y - .06, wrL.z, .032, .06, .04), c: SKIN });
+    var shR = new T.Vector3(.2, 1.4, 0), elR = new T.Vector3(.39, 1.3, .05), wrR = new T.Vector3(.42, 1.58, .08);
+    limb(shR, elR, .055, ROBE); limb(elR, wrR, .046, ROBE); L.push({ g: new T.SphereGeometry(1, 12, 8), m: M(wrR.x + .005, wrR.y + .07, wrR.z, .035, .07, .022), c: SKIN });
+    return merge(T, L);
   }
 
   // the camera and the aeroplane both move on C1 Hermite curves through timed keys (tangents from the neighbours)
@@ -787,48 +1097,65 @@
     pause: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13M16 5.5v13" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>',
     play: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.5 5.5v13l11-6.5-11-6.5z" fill="currentColor"/></svg>'
   };
-  var TXT = {
-    en: { title: "James's story: TRAVEL to RAVEL", close: 'Close', skip: 'Skip', replay: 'Replay', scenes: 'Scenes', scene: 'Scene', of: 'of', call: 'Call', wa: 'WhatsApp', note: 'Still version: motion is off in this mode', paused: 'Paused' },
-    ar: { title: 'قصة James: من TRAVEL إلى RAVEL', close: 'إغلاق', skip: 'تخطٍّ', replay: 'إعادة العرض', scenes: 'مشاهد القصة', scene: 'المشهد', of: 'من', call: 'اتصال', wa: 'واتساب', note: 'عرض ثابت: الحركة متوقفة في هذا الوضع', paused: 'متوقف' }
+  var UI = {
+    en: { close: 'Close', skip: 'Skip', replay: 'Replay', scenes: 'Scenes', scene: 'Scene', of: 'of', call: 'Call', wa: 'WhatsApp', cta: 'Explore Storage Units', note: 'Still version: motion is off in this mode' },
+    ar: { close: 'إغلاق', skip: 'تخطَّ', replay: 'إعادة العرض', scenes: 'مشاهد القصة', scene: 'المشهد', of: 'من', call: 'اتصال', wa: 'واتساب', cta: 'استكشف وحدات التخزين', note: 'عرض ثابت: الحركة متوقفة في هذا الوضع' }
   };
-  var COPY = {
-    name: 'James', j1: 'Travelling for 6 months.', j2a: 'Saved ', j2b: 'AED 6,600/month', j2c: ' by storing his furniture instead of keeping his apartment.',
-    m1: 'Travelling for months?', m2: 'Why keep paying rent?', m3a: 'Store your furniture safely with ', m3b: 'Ravel Storage', m3c: '.', m4a: 'Travel light.', m4b: 'Save more.',
-    cta: 'Explore Storage Units',
-    sr: 'James is travelling for 6 months. The T of TRAVEL becomes an aeroplane and leaves; the word that stays is RAVEL. His furniture is stored in a locked Ravel Storage unit. He saved AED 6,600 a month by storing it instead of keeping his apartment. Travel light. Save more.'
+  // Each story: its clock (length, scene starts, skip target), when each caption comes and goes, and its words in both languages.
+  // j2 and m3 are [before, marked, after]: the marked part is bold (j2) or underlined in cyan (m3); m4 is [first, on the mango block].
+  var STORY = {
+    james: {
+      dur: 25.4, sc: [0, 3.4, 11.2, 13.6, 20.0], skip: 24.5, dayAt: 12.2, bloom: [8.6, 8.95, 9.35], scrim: [20.0, 21.0],
+      j1: [7.3, 8.4, 8.6], j2: [15.4, 16.7, 16.9], m1: 20.3, m2: 21.3, m12: [22.6, 22.9], m3: [22.9, 24.3, 24.6], rule: [23.5, 24.0], m4: 24.5, hl: [24.8, 25.3], end: 24.9,
+      en: { title: "James's story: TRAVEL to RAVEL", name: 'James', j1: 'Travelling for 6 months.', j2: ['Saved ', 'AED 6,600/month', ' by storing his furniture instead of keeping his apartment.'],
+        m1: 'Travelling for months?', m2: 'Why keep paying rent?', m3: ['Store your furniture safely with ', 'Ravel Storage', '.'], m4: ['Travel light.', 'Save more.'],
+        sr: 'James is travelling for 6 months. The T of TRAVEL becomes an aeroplane and leaves; the word that stays is RAVEL. His furniture is stored in a locked Ravel Storage unit. He saved AED 6,600 a month by storing it instead of keeping his apartment. Travel light. Save more.' },
+      ar: { title: 'قصة جيمس: من TRAVEL إلى RAVEL', name: 'جيمس', j1: 'مسافر لمدة 6 أشهر.', j2: ['وفّر ', '6,600 درهم شهرياً', ' بتخزين أثاثه بدلاً من الاحتفاظ بشقته.'],
+        m1: 'مسافر لعدة أشهر؟', m2: 'لماذا تستمر في دفع الإيجار؟', m3: ['خزّن أثاثك بأمان مع ', 'رافل للتخزين', '.'], m4: ['سافر بخفة.', 'ووفّر أكثر.'] }
+    },
+    rashid: {
+      dur: 20.0, sc: [0, 4.0, 6.2, 12.4, 15.4], skip: 18.6, dayAt: 15.9, bloom: null, scrim: [16.2, 17.0],
+      j1: [1.6, 3.85, 4.05], j2: [6.4, 10.6, 10.8], m3: [16.6, 18.5, 18.8], rule: [17.2, 17.7], m4: 18.8, hl: [19.1, 19.6], end: 19.2,
+      en: { title: "Rashid's story", name: 'Rashid', j1: 'His home was full.', j2: ['', '', 'He moved the extras into a Ravel unit.'], m3: ['For only ', 'AED 500', ' a month.'], m4: ['More space at home.', 'A tidier house.'] },
+      ar: { title: 'قصة راشد', name: 'راشد', j1: 'بيته كان ممتلئاً بالأغراض.', j2: ['', '', 'نقل الأغراض الزائدة إلى وحدة في رافل.'], m3: ['بـ ', '500 درهم', ' فقط شهرياً.'], m4: ['مساحة أكبر في البيت،', 'وبيت أكثر ترتيباً.'] }
+    }
   };
+  function plainCopy(C) { return [C.name + ': ' + C.j1, C.j2.join(''), C.m1 || '', C.m2 || '', C.m3.join(''), C.m4.join(' ')].filter(Boolean).join(' '); }
   function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
   // each word in its own clipped box, so it can rise into view
   function words(s, cls) { return s.split(' ').filter(Boolean).map(function (w) { return '<span class="mfilm__w"><span class="mfilm__wi' + (cls ? ' ' + cls : '') + '">' + esc(w) + '</span></span>'; }).join(' '); }
+  function tail(s) { return /^\s/.test(s) ? ' ' + words(s) : esc(s); }
+  function j2html(C) { return esc(C.j2[0]) + (C.j2[1] ? '<strong>' + esc(C.j2[1]) + '</strong>' : '') + esc(C.j2[2]); }
 
-  function buildDom(o, L) {
+  function buildDom(o, L, C, S) {
+    var ar = o.lang === 'ar', LG = ar ? 'lang="ar" dir="rtl"' : 'lang="en" dir="ltr"';
     var root = doc.createElement('div');
-    root.className = 'mfilm'; root.setAttribute('role', 'dialog'); root.setAttribute('aria-modal', 'true'); root.setAttribute('aria-label', L.title);
-    root.setAttribute('dir', o.lang === 'ar' ? 'rtl' : 'ltr'); root.setAttribute('lang', o.lang === 'ar' ? 'ar' : 'en');
-    var bar = ''; for (var i = 0; i < 5; i++) bar += '<button class="mfilm__seg" type="button" data-scene="' + i + '" aria-label="' + esc(L.scene + ' ' + (i + 1) + ' ' + L.of + ' 5') + '"><i></i></button>';
+    root.className = 'mfilm mfilm--' + o.story; root.setAttribute('role', 'dialog'); root.setAttribute('aria-modal', 'true'); root.setAttribute('aria-label', C.title);
+    root.setAttribute('dir', ar ? 'rtl' : 'ltr'); root.setAttribute('lang', ar ? 'ar' : 'en');
+    var bar = ''; for (var i = 0; i < S.sc.length; i++) bar += '<button class="mfilm__seg" type="button" data-scene="' + i + '" aria-label="' + esc(L.scene + ' ' + (i + 1) + ' ' + L.of + ' ' + S.sc.length) + '"><i></i></button>';
     var wa = esc(o.wa || '#'), tel = esc(o.tel || 'tel:+971503250551');
     root.innerHTML =
       '<div class="mfilm__stage"></div>' +
       '<div class="mfilm__bloom" aria-hidden="true"></div><div class="mfilm__scrim" aria-hidden="true"></div><div class="mfilm__black" aria-hidden="true"></div>' +
-      '<div class="mfilm__caps" lang="en" dir="ltr" aria-hidden="true">' +
-        '<div class="mfilm__third mfilm__j1"><b class="mfilm__name">' + COPY.name + '</b><span class="mfilm__plate">' + esc(COPY.j1) + '</span></div>' +
-        '<div class="mfilm__third mfilm__j2"><b class="mfilm__name">' + COPY.name + '</b><span class="mfilm__plate">' + esc(COPY.j2a) + '<strong>' + esc(COPY.j2b) + '</strong>' + esc(COPY.j2c) + '</span></div>' +
+      '<div class="mfilm__caps" ' + LG + ' aria-hidden="true">' +
+        '<div class="mfilm__third mfilm__j1"><b class="mfilm__name">' + esc(C.name) + '</b><span class="mfilm__plate">' + esc(C.j1) + '</span></div>' +
+        '<div class="mfilm__third mfilm__j2"><b class="mfilm__name">' + esc(C.name) + '</b><span class="mfilm__plate">' + j2html(C) + '</span></div>' +
       '</div>' +
-      '<div class="mfilm__copy" lang="en" dir="ltr">' +
+      '<div class="mfilm__copy" ' + LG + '>' +
         '<div class="mfilm__msg" aria-hidden="true">' +
-          '<p class="mfilm__line mfilm__m12"><span class="mfilm__l1">' + words(COPY.m1) + '</span><span class="mfilm__l2">' + words(COPY.m2) + '</span></p>' +
-          '<p class="mfilm__line mfilm__m3">' + words(COPY.m3a) + ' <span class="mfilm__rule">' + words(COPY.m3b) + '<i class="mfilm__ruleb"></i></span>' + esc(COPY.m3c) + '</p>' +
-          '<p class="mfilm__line mfilm__m4">' + words(COPY.m4a) + ' <span class="mfilm__hl"><i class="mfilm__hlb"></i>' + words(COPY.m4b) + '</span></p>' +
+          (C.m1 ? '<p class="mfilm__line mfilm__m12"><span class="mfilm__l1">' + words(C.m1) + '</span><span class="mfilm__l2">' + words(C.m2) + '</span></p>' : '') +
+          '<p class="mfilm__line mfilm__m3">' + words(C.m3[0]) + ' <span class="mfilm__rule">' + words(C.m3[1]) + '<i class="mfilm__ruleb"></i></span>' + tail(C.m3[2]) + '</p>' +
+          '<p class="mfilm__line mfilm__m4">' + words(C.m4[0]) + ' <span class="mfilm__hl"><i class="mfilm__hlb"></i>' + words(C.m4[1]) + '</span></p>' +
         '</div>' +
         '<div class="mfilm__end">' +
-          '<div class="mfilm__row"><button class="mfilm__btn mfilm__btn--navy mfilm__cta" type="button">' + esc(COPY.cta) + ICON.arrow + '</button>' +
-          '<button class="mfilm__btn mfilm__btn--ghost mfilm__replay" type="button" dir="' + (o.lang === 'ar' ? 'rtl' : 'ltr') + '">' + ICON.replay + '<span>' + esc(L.replay) + '</span></button></div>' +
-          '<div class="mfilm__row mfilm__contact" dir="' + (o.lang === 'ar' ? 'rtl' : 'ltr') + '"><a class="mfilm__btn mfilm__btn--wa" href="' + wa + '" target="_blank" rel="noopener">' + ICON.wa + '<span>' + esc(L.wa) + '</span></a>' +
+          '<div class="mfilm__row"><button class="mfilm__btn mfilm__btn--navy mfilm__cta" type="button">' + esc(L.cta) + ICON.arrow + '</button>' +
+          '<button class="mfilm__btn mfilm__btn--ghost mfilm__replay" type="button">' + ICON.replay + '<span>' + esc(L.replay) + '</span></button></div>' +
+          '<div class="mfilm__row mfilm__contact"><a class="mfilm__btn mfilm__btn--wa" href="' + wa + '" target="_blank" rel="noopener">' + ICON.wa + '<span>' + esc(L.wa) + '</span></a>' +
           '<a class="mfilm__btn mfilm__btn--tel" href="' + tel + '">' + ICON.tel + '<span>' + esc(L.call) + '</span></a></div>' +
         '</div>' +
       '</div>' +
-      '<div class="mfilm__still" lang="en" dir="ltr" hidden></div>' +
-      '<p class="mfilm__sr" lang="en">' + esc(COPY.sr) + '</p>' +
+      '<div class="mfilm__still" ' + LG + ' hidden></div>' +
+      '<p class="mfilm__sr" ' + LG + '>' + esc(C.sr || plainCopy(C)) + '</p>' +
       '<div class="mfilm__bar" role="group" aria-label="' + esc(L.scenes) + '">' + bar + '</div>' +
       '<button class="mfilm__close" type="button" aria-label="' + esc(L.close) + '">' + ICON.close + '</button>' +
       '<button class="mfilm__skip" type="button"><span>' + esc(L.skip) + '</span>' + ICON.skip + '</button>' +
@@ -845,14 +1172,18 @@
     };
   }
 
-  function storyboard(o) {
+  var SB_UNIT = '<svg viewBox="0 0 120 100" width="104" height="87" aria-hidden="true"><path d="M8 94V26L60 6l52 20v68" fill="none" stroke="#152249" stroke-width="3" stroke-linejoin="round"/><path d="M4 94h112" stroke="#152249" stroke-width="3" stroke-linecap="round"/><rect x="30" y="40" width="60" height="54" rx="2" fill="#fff" stroke="#152249" stroke-width="3"/><path d="M60 40v54" stroke="#152249" stroke-width="2.4"/><path d="M36 50h18M66 50h18M36 60h18M66 60h18M36 84h18M66 84h18" stroke="#B9C2CF" stroke-width="1.6"/><path d="M55 66a5 5 0 0 1 10 0v4" fill="none" stroke="#152249" stroke-width="2.4"/><rect x="52.5" y="69" width="15" height="12" rx="2.5" fill="#FFC83D" stroke="#152249" stroke-width="1.6"/><path d="M26 36h68" stroke="#2EC5FF" stroke-width="2.4" stroke-linecap="round"/></svg>';
+  var SB_HOME = '<svg viewBox="0 0 120 100" width="104" height="87" aria-hidden="true"><path d="M10 94V44L60 10l50 34v50" fill="none" stroke="#152249" stroke-width="3" stroke-linejoin="round"/><path d="M4 94h112" stroke="#152249" stroke-width="3" stroke-linecap="round"/><rect x="24" y="66" width="20" height="16" rx="1.5" fill="#C69D70" stroke="#152249" stroke-width="1.6"/><rect x="40" y="74" width="18" height="20" rx="1.5" fill="#C69D70" stroke="#152249" stroke-width="1.6"/><rect x="28" y="52" width="14" height="14" rx="1.5" fill="#E2C7A2" stroke="#152249" stroke-width="1.6"/><rect x="66" y="58" width="18" height="36" rx="1.5" fill="#fff" stroke="#152249" stroke-width="1.6"/><rect x="86" y="70" width="14" height="24" rx="1.5" fill="#C69D70" stroke="#152249" stroke-width="1.6"/></svg>';
+  var SB_ARROW = '<svg viewBox="0 0 48 24" width="40" height="20" aria-hidden="true"><path d="M4 12h36M32 5l8 7-8 7" fill="none" stroke="#2EC5FF" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  function storyboard(o, C) {
+    var cap = '<p class="mfilm__sbcap"><b>' + esc(C.name) + '</b>' + esc(C.j1) + ' ' + j2html(C) + '</p>';
+    var lines = '<div class="mfilm__sblines">' + (C.m1 ? '<p class="mfilm__sbl">' + esc(C.m1) + '<br>' + esc(C.m2) + '</p>' : '') +
+      '<p class="mfilm__sbm">' + esc(C.m3[0]) + '<span class="mfilm__sbrule">' + esc(C.m3[1]) + '</span>' + esc(C.m3[2]) + '</p>' +
+      '<p class="mfilm__sbbig">' + esc(C.m4[0]) + ' <span class="mfilm__sbhl">' + esc(C.m4[1]) + '</span></p></div>';
+    if (o.story === 'rashid') return '<div class="mfilm__sb"><div class="mfilm__sbpair">' + SB_HOME + '<span class="mfilm__sbarrow">' + SB_ARROW + '</span>' + SB_UNIT + '</div>' + cap + lines + '</div>';
     return '<div class="mfilm__sb">' +
-      '<div class="mfilm__sbword" aria-hidden="true"><span class="mfilm__sbt">T<svg class="mfilm__sbtrail" viewBox="0 0 120 60" preserveAspectRatio="none"><path d="M118 8C80 10 40 30 2 56" fill="none" stroke="#FFB81C" stroke-width="2.2" stroke-linecap="round" stroke-dasharray="1 0"/><path d="M118 8C82 12 46 30 10 54" fill="none" stroke="#FFE2A8" stroke-width="1" stroke-linecap="round" opacity=".7"/></svg></span><span class="mfilm__sbr">RAVEL</span></div>' +
-      '<div class="mfilm__sbunit"><svg viewBox="0 0 120 100" width="104" height="87" aria-hidden="true"><path d="M8 94V26L60 6l52 20v68" fill="none" stroke="#152249" stroke-width="3" stroke-linejoin="round"/><path d="M4 94h112" stroke="#152249" stroke-width="3" stroke-linecap="round"/><rect x="30" y="40" width="60" height="54" rx="2" fill="#fff" stroke="#152249" stroke-width="3"/><path d="M60 40v54" stroke="#152249" stroke-width="2.4"/><path d="M36 50h18M66 50h18M36 60h18M66 60h18M36 84h18M66 84h18" stroke="#B9C2CF" stroke-width="1.6"/><path d="M55 66a5 5 0 0 1 10 0v4" fill="none" stroke="#152249" stroke-width="2.4"/><rect x="52.5" y="69" width="15" height="12" rx="2.5" fill="#FFC83D" stroke="#152249" stroke-width="1.6"/><path d="M26 36h68" stroke="#2EC5FF" stroke-width="2.4" stroke-linecap="round"/></svg>' +
-      '<p class="mfilm__sbcap"><b>James</b>' + esc(COPY.j1) + ' ' + esc(COPY.j2a) + '<strong>' + esc(COPY.j2b) + '</strong>' + esc(COPY.j2c) + '</p></div>' +
-      '<div class="mfilm__sblines"><p class="mfilm__sbl">' + esc(COPY.m1) + '<br>' + esc(COPY.m2) + '</p><p class="mfilm__sbm">' + esc(COPY.m3a) + '<span class="mfilm__sbrule">' + esc(COPY.m3b) + '</span>' + esc(COPY.m3c) + '</p>' +
-      '<p class="mfilm__sbbig">' + esc(COPY.m4a) + ' <span class="mfilm__sbhl">' + esc(COPY.m4b) + '</span></p></div>' +
-      '</div>';
+      '<div class="mfilm__sbword" aria-hidden="true" dir="ltr"><span class="mfilm__sbt">T<svg class="mfilm__sbtrail" viewBox="0 0 120 60" preserveAspectRatio="none"><path d="M118 8C80 10 40 30 2 56" fill="none" stroke="#FFB81C" stroke-width="2.2" stroke-linecap="round"/><path d="M118 8C82 12 46 30 10 54" fill="none" stroke="#FFE2A8" stroke-width="1" stroke-linecap="round" opacity=".7"/></svg></span><span class="mfilm__sbr">RAVEL</span></div>' +
+      '<div class="mfilm__sbunit">' + SB_UNIT + cap + '</div>' + lines + '</div>';
   }
 
   /* ============================== the player ============================== */
@@ -867,7 +1198,10 @@
 
   function open(opts) {
     if (cur) return cur.player;
-    var o = opts || {}, L = TXT[o.lang === 'ar' ? 'ar' : 'en'], d = buildDom(o, L), html = doc.documentElement;
+    var o = {}, k0; for (k0 in opts || {}) o[k0] = opts[k0];
+    o.lang = o.lang === 'ar' ? 'ar' : 'en'; o.story = o.story === 'rashid' ? 'rashid' : 'james'; o.rtl = o.lang === 'ar';
+    var S = STORY[o.story], C = S[o.lang], L = UI[o.lang], DUR = S.dur, SC = S.sc, SKIP_TO = S.skip;
+    var d = buildDom(o, L, C, S), html = doc.documentElement;
     var st = { t: 0, playing: false, ended: false, raf: 0, last: 0, eng: null, mode: '3d', opener: doc.activeElement, pushed: false, dead: false, endFocused: false, pr: 1, slow: [], w: 0, h: 0 };
     var styleCache = typeof WeakMap === 'function' ? new WeakMap() : null;
     function css(el, s) { if (styleCache) { if (styleCache.get(el) === s) return; styleCache.set(el, s); } el.style.cssText = s; }
@@ -881,7 +1215,7 @@
       if (st.eng) { st.eng.dispose(); st.eng = null; }
       cancelAnimationFrame(st.raf); st.playing = false;
       d.root.classList.add('mfilm--still');
-      d.still.innerHTML = storyboard(o) + '<p class="mfilm__note" hidden dir="' + (o.lang === 'ar' ? 'rtl' : 'ltr') + '" lang="' + (o.lang === 'ar' ? 'ar' : 'en') + '">' + esc(L.note) + '</p>';
+      d.still.innerHTML = storyboard(o, C) + '<p class="mfilm__note" hidden dir="' + (o.lang === 'ar' ? 'rtl' : 'ltr') + '" lang="' + (o.lang === 'ar' ? 'ar' : 'en') + '">' + esc(L.note) + '</p>';
       d.still.hidden = false; d.still.appendChild(d.end); var nt = d.still.querySelector('.mfilm__note'); d.still.appendChild(nt); nt.hidden = false; d.end.classList.add('is-on');
       d.endBtns.forEach(function (b) { b.style.cssText = ''; });
       d.replay.hidden = true;
@@ -889,7 +1223,7 @@
     }
     if (o.reduced || !can()) still(o.reduced ? 'reduced' : 'nogl');
     else {
-      try { st.eng = createEngine(d.stage, o); }
+      try { st.eng = (o.story === 'rashid' ? createRashid : createEngine)(d.stage, o); }
       catch (e) {
         if (W.console) console.warn('RVMotion: 3D failed, showing the storyboard', e);
         var fc = d.stage.querySelector('canvas');
@@ -904,19 +1238,19 @@
     function third(el, a, b0, b1, t) { var p = out3(seg(t, a, a + .45)), x = seg(t, b0, b1), on = t >= a && x < 1; css(el, on ? 'visibility:visible;opacity:' + (p * (1 - x)).toFixed(3) + ';transform:translateY(' + ((1 - p) * 14 - x * 8).toFixed(2) + 'px)' : 'visibility:hidden'); }
     function captions(t) {
       css(d.black, t < .4 ? 'opacity:' + (1 - out3(t / .4)).toFixed(3) : 'visibility:hidden');
-      var bl = t < 8.95 ? inq(seg(t, 8.6, 8.95)) : 1 - out3(seg(t, 8.95, 9.35));
+      var B = S.bloom, bl = !B ? 0 : t < B[1] ? inq(seg(t, B[0], B[1])) : 1 - out3(seg(t, B[1], B[2]));
       css(d.bloom, bl > 0 ? 'visibility:visible;opacity:' + bl.toFixed(3) : 'visibility:hidden');
-      var sc = tw(t, 20.0, 21.0); css(d.scrim, sc > 0 ? 'visibility:visible;opacity:' + sc.toFixed(3) : 'visibility:hidden');
-      third(d.j1, 7.3, 8.4, 8.6, t); third(d.j2, 15.4, 16.7, 16.9, t);
-      if (lineOut(d.m12, 22.6, 22.9, t, 20.3)) { wordIn(d.l1, 20.3, t); wordIn(d.l2, 21.3, t); }
-      if (lineOut(d.m3, 24.3, 24.6, t, 22.9)) { wordIn(d.m3, 22.9, t); css(d.rule, 'transform:scaleX(' + out3(seg(t, 23.5, 24.0)).toFixed(3) + ')'); }
-      if (lineOut(d.m4, 99, 100, t, 24.5)) { wordIn(d.m4, 24.5, t); css(d.hl, 'transform:scaleX(' + out3(seg(t, 24.8, 25.3)).toFixed(3) + ')'); }
-      var endOn = t >= 24.9; d.end.classList.toggle('is-on', endOn);
-      d.endBtns.forEach(function (b, i) { var p = out3(seg(t, 24.9 + Math.min(i, 2) * .12, 25.4 + Math.min(i, 2) * .12)); css(b, endOn ? 'opacity:' + p.toFixed(3) + ';transform:translateY(' + ((1 - p) * 12).toFixed(2) + 'px)' : ''); });
+      var sc = tw(t, S.scrim[0], S.scrim[1]); css(d.scrim, sc > 0 ? 'visibility:visible;opacity:' + sc.toFixed(3) : 'visibility:hidden');
+      third(d.j1, S.j1[0], S.j1[1], S.j1[2], t); third(d.j2, S.j2[0], S.j2[1], S.j2[2], t);
+      if (d.m12 && lineOut(d.m12, S.m12[0], S.m12[1], t, S.m1)) { wordIn(d.l1, S.m1, t); wordIn(d.l2, S.m2, t); }
+      if (lineOut(d.m3, S.m3[1], S.m3[2], t, S.m3[0])) { wordIn(d.m3, S.m3[0], t); css(d.rule, 'transform:scaleX(' + out3(seg(t, S.rule[0], S.rule[1])).toFixed(3) + ')'); }
+      if (lineOut(d.m4, 99, 100, t, S.m4)) { wordIn(d.m4, S.m4, t); css(d.hl, 'transform:scaleX(' + out3(seg(t, S.hl[0], S.hl[1])).toFixed(3) + ')'); }
+      var endOn = t >= S.end; d.end.classList.toggle('is-on', endOn);
+      d.endBtns.forEach(function (b, i) { var p = out3(seg(t, S.end + Math.min(i, 2) * .12, S.end + .5 + Math.min(i, 2) * .12)); css(b, endOn ? 'opacity:' + p.toFixed(3) + ';transform:translateY(' + ((1 - p) * 12).toFixed(2) + 'px)' : ''); });
       d.skip.hidden = t >= SKIP_TO - .01; d.fab.hidden = endOn;
-      var s = sceneOf(t);
-      d.segs.forEach(function (b, i) { var f = seg(t, SC[i], i < 4 ? SC[i + 1] : DUR); css(b.firstChild, 'transform:scaleX(' + f.toFixed(4) + ')'); if (i === s) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current'); });
-      d.root.classList.toggle('mfilm--end', endOn); d.root.classList.toggle('mfilm--day', t > 12.2);
+      var s = sceneOf(t, SC);
+      d.segs.forEach(function (b, i) { var f = seg(t, SC[i], i < SC.length - 1 ? SC[i + 1] : DUR); css(b.firstChild, 'transform:scaleX(' + f.toFixed(4) + ')'); if (i === s) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current'); });
+      d.root.classList.toggle('mfilm--end', endOn); d.root.classList.toggle('mfilm--day', t > S.dayAt);
     }
     function render() {
       if (!st.eng) return;
@@ -952,7 +1286,7 @@
       st.playing = true; st.ended = false; st.last = 0; if (!o.manual && !st.raf) st.raf = requestAnimationFrame(loop);
     }
     function pause() { st.playing = false; if (st.raf) cancelAnimationFrame(st.raf); st.raf = 0; }
-    function seek(t) { st.t = clamp(+t || 0, 0, DUR); if (st.t < 24.9) st.endFocused = false; render(); if (st.t >= DUR) { st.ended = true; if (st.playing) pause(); } }
+    function seek(t) { st.t = clamp(+t || 0, 0, DUR); if (st.t < S.end) st.endFocused = false; render(); if (st.t >= DUR) { st.ended = true; if (st.playing) pause(); } }
     function skip() {
       if (st.mode !== '3d') return;
       d.flash.classList.remove('is-on'); void d.flash.offsetWidth; d.flash.classList.add('is-on');
@@ -983,8 +1317,8 @@
       var tag = (e.target && e.target.tagName) || '';
       if ((k === ' ' || k === 'k' || k === 'K') && tag !== 'BUTTON' && tag !== 'A') { e.preventDefault(); toggle(); }
       else if (k === 'ArrowRight' || k === 'ArrowLeft') {
-        var s = sceneOf(st.t), fwd = (k === 'ArrowRight') !== (d.root.getAttribute('dir') === 'rtl');
-        var nt = fwd ? (s < 4 ? SC[s + 1] : SKIP_TO) : (st.t - SC[s] > 1 || s === 0 ? SC[s] : SC[s - 1]);
+        var s = sceneOf(st.t, SC), fwd = (k === 'ArrowRight') !== (d.root.getAttribute('dir') === 'rtl');
+        var nt = fwd ? (s < SC.length - 1 ? SC[s + 1] : SKIP_TO) : (st.t - SC[s] > 1 || s === 0 ? SC[s] : SC[s - 1]);
         e.preventDefault(); seek(nt); if (!o.manual) play();
       } else if (k === 'r' || k === 'R') { e.preventDefault(); replay(); }
     }
@@ -998,7 +1332,7 @@
     d.close.addEventListener('click', function () { close(); });
     d.skip.addEventListener('click', skip);
     d.replay.addEventListener('click', replay);
-    d.cta.addEventListener('click', function () { var cb = o.onExplore; close(); if (cb) cb(); });
+    d.cta.addEventListener('click', function () { var cb = o.onExplore; close(); if (cb) cb(o.story); });
     d.segs.forEach(function (b, i) { b.addEventListener('click', function () { seek(SC[i]); if (!o.manual) play(); }); });
 
     function close() {
@@ -1020,9 +1354,9 @@
       play: play, pause: pause, seek: seek, skip: skip, replay: replay, close: close, resize: function () { size(); render(); },
       probe: function () {
         var i = st.eng ? st.eng.info : {}, caps = [];
-        [['j1', d.j1], ['j2', d.j2], ['m1', d.m12], ['m3', d.m3], ['m4', d.m4]].forEach(function (p) { if (p[1].style.visibility === 'visible' && st.mode === '3d') caps.push(p[0]); });
-        return { mode: st.mode, why: st.why, t: st.t, scene: sceneOf(st.t), playing: st.playing, ended: st.ended, k: i.k, sub: i.sub, plane: i.plane, wipe: i.wipe, close: i.close, door: i.door, lock: i.lock,
-          day: i.day, calls: i.calls, tris: i.tris, rebuilt: i.rebuilt, pr: st.pr, meanFrame: st.mean, caps: caps, end: d.end.classList.contains('is-on'), photo: st.eng ? st.eng.hasPhoto() : false, wipeShader: st.eng ? st.eng.wipeOK() : null };
+        [['j1', d.j1], ['j2', d.j2], ['m1', d.m12], ['m3', d.m3], ['m4', d.m4]].forEach(function (p) { if (p[1] && p[1].style.visibility === 'visible' && st.mode === '3d') caps.push(p[0]); });
+        return { story: o.story, lang: o.lang, mode: st.mode, why: st.why, t: st.t, dur: DUR, scene: sceneOf(st.t, SC), playing: st.playing, ended: st.ended, k: i.k, sub: i.sub, plane: i.plane, wipe: i.wipe, close: i.close, door: i.door, lock: i.lock,
+          day: i.day, wrapped: i.wrapped, stored: i.stored, clean: i.clean, calls: i.calls, tris: i.tris, rebuilt: i.rebuilt, pr: st.pr, meanFrame: st.mean, caps: caps, end: d.end.classList.contains('is-on'), photo: st.eng ? st.eng.hasPhoto() : false, wipeShader: st.eng ? st.eng.wipeOK() : null };
       },
       _eng: function () { return st.eng; }
     };
@@ -1049,7 +1383,7 @@
       probe: function () { return cur ? cur.player.probe() : null; },
       player: function () { return cur ? cur.player : null; },
       sched: sched,
-      solid: function (k) { var e = cur && cur.player._eng(); if (!e) return null; var r = e.solid(k); if (cur) cur.player.seek(cur.st.t); return r; }
+      solid: function (k) { var e = cur && cur.player._eng(); if (!e || !e.solid) return null; var r = e.solid(k); if (cur) cur.player.seek(cur.st.t); return r; }
     }
   };
 })();
