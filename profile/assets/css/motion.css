@@ -136,3 +136,9 @@ html.mfilm-lock,html.mfilm-lock body{overflow:hidden!important;overscroll-behavi
 .mfilm__still[lang=ar] .mfilm__sbword{justify-content:flex-end}
 .mfilm__sbpair{display:flex;align-items:center;gap:10px}
 [dir=rtl] .mfilm__sbarrow svg{transform:scaleX(-1)}
+/* Rashid's film ends on his tidy room: a lighter veil, low in the frame, so the room stays the picture */
+.mfilm--rashid .mfilm__scrim{background:linear-gradient(180deg,rgba(244,246,248,0) 48%,rgba(244,246,248,.72) 66%,rgba(244,246,248,.93) 84%)}
+@media (min-aspect-ratio:1/1){
+  .mfilm--rashid .mfilm__scrim{background:linear-gradient(90deg,rgba(244,246,248,.9) 0%,rgba(244,246,248,.72) 26%,rgba(244,246,248,0) 46%)}
+  .mfilm--rashid[dir=rtl] .mfilm__scrim{background:linear-gradient(270deg,rgba(244,246,248,.9) 0%,rgba(244,246,248,.72) 26%,rgba(244,246,248,0) 46%)}
+}

@@ -502,7 +502,7 @@
       sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nuniform vec3 uRimDir, uRimCol;\nuniform float uRimK;')
         .replace('#include <output_fragment>', 'vec3 rvN = normalize(normal);\nfloat rvF = pow(1.0 - clamp(dot(rvN, normalize(vViewPosition)), 0.0, 1.0), 2.6);\nfloat rvD = clamp(dot(rvN, uRimDir) * .7 + .35, 0.0, 1.0);\noutgoingLight += uRimCol * rvF * rvD * uRimK;\n#include <output_fragment>');
     };
-    var sil = new T.Mesh(buildSilhouette(T), jMat); james.add(sil);
+    var JH = 1.98, sil = new T.Mesh(buildSilhouette(T), jMat); sil.scale.setScalar(JH / 1.83); james.add(sil);
     var photo = null, photoMat = null, photoTex = null, photoAsp = .413;
     if (o.jamesImg) {
       var img = new Image();
@@ -513,7 +513,7 @@
         photoAsp = img.naturalWidth / img.naturalHeight || .413;
         photoMat = new T.MeshBasicMaterial({ map: photoTex, transparent: true, depthWrite: false, alphaTest: .02, side: T.DoubleSide, color: 0x1B2748 });
         var g = new T.PlaneGeometry(1, 1); g.translate(0, .5, 0);
-        photo = new T.Mesh(g, photoMat); photo.scale.set(1.83 * photoAsp, 1.83, 1); photo.renderOrder = 5; james.add(photo);
+        photo = new T.Mesh(g, photoMat); photo.scale.set(JH * photoAsp, JH, 1); photo.renderOrder = 5; james.add(photo);
         sil.visible = false;
         if (api.onReady) api.onReady();
       };
@@ -698,19 +698,21 @@
     return api;
   }
 
-  /* ============================== Rashid: a full room, the extras packed and moved to a Ravel unit ============================== */
-  // World: the room is a cut-away set (no front wall, no ceiling), floor at y = 0, x across, z toward the viewer.
-  // Its door is in the right wall; a Ravel unit stands outside, its doorway facing the room's door.
-  var RTM = { wrap: 4.1, wrapGap: .17, move: 6.2, moveGap: .32, moveDur: 3.0, close: 12.45, lock: 13.75, back: 15.4 };
+  /* ============================== Rashid: his crowded room (photo), the move to a Ravel unit (3D), his tidy room (photo) ============================== */
+  // A and C are the two photographs of the same room, composited in 2D (Ken Burns push, parallax, a light-sweep wipe);
+  // B is real 3D: the wrapped pieces leave the house through its lit doorway in a line and are stored in a white Ravel unit.
+  // The hand-offs hide in the window's light: A pushes into the window, the light blooms, B opens on the house's lit doorway.
+  var RTM = { swapA: 4.65, move: 5.0, moveGap: .32, moveDur: 3.0, close: 11.3, lock: 12.6, swapB: 15.35, wipe: [15.9, 17.4] };
+  var RPOS = { P: { u: .28, v: .69, h: .255 }, Len: { u: .8, v: .81, h: .45 }, Lar: { u: .29, v: .79, h: .44 } };   // Rashid's feet and height in the photo (fractions of the photo)
+  var PFOCUS = { P: [.8, .42], L: [.66, .38] };                                                                        // the window: where A pushes in and C comes out
   function createRashid(host, o) {
     var T = W.THREE, R = W.RV3D;
     var canvas = doc.createElement('canvas'); canvas.className = 'mfilm__gl'; host.appendChild(canvas);
     var renderer = new T.WebGLRenderer({ canvas: canvas, antialias: !o.low, alpha: false, powerPreference: 'high-performance', preserveDrawingBuffer: !!o.manual });
-    renderer.setClearColor(0x1C2552, 1);
+    renderer.setClearColor(0xEFE6D8, 1);
     var scene = new T.Scene(), cam = new T.PerspectiveCamera(36, 1, .05, 1500);
-    scene.fog = new T.Fog(0xE7A06A, 40, 220);
-    var extra = [], dead = false, info = {};
-    var V1 = new T.Vector3(), cA = new T.Color(), cB = new T.Color(), tmpC = new T.Color();
+    scene.fog = new T.Fog(0xF2C99C, 40, 260);
+    var extra = [], dead = false, info = {}, tmpC = new T.Color(), cA = new T.Color(), cB = new T.Color();
     function mixHex(a, b, k) { return cA.setHex(a).lerp(cB.setHex(b), k).getHex(); }
     function canvasTex(c) { var t = new T.CanvasTexture(c); extra.push(t); return t; }
     function radial(size, stops) {
@@ -719,208 +721,136 @@
     }
     function quad(mat, ro) { var m = new T.Mesh(new T.PlaneGeometry(1, 1), mat); if (ro != null) m.renderOrder = ro; return m; }
     function addMat(o2) { var p = { transparent: true, blending: T.AdditiveBlending, depthWrite: false }; for (var k in o2) p[k] = o2[k]; return new T.MeshBasicMaterial(p); }
-    function M(x, y, z, ry) { var m = new T.Matrix4().makeRotationY(ry || 0); m.setPosition(x, y, z); return m; }
-    var glowTex = radial(128, [[0, 'rgba(255,255,255,1)'], [.3, 'rgba(255,255,255,.45)'], [1, 'rgba(255,255,255,0)']]);
+    function M(x, y, z) { return new T.Matrix4().makeTranslation(x, y, z); }
     var softTex = radial(128, [[0, 'rgba(255,255,255,1)'], [.55, 'rgba(255,255,255,.35)'], [1, 'rgba(255,255,255,0)']]);
-    var blobTex = radial(128, [[0, 'rgba(20,16,30,.5)'], [.5, 'rgba(20,16,30,.24)'], [1, 'rgba(20,16,30,0)']]);
+    var glowTex = radial(128, [[0, 'rgba(255,255,255,1)'], [.3, 'rgba(255,255,255,.45)'], [1, 'rgba(255,255,255,0)']]);
+    var blobTex = radial(128, [[0, 'rgba(40,28,18,.55)'], [.5, 'rgba(40,28,18,.26)'], [1, 'rgba(40,28,18,0)']]);
+    function loadImg(src, cb) {
+      if (!src) return;
+      var im = new Image(); if (!/^data:/.test(src)) im.crossOrigin = 'anonymous';
+      im.onload = function () { if (dead) return; var tx = new T.Texture(im); tx.minFilter = T.LinearFilter; tx.generateMipmaps = false; tx.needsUpdate = true; extra.push(tx); cb(tx, im.naturalWidth / im.naturalHeight); if (api && api.onReady) api.onReady(); };
+      im.src = src;
+    }
 
-    /* ---------- light: dusk, a lamp switched on, then a bright clean evening ---------- */
-    var hemi = new T.HemisphereLight(0xFFD7B0, 0x3A3050, .5), key = new T.DirectionalLight(0xFFE3C2, .6);
-    key.position.set(-5, 9, 8);
-    var lamp = new T.PointLight(0xFFB06A, 0, 9, 1.3);
-    scene.add(hemi); scene.add(key); scene.add(lamp);
-    var domeGeo = new T.SphereGeometry(600, 32, 16), domeCol = new Float32Array(domeGeo.attributes.position.count * 3), skyKey = '';
+    /* ---------- the 2D layer: the room photographs ---------- */
+    var scene2 = new T.Scene(), ortho = new T.OrthographicCamera(-.5, .5, .5, -.5, -10, 10);
+    var PU = { tA: { value: null }, tB: { value: null }, uW: { value: -1 }, uSoft: { value: .07 }, uBand: { value: 0 }, uBright: { value: 1 } };
+    var photoMat = new T.ShaderMaterial({ uniforms: PU, depthTest: false, depthWrite: false,
+      vertexShader: 'varying vec2 vUv; void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+      fragmentShader: 'uniform sampler2D tA, tB; uniform float uW, uSoft, uBand, uBright; varying vec2 vUv;\n' +
+        'void main() { vec3 a = texture2D(tA, vUv).rgb, b = texture2D(tB, vUv).rgb; float x = vUv.x - (vUv.y - .5) * .28;\n' +
+        ' float e = smoothstep(uW - uSoft, uW + uSoft, x); vec3 c = mix(b, a, e);\n' +
+        ' float band = exp(-pow((x - uW) / (uSoft * 1.6), 2.0)); c = c * uBright + vec3(1.0, .86, .62) * band * uBand;\n' +
+        ' gl_FragColor = vec4(c, 1.0); }' });
+    var photo = new T.Mesh(new T.PlaneGeometry(1, 1), photoMat); photo.renderOrder = 0; scene2.add(photo);
+    var standGeo = new T.PlaneGeometry(1, 1); standGeo.translate(0, .5, 0);
+    var standMat = new T.MeshBasicMaterial({ transparent: true, depthTest: false, depthWrite: false, color: 0xFFFFFF });
+    var stand = new T.Mesh(standGeo, standMat); stand.renderOrder = 2; stand.visible = false; scene2.add(stand);
+    var stand2Sh = new T.Mesh(new T.PlaneGeometry(1, 1), new T.MeshBasicMaterial({ map: blobTex, transparent: true, depthTest: false, depthWrite: false, opacity: .9 })); stand2Sh.renderOrder = 1; scene2.add(stand2Sh);
+    var RI = o.roomImgs || {}, ROOM = { fullP: null, fullL: null, tidyP: null, tidyL: null }, RASP = { P: .5625, L: 1.7778 }, standAsp = .364;
+    ['fullP', 'fullL', 'tidyP', 'tidyL'].forEach(function (k) { loadImg(RI[k], function (tx, a) { ROOM[k] = tx; RASP[k.slice(-1)] = a; }); });
+    loadImg(o.rashidStandImg, function (tx, a) { standMat.map = tx; standMat.needsUpdate = true; standAsp = a; stand.visible = true; });
+
+    /* ---------- the 3D world: the house's front, the lane, the unit, golden hour ---------- */
+    var hemi = new T.HemisphereLight(0xFFF7EE, 0xB9B2A8, .64), key = new T.DirectionalLight(0xFFF0DC, .82); key.position.set(-6, 8, 7);
+    scene.add(hemi); scene.add(key);
+    var domeGeo = new T.SphereGeometry(600, 32, 16), domeCol = new Float32Array(domeGeo.attributes.position.count * 3);
     domeGeo.setAttribute('color', new T.BufferAttribute(domeCol, 3));
+    (function () { var cz = new T.Color(0x7394C4), ch = new T.Color(0xF2C99C), p = domeGeo.attributes.position; for (var i = 0; i < p.count; i++) { var e = clamp(p.getY(i) / 600, 0, 1); tmpC.copy(ch).lerp(cz, Math.pow(e, .5)); domeCol[i * 3] = tmpC.r; domeCol[i * 3 + 1] = tmpC.g; domeCol[i * 3 + 2] = tmpC.b; } })();
     var dome = new T.Mesh(domeGeo, new T.MeshBasicMaterial({ vertexColors: true, side: T.BackSide, fog: false, depthWrite: false })); dome.renderOrder = -10; scene.add(dome);
-    var cz = new T.Color(), chz = new T.Color();
-    function sky(zen, hor) {
-      var k2 = zen + ':' + hor; if (k2 === skyKey) return; skyKey = k2;
-      cz.setHex(zen); chz.setHex(hor); var p = domeGeo.attributes.position;
-      for (var i = 0; i < p.count; i++) { var e = clamp(p.getY(i) / 600, 0, 1), k = Math.pow(e, .5); tmpC.copy(chz).lerp(cz, k); domeCol[i * 3] = tmpC.r; domeCol[i * 3 + 1] = tmpC.g; domeCol[i * 3 + 2] = tmpC.b; }
-      domeGeo.attributes.color.needsUpdate = true;
-    }
-    var groundMat = new T.MeshBasicMaterial({ color: 0x8A8290, map: radial(256, [[0, '#ffffff'], [.18, '#e9e9ee'], [.5, '#b9bac6'], [1, '#9a9bab']]) });
-    var ground = new T.Mesh(new T.CircleGeometry(300, 64), groundMat); ground.rotation.x = -Math.PI / 2; ground.position.y = -.2; scene.add(ground);
-
-    /* ---------- the room ---------- */
-    var RW = 6.4, RD = 4.8, RH = 3.0, WT = .14, DZ = .4, DWD = 1.1, DHT = 2.4, X0 = -RW / 2, X1 = RW / 2, Z0 = -RD / 2, Z1 = RD / 2;
-    var WALL = 0xF1E9DE, EDGE = 0xD9CFC2, SKIRT = 0xCDBFAE;
-    var room = new T.Group(); scene.add(room);
-    var wallsG = merge(T, [
-      { g: new T.BoxGeometry(RW + 2 * WT, RH, WT), m: M(0, RH / 2, Z0 - WT / 2), c: WALL },
-      { g: new T.BoxGeometry(WT, RH, RD), m: M(X0 - WT / 2, RH / 2, 0), c: WALL },
-      { g: new T.BoxGeometry(WT, RH, DZ - DWD / 2 - Z0), m: M(X1 + WT / 2, RH / 2, (Z0 + DZ - DWD / 2) / 2), c: WALL },
-      { g: new T.BoxGeometry(WT, RH, Z1 - DZ - DWD / 2), m: M(X1 + WT / 2, RH / 2, (Z1 + DZ + DWD / 2) / 2), c: WALL },
-      { g: new T.BoxGeometry(WT, RH - DHT, DWD), m: M(X1 + WT / 2, (RH + DHT) / 2, DZ), c: WALL },
-      { g: new T.BoxGeometry(RW, .1, .02), m: M(0, .05, Z0 + .01), c: SKIRT },
-      { g: new T.BoxGeometry(.02, .1, RD), m: M(X0 + .01, .05, 0), c: SKIRT },
-      { g: new T.BoxGeometry(RW + 2 * WT + .02, .02, WT + .02), m: M(0, RH + .01, Z0 - WT / 2), c: EDGE },
-      { g: new T.BoxGeometry(WT + .02, .02, RD), m: M(X0 - WT / 2, RH + .01, 0), c: EDGE },
-      { g: new T.BoxGeometry(RW + 2 * WT + .3, .24, RD + WT + .3), m: M(0, -.12, -WT / 2), c: 0xCFC4B4 },
-      // the door's frame and the window's frame (bronze)
-      { g: new T.BoxGeometry(WT + .04, DHT + .05, .05), m: M(X1 + WT / 2, (DHT + .05) / 2, DZ - DWD / 2 - .025), c: 0x7A6650 },
-      { g: new T.BoxGeometry(WT + .04, DHT + .05, .05), m: M(X1 + WT / 2, (DHT + .05) / 2, DZ + DWD / 2 + .025), c: 0x7A6650 },
-      { g: new T.BoxGeometry(WT + .04, .05, DWD + .1), m: M(X1 + WT / 2, DHT + .025, DZ), c: 0x7A6650 },
-      { g: new T.BoxGeometry(1.7, .06, .08), m: M(1.6, 2.35, Z0 + .03), c: 0x6B5A48 }, { g: new T.BoxGeometry(1.7, .06, .08), m: M(1.6, .95, Z0 + .03), c: 0x6B5A48 },
-      { g: new T.BoxGeometry(.06, 1.46, .08), m: M(.78, 1.65, Z0 + .03), c: 0x6B5A48 }, { g: new T.BoxGeometry(.06, 1.46, .08), m: M(2.42, 1.65, Z0 + .03), c: 0x6B5A48 },
-      { g: new T.BoxGeometry(.04, 1.4, .06), m: M(1.6, 1.65, Z0 + .03), c: 0x6B5A48 }
-    ]);
-    var walls = new T.Mesh(wallsG, new T.MeshLambertMaterial({ vertexColors: true })); room.add(walls);
-    // floor: pale stone tiles with a soft painted falloff
-    var fc = R.mk(512, 512), fg = fc.getContext('2d'); fg.fillStyle = '#ECE4D7'; fg.fillRect(0, 0, 512, 512);
-    fg.strokeStyle = 'rgba(140,120,96,.18)'; fg.lineWidth = 1.5; for (var gx = 0; gx <= 512; gx += 512 / 8) { fg.beginPath(); fg.moveTo(gx, 0); fg.lineTo(gx, 512); fg.stroke(); fg.beginPath(); fg.moveTo(0, gx); fg.lineTo(512, gx); fg.stroke(); }
-    var fgr = fg.createRadialGradient(256, 230, 40, 256, 256, 380); fgr.addColorStop(0, 'rgba(255,255,255,.25)'); fgr.addColorStop(1, 'rgba(90,70,50,.18)'); fg.fillStyle = fgr; fg.fillRect(0, 0, 512, 512);
-    var floorTex = canvasTex(fc); floorTex.anisotropy = 4;
-    var floorMat = new T.MeshLambertMaterial({ map: floorTex, color: 0xD8CEC0 });
-    var floorM = new T.Mesh(new T.PlaneGeometry(RW, RD), floorMat); floorM.rotation.x = -Math.PI / 2; floorM.position.y = .002; room.add(floorM);
-    // a rug in navy and sand, a window holding the dusk
-    var rc = R.mk(512, 352), rg = rc.getContext('2d'); rg.fillStyle = '#22346E'; rg.fillRect(0, 0, 512, 352); rg.strokeStyle = '#D8C29A'; rg.lineWidth = 10; rg.strokeRect(22, 22, 468, 308); rg.lineWidth = 3; rg.strokeRect(42, 42, 428, 268);
-    rg.fillStyle = 'rgba(216,194,154,.85)'; for (var ri = 0; ri < 5; ri++) { rg.save(); rg.translate(108 + ri * 74, 176); rg.rotate(Math.PI / 4); rg.fillRect(-16, -16, 32, 32); rg.restore(); }
-    var rug = new T.Mesh(new T.PlaneGeometry(3.4, 2.3), new T.MeshLambertMaterial({ map: canvasTex(rc) })); rug.rotation.x = -Math.PI / 2; rug.position.set(-.6, .006, -1.05); room.add(rug);
-    var wc = R.mk(64, 128), wg = wc.getContext('2d'), wgr = wg.createLinearGradient(0, 0, 0, 128); wgr.addColorStop(0, '#2A3466'); wgr.addColorStop(.55, '#B7708A'); wgr.addColorStop(1, '#F2A66A'); wg.fillStyle = wgr; wg.fillRect(0, 0, 64, 128);
-    var winMat = new T.MeshBasicMaterial({ map: canvasTex(wc), color: 0xffffff });
-    var win = new T.Mesh(new T.PlaneGeometry(1.64, 1.4), winMat); win.position.set(1.6, 1.65, Z0 + .005); room.add(win);
-    // furniture that stays: a sofa, a coffee table, a side table with a lamp, a plant
-    var fb = new R.BoxBatch(T), SOFA = '#3A4A72', SOFA_L = '#4A5C88', WOOD = '#6A4630', WOOD_D = '#4A2F1E';
-    (function () {
-      var sx = -.6, sz = Z0 + .5, sw = 2.3;
-      fb.add(sx, .2, sz + .05, sw, .4, .86, SOFA, 0, .95); fb.add(sx, .62, sz - .3, sw, .5, .24, SOFA, 0, 1.08);
-      fb.add(sx - sw / 2 + .1, .42, sz + .03, .2, .44, .9, SOFA, 0, 1.12); fb.add(sx + sw / 2 - .1, .42, sz + .03, .2, .44, .9, SOFA, 0, 1.12);
-      [-1, 0, 1].forEach(function (k) { fb.add(sx + k * .66, .46, sz + .1, .64, .12, .64, SOFA_L, 0, 1.1); fb.add(sx + k * .66, .7, sz - .14, .6, .34, .14, SOFA_L, 0, 1.15); });
-      fb.add(sx - .85, .66, sz - .03, .34, .3, .1, '#D8C29A', .2, 1); fb.add(sx + .9, .66, sz - .03, .34, .3, .1, '#D8C29A', -.2, 1);
-      var tx = -.6, tz = -.75; fb.add(tx, .4, tz, 1.1, .05, .6, WOOD, 0, 1.05); [[-1, -1], [1, -1], [-1, 1], [1, 1]].forEach(function (q) { fb.add(tx + q[0] * .5, .19, tz + q[1] * .25, .05, .38, .05, WOOD_D, 0, 1); });
-      fb.add(tx, .12, tz, 1.0, .03, .5, WOOD, 0, .95);
-      var ex = -2.35, ez = Z0 + .35; fb.add(ex, .27, ez, .5, .54, .45, WOOD, 0, 1); fb.add(ex, .55, ez, .52, .03, .47, WOOD_D, 0, 1);
-      fb.add(2.75, .17, 1.9, .42, .34, .42, '#C9BBA6', 0, 1);
-    })();
-    var furn = fb.mesh(new T.MeshLambertMaterial({ vertexColors: true })); room.add(furn);
-    var decor = new T.Mesh(merge(T, [
-      { g: new T.CylinderGeometry(.012, .012, .5, 8), m: M(-2.35, .82, Z0 + .35), c: 0x8A7A62 },
-      { g: new T.CylinderGeometry(.13, .19, .26, 24, 1, true), m: M(-2.35, 1.16, Z0 + .35), c: 0xF6E7CC },
-      { g: new T.SphereGeometry(.34, 18, 12), m: M(2.75, .62, 1.9), c: 0x4E6B4A }, { g: new T.SphereGeometry(.26, 16, 10), m: M(2.62, .9, 1.82), c: 0x5D7C56 }, { g: new T.SphereGeometry(.22, 16, 10), m: M(2.9, .86, 1.98), c: 0x47613F }
-    ]), new T.MeshLambertMaterial({ vertexColors: true, side: T.DoubleSide })); room.add(decor);
-    var lampGlow = quad(addMat({ map: glowTex, color: 0xFFB872, fog: false }), 6); lampGlow.position.set(-2.35, 1.16, Z0 + .45); lampGlow.scale.set(1.4, 1.4, 1); room.add(lampGlow);
-    lamp.position.set(-2.2, 1.5, Z0 + .7);
-    // the soft light that crosses the clear floor (painted, not a light: no extra cost per pixel)
-    var sweepQ = quad(addMat({ map: softTex, color: 0xFFF1DA, opacity: 0, fog: false }), 3); sweepQ.rotation.x = -Math.PI / 2; sweepQ.position.y = .01; sweepQ.scale.set(2.4, 3.6, 1); room.add(sweepQ);
-
-    /* ---------- the unit outside ---------- */
-    // a unit as deep as the page's and a little wider, so its open leaves fold flat against its front
+    var ground = new T.Mesh(new T.CircleGeometry(300, 64), new T.MeshBasicMaterial({ color: 0xCFC7BB, map: radial(256, [[0, '#ffffff'], [.2, '#f1eee9'], [.6, '#d9d5ce'], [1, '#c9c4bc']]) }));
+    ground.rotation.x = -Math.PI / 2; scene.add(ground);
+    // the house: a sand-white front with a lit doorway, a canopy, two lit windows
+    var HX0 = -6.5, HX1 = 1.6, HD = 6, HH = 6.4, DXH = -.6, DWH = 1.2, DHH = 2.5, SAND = 0xEEE6D9, TRIM = 0xD7CCBB, BRONZE = 0x7A6650;
+    var house = new T.Mesh(merge(T, [
+      { g: new T.BoxGeometry(HX1 - HX0, HH, HD - .3), m: M((HX0 + HX1) / 2, HH / 2, -.3 - (HD - .3) / 2), c: SAND },
+      { g: new T.BoxGeometry(DXH - DWH / 2 - HX0, HH, .3), m: M((HX0 + DXH - DWH / 2) / 2, HH / 2, -.15), c: SAND },
+      { g: new T.BoxGeometry(HX1 - DXH - DWH / 2, HH, .3), m: M((HX1 + DXH + DWH / 2) / 2, HH / 2, -.15), c: SAND },
+      { g: new T.BoxGeometry(DWH, HH - DHH, .3), m: M(DXH, (HH + DHH) / 2, -.15), c: SAND },
+      { g: new T.BoxGeometry(HX1 - HX0 + .1, .2, HD + .1), m: M((HX0 + HX1) / 2, HH + .1, -HD / 2 + .05), c: TRIM },
+      { g: new T.BoxGeometry(HX1 - HX0 + .04, .18, .04), m: M((HX0 + HX1) / 2, .09, .02), c: TRIM },
+      { g: new T.BoxGeometry(.08, DHH + .08, .1), m: M(DXH - DWH / 2 - .04, (DHH + .08) / 2, .02), c: BRONZE },
+      { g: new T.BoxGeometry(.08, DHH + .08, .1), m: M(DXH + DWH / 2 + .04, (DHH + .08) / 2, .02), c: BRONZE },
+      { g: new T.BoxGeometry(DWH + .16, .08, .1), m: M(DXH, DHH + .04, .02), c: BRONZE },
+      { g: new T.BoxGeometry(DWH + 1.0, .1, .9), m: M(DXH, DHH + .45, .42), c: TRIM },
+      { g: new T.BoxGeometry(HX1 - HX0 + .06, .14, .12), m: M((HX0 + HX1) / 2, 3.35, .06), c: TRIM }
+    ].concat([[-3.4, 1.75, 1.4], [.85, 1.75, 1.0], [-4.6, 4.75, 1.3], [-2.0, 4.75, 1.3], [.6, 4.75, 1.3]].reduce(function (a, w) {
+      // a window: bronze frame, a sill, a cross mullion
+      return a.concat([{ g: new T.BoxGeometry(w[2] + .1, 1.6, .06), m: M(w[0], w[1], .01), c: BRONZE }, { g: new T.BoxGeometry(w[2] + .3, .07, .2), m: M(w[0], w[1] - .84, .08), c: TRIM },
+        { g: new T.BoxGeometry(.04, 1.42, .1), m: M(w[0], w[1], .06), c: BRONZE }, { g: new T.BoxGeometry(w[2] - .04, .04, .1), m: M(w[0], w[1] + .2, .06), c: BRONZE }]);
+    }, []))), new T.MeshLambertMaterial({ vertexColors: true })); scene.add(house);
+    var warm = new T.MeshBasicMaterial({ color: 0xFFE6C2 });
+    var doorLight = new T.Mesh(new T.PlaneGeometry(DWH, DHH), warm); doorLight.position.set(DXH, DHH / 2, -.29); scene.add(doorLight);
+    var glass = new T.Mesh(merge(T, [[-3.4, 1.75, 1.3], [.85, 1.75, .9], [-4.6, 4.75, 1.2], [-2.0, 4.75, 1.2], [.6, 4.75, 1.2]].map(function (w, i) { return { g: new T.PlaneGeometry(w[2], 1.42), m: M(w[0], w[1], .045), c: i < 2 ? 0xFFDDB0 : 0xC9D3E0 }; })), new T.MeshBasicMaterial({ vertexColors: true })); scene.add(glass);
+    var spill = quad(addMat({ map: softTex, color: 0xFFC98E, opacity: .55 }), 3); spill.rotation.x = -Math.PI / 2; spill.position.set(DXH, .02, 1.3); spill.scale.set(2.6, 3.2, 1); scene.add(spill);
+    var doorGlow = quad(addMat({ map: glowTex, color: 0xFFE0B0, opacity: .5, fog: false }), 6); doorGlow.position.set(DXH, 1.3, .1); doorGlow.scale.set(2.6, 3.4, 1); scene.add(doorGlow);
+    // the unit, its doorway on the same building line as the house's
     var UW = Math.max(3.6, o.unit && o.unit.w || 3), UD = o.unit && o.unit.d || 4, UH = o.unit && o.unit.h || 3, ZF = UD / 2 + .035;
-    var UPX = X1 + WT + 3.6 + ZF, UPZ = DZ, URY = -Math.PI / 2;
-    var unitG = new T.Group(); unitG.position.set(UPX, 0, UPZ); unitG.rotation.y = URY; scene.add(unitG);
+    var UX = HX1 + 1.0 + UW / 2, UZ = -ZF;
+    var unitG = new T.Group(); unitG.position.set(UX, 0, UZ); scene.add(unitG);
     var U4 = makeUnit({ T: T, R: R, canvasTex: canvasTex, radial: radial, quad: quad, addMat: addMat, softTex: softTex }, unitG, { w: UW, d: UD, h: UH }, []);
-    function uw(lx, lz, out) { return out.set(UPX - lz, 0, UPZ + lx); }      // unit-local floor point -> world
-    var LOCKW = uw(-.07, U4.LZ + .02, new T.Vector3()); LOCKW.y = U4.LY - .08;
-    var UDOOR = uw(0, ZF, new T.Vector3());
 
-    /* ---------- the extras: each one clutter first, then wrapped, then carried out in a line ---------- */
-    // [kind, start x, start y, start z, start yaw, slot x, slot z, slot yaw, extra fields]  (slots in unit-local metres, back rows first)
+    /* ---------- the pieces, wrapped, in a line from the house into the unit ---------- */
     var CAT = { box: [.5, .45, .42, '#C69D70'], wardrobeS: [1.0, .58, 1.95, '#7A5236'], carpet: [.56, .5, 2.0, '#8E2F3A'], majlis: [1.9, .7, .8, '#8E2F3A'], dresser: [.9, .45, .8, '#7A5236'], tv: [1.25, .2, .78, '#C69D70'], suit: [.5, .3, .72, '#4A5A73'] };
-    var LIST = [
-      ['carpet', 2.75, 0, -1.95, 0, -1.15, -1.68, 0],
-      ['box', 2.3, 0, -1.05, .15, -.55, -1.7, 0, { n: 3 }],
-      ['dresser', 1.45, 0, -.45, -.25, .25, -1.72, 0, { top: true }],
-      ['box', .25, .44, -1.92, .08, 1.15, -1.7, 0, { n: 2 }],
-      ['tv', 1.25, 0, .95, -.35, .85, -.95, 0],
-      ['box', -.45, .43, -.75, -.12, -1.15, -.95, 0, { n: 1 }],
-      ['box', -1.2, .44, -1.9, .1, -.6, -.95, 0, { n: 2, small: true }],
-      ['suit', .25, 0, 1.05, .3, -1.15, -.2, 0, { v: 1 }],
-      ['suit', -.25, 0, 1.25, -.2, -.75, -.2, 0, { v: 0 }],
-      ['majlis', -2.3, 0, -.3, Math.PI / 2, .45, -.2, 0],
-      ['wardrobeS', -2.6, 0, .5, Math.PI / 2, -.9, .75, 0]
-    ];
-    function plainBatch(kind, w, d, h, c, ex) {
-      var b = new R.BoxBatch(T), i;
-      if (kind === 'box') { for (i = 0; i < ex.n; i++) { var top = i === ex.n - 1 && ex.small; b.add(i % 2 ? .03 : -.02, .21 + i * .42, 0, top ? .38 : .48, top ? .3 : .4, top ? .36 : .43, '#C69D70', (i % 2 ? .12 : -.08), .95 + (i % 3) * .03); } var fy = ex.n * .42; b.add(-.12, fy + .05, -.12, .2, .1, .02, '#B38A5E', .3); b.add(.12, fy + .05, .1, .2, .1, .02, '#B38A5E', -.2); }
-      else if (kind === 'wardrobeS') { b.add(0, h / 2, 0, w, h, d, c); b.add(0, h / 2 + .04, d / 2 + .004, .012, h - .14, .008, '#4A2F1E'); b.add(-.1, h / 2, d / 2 + .014, .022, .2, .022, '#F1E6D6'); b.add(.1, h / 2, d / 2 + .014, .022, .2, .022, '#F1E6D6'); b.add(0, .05, d / 2 + .003, w, .1, .006, '#4A2F1E'); }
-      else if (kind === 'dresser') { b.add(0, h / 2, 0, w, h, d, c); [.2, .45, .7].forEach(function (f) { b.add(0, h * f, d / 2 + .004, w - .1, .012, .008, '#4A2F1E'); }); [.32, .57, .84].forEach(function (f) { b.add(0, h * f, d / 2 + .012, .12, .02, .02, '#F1E6D6'); }); b.add(-.2, h + .1, 0, .3, .2, .25, '#E7D9C2', .2); b.add(.18, h + .06, .02, .26, .12, .2, '#22346E', -.1); }
-      else if (kind === 'tv') { b.add(0, .44, 0, w, .7, .05, '#121722'); b.add(0, .44, .028, w - .04, .66, .004, '#1E2533'); b.add(0, .05, 0, .5, .03, .22, '#2A2F3A'); b.add(0, .09, 0, .06, .1, .04, '#2A2F3A'); }
-      else return null;
-      return b.mesh(itemMat);
-    }
-    var itemMat = new T.MeshLambertMaterial({ vertexColors: true }), filmMat = new T.MeshLambertMaterial({ color: 0xF4F8FC, transparent: true, opacity: .55, depthWrite: false });
-    var filmGeo = new T.BoxGeometry(1, 1, 1); filmGeo.translate(0, .5, 0);
-    var movers = [], ri = 0;
+    // [kind, slot x, slot z, slot yaw, extra]  (unit-local metres; back rows first, which is also the order they leave)
+    var LIST = [['carpet', -1.45, -1.68, 0], ['box', -.85, -1.7, 0, { n: 3 }], ['dresser', -.05, -1.72, 0, { top: true }], ['box', .75, -1.7, 0, { n: 2 }], ['tv', 1.35, -1.1, Math.PI / 2],
+      ['box', -1.45, -.9, 0, { n: 1 }], ['box', -.85, -.9, 0, { n: 2, small: true }], ['suit', -.25, -.9, 0, { v: 1 }], ['suit', .2, -.9, 0, { v: 0 }], ['majlis', .3, -.05, 0], ['wardrobeS', -1.2, .5, 0]];
+    var itemMat = new T.MeshLambertMaterial({ vertexColors: true }), movers = [];
     LIST.forEach(function (L2, i) {
-      var c = CAT[L2[0]], ex = L2[8] || {}, it = { kind: L2[0], x: 0, z: 0, w: c[0], d: c[1], h: c[2], c: c[3], yaw: 0, v: ex.v != null ? ex.v : i };
-      for (var k in ex) it[k] = ex[k];
+      var c = CAT[L2[0]], ex = L2[4] || {}, it = { kind: L2[0], x: 0, z: 0, w: c[0], d: c[1], h: c[2], c: c[3], yaw: 0, v: ex.v != null ? ex.v : i }, k;
+      for (k in ex) it[k] = ex[k];
       var hh = it.kind === 'box' ? it.n * .42 : it.kind === 'dresser' && it.top ? it.h + .4 : it.h;
-      var b = new R.BoxBatch(T); R.addItem(b, it); var wrapped = b.mesh(itemMat); scene.add(wrapped);
-      var plain = plainBatch(it.kind, it.w, it.d, it.h, it.c, it); if (plain) scene.add(plain);
-      var film = new T.Mesh(filmGeo, filmMat.clone()); film.renderOrder = 4; scene.add(film);
-      var sw = uw(L2[5], L2[6], new T.Vector3()), syaw = L2[7] + URY;
-      var hy = Math.max(0, Math.min(1.0, DHT - .06 - hh));
-      // waypoints: lifted over the start, inside the room's door, outside it, inside the unit's doorway, the slot
-      var P = [[L2[1], L2[2] + hy * .5, L2[3]], [X1 - .75, hy, DZ], [X1 + WT + .9, Math.min(hy, .25), DZ], [UDOOR.x + .5, .04, UDOOR.z], [sw.x, 0, sw.z]];
-      var lens = [], tot = 0; for (var j = 0; j < P.length - 1; j++) { var dx = P[j + 1][0] - P[j][0], dy = P[j + 1][1] - P[j][1], dz = P[j + 1][2] - P[j][2], l = Math.sqrt(dx * dx + dy * dy + dz * dz) * (j === 2 ? 2.4 : j === 1 ? 1.4 : 1); lens.push(l); tot += l; }   // weighted: the pieces slow down between the two doors, so the line reads
-      var footR = Math.max(it.w, it.d) * .9;
+      var b = new R.BoxBatch(T); R.addItem(b, it); var mesh = b.mesh(itemMat); scene.add(mesh);
+      var hy = Math.max(.04, Math.min(.35, DHH - .08 - hh)), sx = UX + L2[1], sz = UZ + L2[2];
+      var P = [[DXH, hy, -1.4], [DXH, hy, .5], [DXH + .9, .22, 1.7], [UX - 1.3, .2, 1.7], [UX, .05, .45], [UX, .04, -.6], [sx, 0, sz]];
+      var lens = [], tot = 0; for (var j = 0; j < P.length - 1; j++) { var dx = P[j + 1][0] - P[j][0], dy = P[j + 1][1] - P[j][1], dz = P[j + 1][2] - P[j][2], l = Math.sqrt(dx * dx + dy * dy + dz * dz) * (j === 2 ? 2.0 : 1); lens.push(l); tot += l; }
       var shadow = quad(new T.MeshBasicMaterial({ map: blobTex, transparent: true, depthWrite: false, opacity: 0 }), 2); shadow.rotation.x = -Math.PI / 2; scene.add(shadow);
-      movers.push({ it: it, wrapped: wrapped, plain: plain, film: film, shadow: shadow, hh: hh, start: [L2[1], L2[2], L2[3]], yaw0: L2[4], syaw: syaw, P: P, lens: lens, tot: tot, foot: footR,
-        tw: RTM.wrap + i * RTM.wrapGap, tm: RTM.move + i * RTM.moveGap });
+      movers.push({ it: it, mesh: mesh, shadow: shadow, P: P, lens: lens, tot: tot, yaw0: it.w > 1.1 ? Math.PI / 2 : 0, syaw: L2[3], foot: Math.max(it.w, it.d) * .9, tm: RTM.move + i * RTM.moveGap });
     });
+    var mv = {};
     function moverAt(m, t, out) {
-      var u = io(seg(t, m.tm, m.tm + RTM.moveDur)), lift = tw(t, m.tm - .35, m.tm + .05, out3);
-      out.yaw = m.yaw0; out.x = m.start[0]; out.z = m.start[2]; out.y = m.start[1] + lift * (m.P[0][1] - m.start[1]);
-      if (u <= 0) { out.u = 0; return out; }
-      var d = u * m.tot, j = 0; while (j < m.lens.length - 1 && d > m.lens[j]) { d -= m.lens[j]; j++; }
+      var u = io(seg(t, m.tm, m.tm + RTM.moveDur)), d = u * m.tot, j = 0, acc = 0;
+      while (j < m.lens.length - 1 && d > m.lens[j]) { d -= m.lens[j]; acc += m.lens[j]; j++; }
       var f = m.lens[j] ? clamp(d / m.lens[j], 0, 1) : 1, A = m.P[j], B = m.P[j + 1];
       out.x = lerp(A[0], B[0], f); out.y = lerp(A[1], B[1], f); out.z = lerp(A[2], B[2], f);
-      var travelled = u * m.tot, first = m.lens[0], last = m.lens[m.lens.length - 1];
-      out.yaw = lerp(m.yaw0, 0, io(clamp(travelled / Math.max(first, .4), 0, 1)));
-      out.yaw = lerp(out.yaw, m.syaw, io(clamp((travelled - (m.tot - last - .3)) / (last + .3), 0, 1)));
-      out.u = u; return out;
+      var tr = u * m.tot, toLane = m.lens[0] + m.lens[1], toDoor = m.tot - m.lens[5] - m.lens[4];
+      out.yaw = lerp(m.yaw0, 0, io(clamp((tr - m.lens[0]) / Math.max(m.lens[1], .3), 0, 1)));
+      out.yaw = lerp(out.yaw, m.syaw, io(clamp((tr - toDoor) / (m.tot - toDoor), 0, 1)));
+      out.u = u; out.lane = tr > toLane; return out;
     }
 
-    /* ---------- Rashid ---------- */
-    var RM = new T.Vector3(-1.75, 0, 1.45);
-    var rashid = new T.Group(); rashid.position.copy(RM); scene.add(rashid);
-    var rShadow = quad(new T.MeshBasicMaterial({ map: blobTex, transparent: true, depthWrite: false, opacity: .7 }), 2); rShadow.rotation.x = -Math.PI / 2; rShadow.position.y = .008; rShadow.scale.set(1.0, .55, 1); rashid.add(rShadow);
-    var rGlow = quad(addMat({ map: softTex, color: 0xFFC890, opacity: 0, fog: false }), 3); rGlow.position.set(0, 1.0, -.25); rGlow.scale.set(1.9, 2.6, 1); rashid.add(rGlow);
-    var silMat = new T.MeshPhongMaterial({ vertexColors: true, specular: 0x333333, shininess: 18 });
-    var sil = new T.Mesh(buildKandura(T), silMat); rashid.add(sil);
-    var photo = null, photoMat = null, rFace = 0;
-    if (o.rashidImg) {
-      var img = new Image();
-      if (!/^data:/.test(o.rashidImg)) img.crossOrigin = 'anonymous';
-      img.onload = function () {
-        if (dead || !api) return;
-        var tex = new T.Texture(img); tex.needsUpdate = true; tex.anisotropy = 4; extra.push(tex);
-        var asp = img.naturalWidth / img.naturalHeight || .422;
-        photoMat = new T.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false, alphaTest: .02, side: T.DoubleSide, color: 0x2A2F4A });
-        var g = new T.PlaneGeometry(1, 1); g.translate(0, .5, 0);
-        photo = new T.Mesh(g, photoMat); photo.scale.set(1.78 * asp, 1.78, 1); photo.renderOrder = 5; rashid.add(photo); sil.visible = false;
-        if (api.onReady) api.onReady();
-      };
-      img.src = o.rashidImg;
-    }
+    /* ---------- Rashid at the unit, greeting (the waving photo) ---------- */
+    var RH = 1.96, RW = new T.Vector3(UX + UW / 2 + .65, 0, 1.15);
+    var rashid = new T.Group(); rashid.position.copy(RW); scene.add(rashid);
+    var rShadow = quad(new T.MeshBasicMaterial({ map: blobTex, transparent: true, depthWrite: false, opacity: .7 }), 2); rShadow.rotation.x = -Math.PI / 2; rShadow.position.y = .01; rShadow.scale.set(1.1, .6, 1); rashid.add(rShadow);
+    var sil = new T.Mesh(buildKandura(T), new T.MeshPhongMaterial({ vertexColors: true, specular: 0x333333, shininess: 18 })); sil.scale.setScalar(RH / 1.78); rashid.add(sil);
+    var wavePhoto = null, rFace = 0;
+    loadImg(o.rashidImg, function (tx, a) {
+      var g = new T.PlaneGeometry(1, 1); g.translate(0, .5, 0);
+      wavePhoto = new T.Mesh(g, new T.MeshBasicMaterial({ map: tx, transparent: true, depthWrite: false, alphaTest: .02, side: T.DoubleSide, color: 0xFFF6EC }));
+      wavePhoto.scale.set(RH * a, RH, 1); wavePhoto.renderOrder = 5; rashid.add(wavePhoto); sil.visible = false;
+    });
 
-    /* ---------- camera keys ---------- */
-    var OXS = o.rtl ? -1 : 1, CAMS = [], aspect = 1, camV = [0, 0, 0, 0, 0, 0, 0];
+    /* ---------- camera keys for B ---------- */
+    var CAMS = [], aspect = 1, camV = [0, 0, 0, 0, 0, 0, 0], set = 'P', pw = 1, ph = 1;
     function camKeys() {
-      var room0 = { c: [-.3, 1.0, -.1], w: 6.6, h: 3, d: RD, az: -.28, el: .3, fill: .88, fov: 34 }, roomP0 = { c: [-.85, 1.0, 0], w: 4.1, h: 3.4, d: RD, az: -.3, el: .3, fill: .92, fov: 44 };
-      var endL = { c: [-.25, 1.1, -.4], w: 6.6, h: 3, d: RD, az: .16, el: .2, fill: .6, ox: .19 * OXS, oy: .04, fov: 34 }, endP = { c: [-.6, 1.1, -.4], w: 4.6, h: 3, d: RD, az: .18, el: .24, fill: .98, ox: .19, oy: .22, fov: 46 };
-      function ext(a, b) { var r = {}, k; for (k in a) r[k] = a[k]; for (k in b) r[k] = b[k]; return r; }
       return [
-        { t: 0, L: room0, P: roomP0 },
-        { t: 3.9, L: ext(room0, { c: [-.15, 1.0, -.3], az: -.17, fill: .94 }), P: ext(roomP0, { c: [-.5, 1.0, -.25], w: 3.9, az: -.18, fill: .95 }) },
-        { t: 6.0, L: ext(room0, { c: [.7, 1.0, -.45], w: 5.6, h: 2.8, az: -.04, el: .24, fill: .92 }), P: ext(roomP0, { c: [1.0, 1.0, -.35], w: 3.8, az: .04, el: .2, fill: .95 }) },
-        { t: 8.4, L: { c: [4.6, .8, .3], w: 8.6, h: 3, d: 3, az: -.04, el: .46, fill: .95, fov: 34 }, P: { c: [4.9, .7, .4], w: 4.8, h: 3, d: 2, az: -.02, el: .5, fill: .98, fov: 46 } },
-        { t: 11.2, L: { c: [5.5, .9, .4], w: 7.4, h: 3, d: 3, az: -.12, el: .4, fill: .95, fov: 34 }, P: { c: [UDOOR.x - .6, .9, .4], w: 4.0, h: 3, d: 2, az: -.42, el: .38, fill: .98, fov: 46 } },
-        { t: 12.6, pos: [UDOOR.x - 3.2, 2.3, UDOOR.z + 4.6], look: [UDOOR.x, 1.25, UDOOR.z], fovL: 40, fovP: 54 },
-        { t: 13.45, pos: [UDOOR.x - 3.0, 2.2, UDOOR.z + 4.3], look: [UDOOR.x, 1.22, UDOOR.z], fovL: 40, fovP: 54 },
-        { t: 14.15, pos: [LOCKW.x - 1.0, LOCKW.y + .18, LOCKW.z + .32], look: [LOCKW.x, LOCKW.y - .02, LOCKW.z], fovL: 32, fovP: 40, hold: 1 },
-        { t: 14.6, pos: [LOCKW.x - .97, LOCKW.y + .18, LOCKW.z + .31], look: [LOCKW.x, LOCKW.y - .02, LOCKW.z], fovL: 32, fovP: 40 },
-        { t: 15.3, pos: [UDOOR.x - 3.0, 1.8, UDOOR.z + 3.0], look: [UDOOR.x, 1.3, UDOOR.z], fovL: 40, fovP: 54 },
-        { t: 16.7, L: endL, P: endP },
-        { t: 20.0, L: ext(endL, { az: .21 }), P: ext(endP, { az: .23 }), hold: 1 }
+        { t: RTM.swapA, pos: [DXH, 1.35, 1.7], look: [DXH, 1.25, -1], fovL: 44, fovP: 58 },
+        { t: 6.3, L: { c: [1.4, 1.1, .4], w: 9.6, h: 3.6, d: 2, az: .08, el: .2, fill: .95, fov: 36 }, P: { c: [.4, 1.1, .6], w: 4.8, h: 3.6, d: 2, az: .14, el: .2, fill: .98, fov: 46 } },
+        { t: 9.0, L: { c: [2.6, 1.0, .6], w: 9.2, h: 3.4, d: 2, az: .06, el: .22, fill: .95, fov: 36 }, P: { c: [2.5, 1.0, .8], w: 4.6, h: 3.4, d: 2, az: .1, el: .22, fill: .98, fov: 46 } },
+        { t: 10.8, L: { c: [UX, 1.3, .3], w: 6.2, h: 3.4, d: 2, az: .06, el: .16, fill: .95, fov: 36 }, P: { c: [UX, 1.3, .4], w: 3.8, h: 3.6, d: 2, az: .08, el: .16, fill: .98, fov: 46 } },
+        { t: 12.1, pos: [UX + 1.0, 1.9, 6.4], look: [UX, 1.3, 0], fovL: 38, fovP: 50 },
+        { t: 12.85, pos: [UX + .22, 1.24, 1.2], look: [UX - .07, 1.06, .08], fovL: 30, fovP: 38, hold: 1 },
+        { t: 13.4, pos: [UX + .21, 1.24, 1.16], look: [UX - .07, 1.06, .08], fovL: 30, fovP: 38 },
+        { t: 14.3, L: { c: [UX + 1.2, 1.45, .5], w: 6.6, h: 3.4, d: 2, az: -.1, el: .1, fill: .9, fov: 34 }, P: { c: [UX + 1.55, 1.25, .9], w: 3.4, h: 3.6, d: 1, az: -.12, el: .1, fill: .95, fov: 44 } },
+        { t: 15.4, L: { c: [UX + 1.2, 1.45, .5], w: 6.6, h: 3.4, d: 2, az: -.05, el: .1, fill: .92, fov: 34 }, P: { c: [UX + 1.55, 1.25, .9], w: 3.4, h: 3.6, d: 1, az: -.07, el: .1, fill: .97, fov: 44 }, hold: 1 }
       ];
     }
     function resolveCams() {
-      var q = clamp((aspect - .8) / .4, 0, 1), list = camKeys(), K = [];
-      list.forEach(function (k) { K.push({ t: k.t, v: k.pos ? k.pos.concat(k.look, [lerp(k.fovP, k.fovL, q)]) : frame(blend(k.L, k.P || k.L, q), aspect), hold: k.hold }); });
+      var q = clamp((aspect - .8) / .4, 0, 1), K = [];
+      camKeys().forEach(function (k) { K.push({ t: k.t, v: k.pos ? k.pos.concat(k.look, [lerp(k.fovP, k.fovL, q)]) : frame(blend(k.L, k.P || k.L, q), aspect), hold: k.hold }); });
       tangents(K); CAMS = K;
-      herm(K, 1.4, camV); rFace = Math.atan2(camV[0] - RM.x, camV[2] - RM.z);
+      herm(K, 14.4, camV); rFace = Math.atan2(camV[0] - RW.x, camV[2] - RW.z);
     }
     function camera(t) {
       herm(CAMS, t, camV);
@@ -930,60 +860,70 @@
       cam.updateMatrixWorld();
     }
 
-    /* ---------- one frame, a pure function of t ---------- */
+    /* ---------- the photo layer from t: Ken Burns into / out of the window, Rashid with parallax, the light wipe ---------- */
+    function photoLayer(t) {
+      var full = ROOM['full' + set], tidy = ROOM['tidy' + set] || full;
+      photo.visible = !!full; if (!full) return;
+      PU.tA.value = full; PU.tB.value = tidy;
+      var s, F = PFOCUS[set];
+      if (t < RTM.swapB) s = 1 + .1 * io(seg(t, 0, 4.2)) + .5 * inq(seg(t, 3.85, RTM.swapA));
+      else s = lerp(1.22, 1.0, io(seg(t, RTM.swapB, 18.4)));
+      var ww = RTM.wipe, wu = seg(t, ww[0], ww[1]);
+      PU.uW.value = t < ww[0] ? -1 : t > ww[1] ? 2 : lerp(-.2, 1.25, io(wu)); PU.uBand.value = .75 * bell(wu); PU.uBright.value = 1 + .05 * bell(wu);
+      photo.scale.set(pw * s, ph * s, 1); photo.position.set(-(F[0] - .5) * pw * (s - 1), (F[1] - .5) * ph * (s - 1), 0);
+      // Rashid in the room: standing, a nearer layer, so he slides a little faster than the room
+      var rp = RPOS[set === 'P' ? 'P' : o.rtl ? 'Lar' : 'Len'], sr = 1 + (s - 1) * 1.22;
+      var fx = (rp.u - .5) * pw * sr - (F[0] - .5) * pw * (sr - 1), fy = (.5 - rp.v) * ph * sr + (F[1] - .5) * ph * (sr - 1), hgt = rp.h * ph * sr;
+      stand.position.set(fx, fy, 0); stand.scale.set(hgt * standAsp, hgt, 1);
+      standMat.color.setHex(mixHex(0x6E6470, 0xF6EADC, tw(t, .25, 1.3)));
+      stand2Sh.visible = stand.visible; stand2Sh.position.set(fx, fy + hgt * .004, 0); stand2Sh.scale.set(hgt * .62, hgt * .07, 1); stand2Sh.material.opacity = .85 * tw(t, .25, 1.3);
+    }
+
+    /* ---------- one frame ---------- */
     var st = {};
     function draw(t) {
-      camera(t);
-      var clean = tw(t, RTM.back, RTM.back + 1.4), on = tw(t, .5, 1.5);
-      var zen = mixHex(0x1C2552, 0xFFFFFF, clean), hor = mixHex(0xE7A06A, 0xE6E9EB, clean);
-      sky(zen, hor); scene.fog.color.setHex(hor); renderer.setClearColor(hor, 1);
-      groundMat.color.setHex(mixHex(mixHex(0x8A8290, 0xB9BAC6, tw(t, 7.5, 9.5)), 0xF2F4F6, clean));
-      var outside = tw(t, 7.0, 9.0) * (1 - tw(t, RTM.back, RTM.back + 1.0)), wl = Math.max(clean, outside);
-      hemi.color.setHex(mixHex(0xFFD7B0, 0xFFFFFF, wl)); hemi.groundColor.setHex(mixHex(0x3A3050, 0xD9DEE6, wl)); hemi.intensity = lerp(.42 + .1 * on, lerp(.66, .9, outside), wl);
-      key.intensity = lerp(.5, .75, wl); key.color.setHex(mixHex(0xFFD9B0, 0xFFFAF2, wl));
-      lamp.intensity = on * lerp(1.0, .55, clean); lampGlow.material.opacity = on * lerp(.85, .5, clean);
-      floorMat.color.setHex(mixHex(0xCFC3B2, 0xF4EEE6, clean));
-      winMat.color.setHex(mixHex(0xFFFFFF, 0xF3F6FA, clean));
-      var sw = seg(t, RTM.back + 1.2, RTM.back + 2.8); sweepQ.visible = sw > 0 && sw < 1; sweepQ.material.opacity = .4 * bell(sw); sweepQ.position.x = lerp(-2.6, 2.6, sw); sweepQ.position.z = -.2;
-      // Rashid: found by the lamp's light; his frame warms when the room is clear
-      rashid.rotation.y = rFace;
-      var tint = mixHex(mixHex(0x2A2F4A, 0xFFFFFF, tw(t, .7, 1.8)), 0xFFF2E0, clean);
-      if (photo) photoMat.color.setHex(tint); else silMat.color.setHex(tint);
-      rGlow.material.opacity = .32 * tw(t, .7, 1.8) * (1 - clean) + .5 * clean;
-      // the extras
-      var wrappedN = 0, gone = 0;
-      for (var i = 0; i < movers.length; i++) {
-        var m = movers[i], wu = seg(t, m.tw, m.tw + .5), isW = wu >= 1 || !m.plain, p = moverAt(m, t, st);
-        if (wu >= 1) wrappedN++;
-        if (m.plain) m.plain.visible = !isW;
-        m.wrapped.visible = isW;
-        var cur = isW ? m.wrapped : m.plain;
-        cur.position.set(p.x, p.y, p.z); cur.rotation.y = p.yaw;
-        var fv = wu > 0 && t < m.tw + .85;
-        m.film.visible = fv;
-        if (fv) { m.film.position.set(p.x, p.y - .01, p.z); m.film.rotation.y = p.yaw; m.film.scale.set(m.it.w + .05, (m.hh + .04) * out3(wu) + .001, m.it.d + .05); m.film.material.opacity = .55 * (1 - seg(t, m.tw + .5, m.tw + .85)); }
-        var inUnit = p.u >= 1; if (inUnit) gone++;
-        m.shadow.visible = p.u > 0 && !inUnit; m.shadow.material.opacity = .55 / (1 + p.y * 2); m.shadow.position.set(p.x, .012, p.z); m.shadow.scale.set(m.foot * 1.6, m.foot * 1.6, 1);
-        // once the unit is shut, the stored pieces are hidden (they cannot be seen) and cost no draw calls
-        if (inUnit && t > RTM.close + 1.3) cur.visible = false;
+      var inPhoto = t < RTM.swapA || t >= RTM.swapB;
+      info.phase = t < RTM.swapA ? 'room-full' : t < RTM.swapB ? 'move' : t < RTM.wipe[1] ? 'room-reveal' : 'room-tidy';
+      var stored = 0;
+      for (var i = 0; i < movers.length; i++) { var m = movers[i], p = moverAt(m, t, st); if (p.u >= 1) stored++; }
+      info.stored = stored; info.wrapped = movers.length;
+      if (inPhoto) {
+        photoLayer(t); renderer.render(scene2, ortho);
+        info.door = t < RTM.swapA ? 0 : 0; info.lock = t >= RTM.swapB ? 1 : 0;
+      } else {
+        camera(t);
+        for (i = 0; i < movers.length; i++) {
+          m = movers[i]; p = moverAt(m, t, st);
+          var vis = p.u > 0 && !(p.u >= 1 && t > RTM.close + 1.3);
+          m.mesh.visible = vis; m.mesh.position.set(p.x, p.y, p.z); m.mesh.rotation.y = p.yaw;
+          m.shadow.visible = vis && p.u < 1 && p.z > -.25; m.shadow.material.opacity = .5 / (1 + p.y * 2); m.shadow.position.set(p.x, .012, p.z); m.shadow.scale.set(m.foot * 1.6, m.foot * 1.6, 1);
+        }
+        var ur = animUnit(U4, t, { b: -10, o: RTM.move - .9, i: 0, c: RTM.close, l: RTM.lock, ang: 2.95, glow: 0 }, cam);
+        info.door = ur.door; info.lock = ur.lock;
+        rashid.rotation.y = rFace;
+        renderer.render(scene, cam);
       }
-      var ur = animUnit(U4, t, { b: -10, o: RTM.move - 1.2, i: 0, c: RTM.close, l: RTM.lock, ang: 2.95, glow: 0 }, cam);
-      info.door = ur.door; info.lock = ur.lock; info.wrapped = wrappedN; info.stored = gone; info.clean = clean;
-      renderer.render(scene, cam);
       info.calls = renderer.info.render.calls; info.tris = renderer.info.render.triangles;
     }
-    function resize(w, h, pr) { renderer.setPixelRatio(pr); renderer.setSize(w, h, false); canvas.style.width = w + 'px'; canvas.style.height = h + 'px'; aspect = w / h; resolveCams(); }
+    function resize(w, h, pr) {
+      renderer.setPixelRatio(pr); renderer.setSize(w, h, false); canvas.style.width = w + 'px'; canvas.style.height = h + 'px';
+      aspect = w / h; set = aspect < 1 ? 'P' : 'L'; if (!RI['full' + set]) set = set === 'P' ? 'L' : 'P';
+      var pa = RASP[set]; ortho.left = -aspect / 2; ortho.right = aspect / 2; ortho.top = .5; ortho.bottom = -.5; ortho.updateProjectionMatrix();
+      if (aspect > pa) { pw = aspect; ph = aspect / pa; } else { ph = 1; pw = pa; }
+      resolveCams();
+    }
     function dispose() {
       dead = true;
-      scene.traverse(function (ob) {
+      [scene, scene2].forEach(function (sc) { sc.traverse(function (ob) {
         if (ob.geometry) ob.geometry.dispose();
         if (ob.material) (ob.material instanceof Array ? ob.material : [ob.material]).forEach(function (m) { if (m.map) m.map.dispose(); m.dispose(); });
-      });
+      }); });
       extra.forEach(function (t2) { t2.dispose(); });
       renderer.dispose(); try { renderer.forceContextLoss(); } catch (e) { /* already lost */ }
       if (canvas.parentNode) canvas.parentNode.removeChild(canvas);
     }
-    var api = { draw: draw, resize: resize, dispose: dispose, info: info, canvas: canvas, renderer: renderer, hasPhoto: function () { return !!photo; }, wipeOK: function () { return null; } };
+    var api = { draw: draw, resize: resize, dispose: dispose, info: info, canvas: canvas, renderer: renderer,
+      hasPhoto: function () { return !!(wavePhoto && stand.visible && ROOM['full' + set] && ROOM['tidy' + set]); }, wipeOK: function () { return null; } };
     return api;
   }
 
@@ -1105,7 +1045,7 @@
   // j2 and m3 are [before, marked, after]: the marked part is bold (j2) or underlined in cyan (m3); m4 is [first, on the mango block].
   var STORY = {
     james: {
-      dur: 25.4, sc: [0, 3.4, 11.2, 13.6, 20.0], skip: 24.5, dayAt: 12.2, bloom: [8.6, 8.95, 9.35], scrim: [20.0, 21.0],
+      dur: 25.4, sc: [0, 3.4, 11.2, 13.6, 20.0], skip: 24.5, dayAt: 12.2, bloom: [[8.6, 8.95, 9.35]], scrim: [20.0, 21.0],
       j1: [7.3, 8.4, 8.6], j2: [15.4, 16.7, 16.9], m1: 20.3, m2: 21.3, m12: [22.6, 22.9], m3: [22.9, 24.3, 24.6], rule: [23.5, 24.0], m4: 24.5, hl: [24.8, 25.3], end: 24.9,
       en: { title: "James's story: TRAVEL to RAVEL", name: 'James', j1: 'Travelling for 6 months.', j2: ['Saved ', 'AED 6,600/month', ' by storing his furniture instead of keeping his apartment.'],
         m1: 'Travelling for months?', m2: 'Why keep paying rent?', m3: ['Store your furniture safely with ', 'Ravel Storage', '.'], m4: ['Travel light.', 'Save more.'],
@@ -1114,8 +1054,8 @@
         m1: 'مسافر لعدة أشهر؟', m2: 'لماذا تستمر في دفع الإيجار؟', m3: ['خزّن أثاثك بأمان مع ', 'رافل للتخزين', '.'], m4: ['سافر بخفة.', 'ووفّر أكثر.'] }
     },
     rashid: {
-      dur: 20.0, sc: [0, 4.0, 6.2, 12.4, 15.4], skip: 18.6, dayAt: 15.9, bloom: null, scrim: [16.2, 17.0],
-      j1: [1.6, 3.85, 4.05], j2: [6.4, 10.6, 10.8], m3: [16.6, 18.5, 18.8], rule: [17.2, 17.7], m4: 18.8, hl: [19.1, 19.6], end: 19.2,
+      dur: 20.6, sc: [0, 4.6, 11.3, 15.35, 17.3], skip: 19.4, dayAt: 0, bloom: [[4.2, 4.65, 5.15], [14.95, 15.35, 15.85]], scrim: [16.9, 17.7],
+      j1: [1.0, 3.85, 4.1], j2: [5.6, 10.4, 10.6], m3: [17.3, 19.1, 19.4], rule: [17.9, 18.4], m4: 19.4, hl: [19.7, 20.2], end: 19.8,
       en: { title: "Rashid's story", name: 'Rashid', j1: 'His home was full.', j2: ['', '', 'He moved the extras into a Ravel unit.'], m3: ['For only ', 'AED 500', ' a month.'], m4: ['More space at home.', 'A tidier house.'] },
       ar: { title: 'قصة راشد', name: 'راشد', j1: 'بيته كان ممتلئاً بالأغراض.', j2: ['', '', 'نقل الأغراض الزائدة إلى وحدة في رافل.'], m3: ['بـ ', '500 درهم', ' فقط شهرياً.'], m4: ['مساحة أكبر في البيت،', 'وبيت أكثر ترتيباً.'] }
     }
@@ -1221,7 +1161,8 @@
       d.replay.hidden = true;
       [d.bar, d.skip, d.fab, d.copy, d.black].forEach(function (el) { el.hidden = true; });
     }
-    if (o.reduced || !can()) still(o.reduced ? 'reduced' : 'nogl');
+    var RI = o.roomImgs || {}, noRoom = o.story === 'rashid' && !((RI.fullP || RI.fullL) && (RI.tidyP || RI.tidyL));
+    if (o.reduced || !can() || noRoom) still(o.reduced ? 'reduced' : noRoom ? 'noroom' : 'nogl');
     else {
       try { st.eng = (o.story === 'rashid' ? createRashid : createEngine)(d.stage, o); }
       catch (e) {
@@ -1238,7 +1179,7 @@
     function third(el, a, b0, b1, t) { var p = out3(seg(t, a, a + .45)), x = seg(t, b0, b1), on = t >= a && x < 1; css(el, on ? 'visibility:visible;opacity:' + (p * (1 - x)).toFixed(3) + ';transform:translateY(' + ((1 - p) * 14 - x * 8).toFixed(2) + 'px)' : 'visibility:hidden'); }
     function captions(t) {
       css(d.black, t < .4 ? 'opacity:' + (1 - out3(t / .4)).toFixed(3) : 'visibility:hidden');
-      var B = S.bloom, bl = !B ? 0 : t < B[1] ? inq(seg(t, B[0], B[1])) : 1 - out3(seg(t, B[1], B[2]));
+      var bl = 0; S.bloom.forEach(function (B) { bl = Math.max(bl, t < B[0] || t > B[2] ? 0 : t < B[1] ? inq(seg(t, B[0], B[1])) : 1 - out3(seg(t, B[1], B[2]))); });
       css(d.bloom, bl > 0 ? 'visibility:visible;opacity:' + bl.toFixed(3) : 'visibility:hidden');
       var sc = tw(t, S.scrim[0], S.scrim[1]); css(d.scrim, sc > 0 ? 'visibility:visible;opacity:' + sc.toFixed(3) : 'visibility:hidden');
       third(d.j1, S.j1[0], S.j1[1], S.j1[2], t); third(d.j2, S.j2[0], S.j2[1], S.j2[2], t);
@@ -1356,7 +1297,7 @@
         var i = st.eng ? st.eng.info : {}, caps = [];
         [['j1', d.j1], ['j2', d.j2], ['m1', d.m12], ['m3', d.m3], ['m4', d.m4]].forEach(function (p) { if (p[1] && p[1].style.visibility === 'visible' && st.mode === '3d') caps.push(p[0]); });
         return { story: o.story, lang: o.lang, mode: st.mode, why: st.why, t: st.t, dur: DUR, scene: sceneOf(st.t, SC), playing: st.playing, ended: st.ended, k: i.k, sub: i.sub, plane: i.plane, wipe: i.wipe, close: i.close, door: i.door, lock: i.lock,
-          day: i.day, wrapped: i.wrapped, stored: i.stored, clean: i.clean, calls: i.calls, tris: i.tris, rebuilt: i.rebuilt, pr: st.pr, meanFrame: st.mean, caps: caps, end: d.end.classList.contains('is-on'), photo: st.eng ? st.eng.hasPhoto() : false, wipeShader: st.eng ? st.eng.wipeOK() : null };
+          day: i.day, phase: i.phase, wrapped: i.wrapped, stored: i.stored, clean: i.clean, calls: i.calls, tris: i.tris, rebuilt: i.rebuilt, pr: st.pr, meanFrame: st.mean, caps: caps, end: d.end.classList.contains('is-on'), photo: st.eng ? st.eng.hasPhoto() : false, wipeShader: st.eng ? st.eng.wipeOK() : null };
       },
       _eng: function () { return st.eng; }
     };
