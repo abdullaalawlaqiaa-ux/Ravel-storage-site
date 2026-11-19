@@ -111,6 +111,7 @@ def main():
             return 'data-img="%s"' % m.group(1)
         body = re.sub(r'src="assets/img/([a-z0-9-]+)\.(?:png|jpg|webp)"', inline_img, body)
         names.update(s["photo"] for s in D["sizes"] if s["photo"])
+        names.update(v["img"] for v in D.get("vaultPhotos", []))   # the photos the first section flips through
         names.update(("logo-white", "film-poster", "film-real"))
         names.update(["char-rashid", "char-james", "char-rashid-stand", "room-full-p", "room-full-l", "room-tidy-p", "room-tidy-l"])   # the two people in the 3D view and the film
         # fonts: only the digits face is embedded; the text faces come from the same families on Google Fonts

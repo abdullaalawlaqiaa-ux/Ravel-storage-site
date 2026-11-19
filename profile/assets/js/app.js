@@ -864,9 +864,24 @@
   function doorFirstView() { if (doorIntro) return; doorIntro = true; setTimeout(function () { if (!doorOpen) setDoor(true); }, 650); }
 
   /* ---------------- boot ---------------- */
+  /* ---------------- the first section's photo: small arrows flip through the Ravel photos (shown when there is more than one) ---------------- */
+  var VP = D.vaultPhotos || [], vpI = 0;
+  function showVault(i) {
+    if (!VP.length) return;
+    vpI = (i + VP.length) % VP.length;
+    var v = VP[vpI], im = $('#vault .vault__img'), src = imgUrl(v.img, D.img && D.img[v.img] ? null : 'jpg');
+    var so = $('#vault source'); if (so) so.srcset = imgUrl(v.img);
+    if (im.getAttribute('src') !== src) im.src = src;
+    im.alt = plain(v.cap); $('#vaultCap').textContent = plain(v.cap);
+  }
+  if (VP.length > 1) {
+    $('#vaultPrev').hidden = $('#vaultNext').hidden = false;
+    $('#vaultPrev').addEventListener('click', function () { showVault(vpI - 1); });
+    $('#vaultNext').addEventListener('click', function () { showVault(vpI + 1); });
+  }
   function renderAll() {
     applyLang(); syncViewLabel(); renderWho(); renderSizes(); renderItemsToggle(); renderPrices(); buildQuoteForm(); renderQuote(); staticLinks();
-    renderUnit(true); updateDock(); remeasureSoon();
+    renderUnit(true); updateDock(); if (VP.length > 1) showVault(vpI); remeasureSoon();
     if (window.RVFX) window.RVFX.refresh();
   }
   // the scroll-driven opening needs room to scroll; without motion the first section is one screen tall
