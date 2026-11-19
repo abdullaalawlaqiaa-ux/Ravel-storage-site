@@ -1,7 +1,7 @@
 import { Audio, Video } from "@remotion/media";
 import React from "react";
 import { AbsoluteFill, Easing, Img, Sequence, interpolate, staticFile, useCurrentFrame } from "remotion";
-import { ACCENT, FONT, LIGHT_GRAY, NAVY, Stretch, clamp, glass, onDark, onLight, stretchCount } from "./ravelType";
+import { ACCENT, FONT, LIGHT_GRAY, Stretch, clamp, onDark, onLight, stretchCount } from "./ravelType";
 
 /**
  * Ad 01 v2 — 10 s, 30 fps, 1080x1920.
@@ -105,19 +105,21 @@ export const Ad01v2: React.FC = () => {
         </div>
       </AbsoluteFill>
       <AbsoluteFill style={{ alignItems: "center", paddingTop: 1150 }}>
+        {/* Logo directly on the scene (no card) — soft white halo keeps it legible */}
         <div
           style={{
-            ...glass,
             opacity: cardIn,
             translate: `0px ${interpolate(cardIn, [0, 1], [40, 0])}px`,
-            padding: "34px 70px 30px",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
           }}
         >
-          <Img src={staticFile("ad01/logo.png")} style={{ width: 300 }} />
-          <div style={{ marginTop: 10, fontSize: 52, fontWeight: 800, color: NAVY, direction: "ltr", letterSpacing: 1 }}>
+          <Img
+            src={staticFile("ad01/logo.png")}
+            style={{ width: 340, filter: "drop-shadow(0 0 14px rgba(255,255,255,0.95)) drop-shadow(0 0 4px rgba(255,255,255,0.9))" }}
+          />
+          <div style={{ marginTop: 10, fontSize: 52, fontWeight: 800, direction: "ltr", letterSpacing: 1, ...onLight }}>
             050 325 0551
           </div>
         </div>
