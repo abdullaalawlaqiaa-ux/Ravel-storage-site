@@ -502,7 +502,7 @@
       sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nuniform vec3 uRimDir, uRimCol;\nuniform float uRimK;')
         .replace('#include <output_fragment>', 'vec3 rvN = normalize(normal);\nfloat rvF = pow(1.0 - clamp(dot(rvN, normalize(vViewPosition)), 0.0, 1.0), 2.6);\nfloat rvD = clamp(dot(rvN, uRimDir) * .7 + .35, 0.0, 1.0);\noutgoingLight += uRimCol * rvF * rvD * uRimK;\n#include <output_fragment>');
     };
-    var JH = 2.2, sil = new T.Mesh(buildSilhouette(T), jMat); sil.scale.setScalar(JH / 1.83); james.add(sil);
+    var JH = 2.6, sil = new T.Mesh(buildSilhouette(T), jMat); sil.scale.setScalar(JH / 1.83); james.add(sil);
     var photo = null, photoMat = null, photoTex = null, photoAsp = .413;
     if (o.jamesImg) {
       var img = new Image();
@@ -703,7 +703,7 @@
   // B is real 3D: the wrapped pieces leave the house through its lit doorway in a line and are stored in a white Ravel unit.
   // The hand-offs hide in the window's light: A pushes into the window, the light blooms, B opens on the house's lit doorway.
   var RTM = { swapA: 4.65, load: 5.0, loadGap: .28, loadDur: 1.7, drive: 8.8, cut: 10.0, arrive: 11.7, unload: 11.9, unloadGap: .26, unloadDur: 1.7, close: 15.6, lock: 16.9, swapB: 19.65, wipe: [20.2, 21.7] };
-  var RPOS = { P: { u: .33, v: .9, h: .48 }, Len: { u: .82, v: .975, h: .74 }, Lar: { u: .25, v: .975, h: .74 } };   // Rashid's feet and height in the photo (fractions of the photo)
+  var RPOS = { P: { u: .34, v: .9, h: .56 }, Len: { u: .82, v: .975, h: .84 }, Lar: { u: .25, v: .975, h: .84 } };   // Rashid's feet and height in the photo (fractions of the photo)
   var PFOCUS = { P: [.8, .42], L: [.66, .38] };                                                                        // the window: where A pushes in and C comes out
   function createRashid(host, o) {
     var T = W.THREE, R = W.RV3D;
@@ -885,7 +885,7 @@
     }
 
     /* ---------- Rashid at the unit, greeting (the waving photo) ---------- */
-    var RH = 2.2, RW = new T.Vector3(UX - UW / 2 - .75, 0, 1.25);
+    var RH = 2.6, RW = new T.Vector3(UX - UW / 2 - .75, 0, 1.25);
     var rashid = new T.Group(); rashid.position.copy(RW); site.add(rashid);
     var rShadow = quad(new T.MeshBasicMaterial({ map: blobTex, transparent: true, depthWrite: false, opacity: .7 }), 2); rShadow.rotation.x = -Math.PI / 2; rShadow.position.y = .01; rShadow.scale.set(1.1, .6, 1); rashid.add(rShadow);
     var sil = new T.Mesh(buildKandura(T), new T.MeshPhongMaterial({ vertexColors: true, specular: 0x333333, shininess: 18 })); sil.scale.setScalar(RH / 1.78); rashid.add(sil);
@@ -1123,7 +1123,7 @@
   var STORY = {
     james: {
       dur: 25.4, sc: [0, 3.4, 11.2, 13.6, 20.0], skip: 24.5, dayAt: 12.2, bloom: [[8.6, 8.95, 9.35]], scrim: [20.0, 21.0],
-      j1: [7.3, 8.4, 8.6], j2: [15.4, 16.7, 16.9], m1: 20.3, m2: 21.3, m12: [22.6, 22.9], m3: [22.9, 24.3, 24.6], rule: [23.5, 24.0], m4: 24.5, hl: [24.8, 25.3], end: 24.9,
+      j1: [7.3, 8.4, 8.6], j2: [14.6, 19.5, 19.8], m1: 20.3, m2: 21.3, m12: [22.6, 22.9], m3: [22.9, 24.3, 24.6], rule: [23.5, 24.0], m4: 24.5, hl: [24.8, 25.3], end: 24.9,
       en: { title: "James's story: TRAVEL to RAVEL", name: 'James', j1: 'Travelling for 6 months.', j2: ['Saved ', 'AED 6,600/month', ' by storing his furniture instead of keeping his apartment.'],
         m1: 'Travelling for months?', m2: 'Why keep paying rent?', m3: ['Store your furniture safely with ', 'Ravel Storage', '.'], m4: ['Travel light.', 'Save more.'],
         sr: 'James is travelling for 6 months. The T of TRAVEL becomes an aeroplane and leaves; the word that stays is RAVEL. His furniture is stored in a locked Ravel Storage unit. He saved AED 6,600 a month by storing it instead of keeping his apartment. Travel light. Save more.' },

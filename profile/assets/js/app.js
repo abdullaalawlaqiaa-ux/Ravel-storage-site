@@ -274,7 +274,7 @@
   }
   function updateViewer(instant) {
     var u = currentUnit(), layout = state.items ? buildLayout(u) : [];
-    if (viewer) { viewer.setPerson(personKind()); if (viewer.setPhoto) viewer.setPhoto(who() === 'rashid' ? { src: imgUrl('char-rashid'), h: 2.2 } : { src: imgUrl('char-james'), h: 2.2 }); viewer.setUnit(u, layout, unitTexts(u), instant); }
+    if (viewer) { viewer.setPerson(personKind()); if (viewer.setPhoto) viewer.setPhoto(who() === 'rashid' ? { src: imgUrl('char-rashid'), h: 2.6 } : { src: imgUrl('char-james'), h: 2.6 }); viewer.setUnit(u, layout, unitTexts(u), instant); }
     $('#unitPlan').innerHTML = planSvg(u, layout);
   }
   function nearestPhoto(u) {
