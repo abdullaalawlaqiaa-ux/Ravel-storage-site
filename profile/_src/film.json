@@ -1,1 +1,1 @@
-{"n": 98, "w": 720, "h": 1280, "cuts": [42, 72], "note": "The film stops on frame 97, facing the closed door of C-06; the third generated shot (98-127) is not used."}
+{"n": 98, "w": 720, "h": 1280, "cuts": [42, 72], "note": "The walk plays frames 0-66 (the corridor, straight on); then the camera turns right on the spot and faces the closed door (frame 97). Frames 67-96 (the pillar and the cut) are not used.", "walk": 67, "door": 97}

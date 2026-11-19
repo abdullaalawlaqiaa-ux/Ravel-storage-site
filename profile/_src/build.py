@@ -129,7 +129,8 @@ def main():
         adata["img"] = dict((n, data_uri("assets/img/%s.webp" % n, "image/webp")) for n in sorted(names))
         # the film's frames come last in the page, after the scripts, so the page shows before they arrive
         adata["film"] = dict(data["film"], inline=True)
-        frames = [data_uri("assets/img/film/%03d.webp" % i, "image/webp") for i in range(data["film"]["n"])]
+        fw, fd = data["film"].get("walk", data["film"]["n"]), data["film"].get("door", -1)
+        frames = [data_uri("assets/img/film/%03d.webp" % i, "image/webp") if (i < fw or i == fd) else "" for i in range(data["film"]["n"])]   # only the frames the walk and the turn use
         out = "\n".join([
             "<title>%s</title>" % html.escape(args.title),
             '<meta name="claude:viewport-fit-sides" content="cover">',

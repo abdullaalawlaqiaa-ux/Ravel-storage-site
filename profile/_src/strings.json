@@ -53,7 +53,7 @@
 
   "u.eyebrow": ["وحداتنا ومساحاتنا", "Units &amp; spaces"],
   "u.h2": ["ادفع لمساحتك فقط، لا أكثر", "Pay only for the space you use"],
-  "u.p": ["اختر المساحة وشاهد وحدتك بحجمها الحقيقي. ارتفاع الوحدات 3 أمتار، فتستفيد من المساحة طولاً وعرضاً وارتفاعاً.", "Pick a size and see your unit at true scale. Units are 3 metres high, so you use the space in length, width and height."],
+  "u.p": ["اختر المساحة وشاهد وحدتك بحجمها الحقيقي. ارتفاع الوحدات 3 أمتار: ترصّ أغراضك للأعلى، وتدفع على مساحة الأرضية فقط.", "Pick a size and see your unit at true scale. Units are 3 metres high: stack upwards and pay only for the floor area."],
   "u.pick": ["اسحب المسطرة واختر المساحة بالمتر المربع", "Drag the ruler to choose a size in square metres"],
   "u.more": ["أكبر", "Larger"],
   "u.view3d": ["مجسّم", "3D"],

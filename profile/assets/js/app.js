@@ -269,13 +269,13 @@
   function foldCard() { clearTimeout(cardT); $('#whoCard').classList.toggle('is-min', true); }
   $('#whoCard').addEventListener('click', function (e) { if (e.target.closest && e.target.closest('#whoPlay')) return; if (this.classList.contains('is-min')) openCard(); else foldCard(); });
   function selectWho(w, user) {
-    if (user && w === 'james') openFilm($('#whoPlay'), 'james');   // choosing James plays his story
+    // choosing a person only switches the figure and opens their card; the story plays from the card's button
     if (w === who() && state.who) return;
     state.who = w; renderWho(); updateViewer(true);
   }
   function updateViewer(instant) {
     var u = currentUnit(), layout = state.items ? buildLayout(u) : [];
-    if (viewer) { viewer.setPerson(personKind()); if (viewer.setPhoto) viewer.setPhoto(who() === 'rashid' ? { src: imgUrl('char-rashid'), h: 1.96 } : { src: imgUrl('char-james'), h: 1.98 }); viewer.setUnit(u, layout, unitTexts(u), instant); }
+    if (viewer) { viewer.setPerson(personKind()); if (viewer.setPhoto) viewer.setPhoto(who() === 'rashid' ? { src: imgUrl('char-rashid'), h: 2.2 } : { src: imgUrl('char-james'), h: 2.2 }); viewer.setUnit(u, layout, unitTexts(u), instant); }
     $('#unitPlan').innerHTML = planSvg(u, layout);
   }
   function nearestPhoto(u) {
@@ -503,6 +503,7 @@
   // copy button. Inside a frame the link usually does nothing, so there the sheet comes at once.
   var sheet = $('#callSheet'), sheetT = 0, sheetFrom = null, awayAt = 0, hidAt = 0, framed = true;
   try { framed = window.self !== window.top; } catch (e) {}
+  if (framed) $('#callSheetNum').setAttribute('target', '_blank');
   function openSheet(kind, from) {
     var mail = kind === 'mail', n = $('#callSheetNum');
     sheetFrom = from || null; sheet.setAttribute('data-kind', kind);
@@ -520,6 +521,9 @@
     if (!a || e.defaultPrevented || !sheet.hidden) return;
     var kind = a.getAttribute('href').indexOf('tel:') === 0 ? 'tel' : 'mail', t0 = Date.now();
     clearTimeout(sheetT);
+    // inside another app's viewer the page itself may not leave for a call: the link is handed out as a new window,
+    // which the app passes to the phone, and the number is offered at once in case it does not
+    if (framed) { if (!a.getAttribute('target')) a.setAttribute('target', '_blank'); openSheet(kind, a); return; }
     sheetT = setTimeout(function () {
       // hidden since the tap: the phone or mail app took over. Lost focus: a system prompt is asking (not trusted inside a frame)
       if (doc.hidden || hidAt >= t0 || (!framed && awayAt >= t0)) return;
@@ -639,14 +643,18 @@
 
   /* ---------------- the opening film: on a phone held upright, the scroll plays a filmed walk frame by frame ---------------- */
   var F = D.film, film = null, filmEl = $('#film'), realEl = $('#filmReal'), filmBar = $('#filmBar'), filmSteps = $$('#filmBar li');
-  var FILM_END = .84;   // the part of the opening scroll the film takes; after it the camera steps up to the closed door and the white of the next section takes over
+  // the opening scroll: the filmed walk down the corridor (to WALK_END), the camera turns right on the spot to face the closed door
+  // of the visitor's unit (to TURN_END), then a few steps up to it and the white of the next section takes over
+  var WALK_END = .64, TURN_END = .8, FILM_END = TURN_END;
+  var FW = F ? (F.walk || F.n) : 0, FD = F ? (F.door != null ? F.door : F.n - 1) : 0;
+  var turnEl = $('#filmTurn'), turnCube = $('#turnCube'), turnFront = $('#turnFront'), turnRight = $('#turnRight'), turn = { th: -1, drawn: '' };
   var filmFits = !!(F && filmEl && filmEl.getContext && !reduced && params.film !== '0' && window.matchMedia && window.matchMedia('(max-width:600px) and (orientation:portrait)').matches);
   // the single-file preview carries the film's first picture inside the page
   if (filmFits && D.img && D.img['film-poster']) poster.src = D.img['film-poster'];
   function filmSrc(k) { return window.RV_FILM ? window.RV_FILM[k] : ASSET + 'img/film/' + ('00' + k).slice(-3) + '.webp'; }
   function filmNearest(k) {           // the closest frame that has arrived
     if (film.imgs[k]) return k;
-    for (var d = 1; d < F.n; d++) { if (film.imgs[k - d]) return k - d; if (film.imgs[k + d]) return k + d; }
+    for (var d = 1; d < FW; d++) { if (film.imgs[k - d]) return k - d; if (k + d < FW && film.imgs[k + d]) return k + d; }
     return -1;
   }
   function drawFilm(pos) {
@@ -660,6 +668,34 @@
     }
     film.drawn = k;
   }
+  // The turn: the last frame of the walk and the picture of the door are two faces of a box around the camera, the walk
+  // ahead and the door on the right; turning the box on the spot is the camera turning its head. Scaling by sin+cos keeps the
+  // far corner filling the screen, and a little blur while it turns fastest reads as a quick head turn.
+  function turnAt(k, push) {
+    var th = ease(k) * Math.PI / 2, on = k > 0;
+    turnEl.style.visibility = on ? 'visible' : 'hidden';
+    if (!on) { turn.th = -1; return; }
+    var a = filmNearest(FW - 1), key = a + ':' + !!film.imgs[FD];
+    if (key !== turn.drawn && a >= 0) { turn.drawn = key; turnFront.getContext('2d').drawImage(film.imgs[a], 0, 0, F.w, F.h); if (film.imgs[FD]) turnRight.getContext('2d').drawImage(film.imgs[FD], 0, 0, F.w, F.h); }
+    var W = stage.clientWidth, H = stage.clientHeight, sc = Math.max(W / F.w, H / F.h), fw = F.w * sc, fh = F.h * sc, ox = (W - fw) / 2, oy = (H - fh) * .38, f = fw / 2;
+    var size = W + 'x' + H;
+    if (turn.size !== size) {
+      turn.size = size;
+      turnEl.style.perspective = f.toFixed(1) + 'px'; turnEl.style.perspectiveOrigin = (ox + fw / 2).toFixed(1) + 'px ' + (oy + fh / 2).toFixed(1) + 'px';
+      turnEl.style.transformOrigin = (ox + fw / 2).toFixed(1) + 'px ' + (oy + fh / 2).toFixed(1) + 'px';
+      turnCube.style.width = turnFront.style.width = turnRight.style.width = fw.toFixed(1) + 'px';
+      turnCube.style.height = turnFront.style.height = turnRight.style.height = fh.toFixed(1) + 'px';
+      turnCube.style.left = ox.toFixed(1) + 'px'; turnCube.style.top = oy.toFixed(1) + 'px';
+      turnFront.style.transform = 'translateZ(' + (-f).toFixed(1) + 'px)';
+      turnRight.style.transform = 'rotateY(-90deg) translateZ(' + (-f).toFixed(1) + 'px)';
+      turn.th = -1;
+    }
+    var z = (Math.sin(th) + Math.cos(th)) * (1 + .2 * ease(push)), blur = 2.4 * Math.sin(Math.PI * k) * Math.sin(Math.PI * k), sig = th.toFixed(4) + z.toFixed(4);
+    if (sig === turn.th) return; turn.th = sig;
+    turnCube.style.transform = 'translateZ(' + f.toFixed(1) + 'px) rotateY(' + (th * 180 / Math.PI).toFixed(3) + 'deg)';
+    turnEl.style.transform = 'scale(' + z.toFixed(4) + ')';
+    turnEl.style.filter = blur > .15 ? 'blur(' + blur.toFixed(2) + 'px)' : '';
+  }
   function showFilm() {
     if (!film || !film.on) return;
     drawFilm(film.pos); stage.classList.add('is-film'); filmBar.hidden = false;
@@ -668,7 +704,7 @@
   }
   function filmOff() {                // back to the still picture
     if (film) film.on = false;
-    rootEl.classList.remove('film'); stage.classList.remove('is-film'); filmBar.hidden = true; realEl.style.opacity = 0; filmEl.style.transform = '';
+    rootEl.classList.remove('film'); stage.classList.remove('is-film'); filmBar.hidden = true; realEl.style.opacity = 0; filmEl.style.transform = ''; turnEl.style.visibility = 'hidden';
     measure();
   }
   function startFilm() {
@@ -680,9 +716,9 @@
     function add(k) { if (k >= 0 && k < n && !seen[k]) { seen[k] = 1; order.push(k); } }
     // the opening frames first, then the whole film in passes from coarse to fine, so it can be played early
     for (i = 0; i < 12; i++) add(i);
-    add(n - 1);
-    [8, 4, 2, 1].forEach(function (st) { for (var k = 0; k < n; k += st) add(k); });
-    first = Math.min(order.length, 13 + Math.ceil(n / 8));
+    add(FD); add(FW - 1);
+    [8, 4, 2, 1].forEach(function (st) { for (var k = 0; k < FW; k += st) add(k); });
+    first = Math.min(order.length, 14 + Math.ceil(FW / 8));
     function fail() { if (!filmFits) return; filmFits = false; filmOff(); startCorridor(); }   // no film: the drawn corridor takes over
     function pump() {
       while (live < 6 && next < order.length && filmFits) (function (k) {
@@ -780,16 +816,17 @@
     if (film && film.on) {
       if (!film.ready || doc.hidden || y > heroLen + vh) return;
       // the film follows the scroll with a little weight; at rest it settles on a whole frame
-      var ft = (F.n - 1) * seg(p, .075, FILM_END);
+      var ft = (FW - 1) * seg(p, .075, WALK_END);
       film.idle = y === film.y ? film.idle + dt : 0; film.y = y;
       if (film.idle > 140) ft = Math.round(ft);
       film.pos += (ft - film.pos) * (1 - Math.exp(-dt / 100)); if (Math.abs(ft - film.pos) < .015) film.pos = ft;
       drawFilm(film.pos);
       // resting on the first screen, the picture drifts slowly toward the door
-      var fz = (1 + .06 * (creep / CREEP_MAX) * (1 - seg(p, 0, .1))) * (1 + .32 * ease(seg(p, FILM_END, 1)));   // at the end, a few steps up to the door
+      var fz = 1 + .06 * (creep / CREEP_MAX) * (1 - seg(p, 0, .1));
       if (fz !== film.z) { film.z = fz; filmEl.style.transform = fz > 1.0005 ? 'scale(' + fz.toFixed(4) + ')' : ''; }
+      turnAt(seg(p, WALK_END + .01, TURN_END), seg(p, TURN_END, 1));
       // the three steps under the film fill as it plays
-      var fc = F.cuts, fk = [seg(film.pos, 0, fc[0]), seg(film.pos, fc[0], fc[1]), seg(film.pos, fc[1], F.n - 1)], fn = fk[1] <= 0 ? 0 : fk[2] <= 0 ? 1 : 2, key = fn + ':' + Math.round(fk[fn] * 100);
+      var fc = F.cuts, fk = [seg(film.pos, 0, fc[0]), seg(film.pos, fc[0], FW - 1), seg(p, WALK_END, TURN_END)], fn = fk[1] <= 0 ? 0 : fk[2] <= 0 ? 1 : 2, key = fn + ':' + Math.round(fk[fn] * 100);
       if (key !== film.bar) { film.bar = key; filmSteps.forEach(function (li, i) { li.style.setProperty('--k', i < fn ? 1 : i > fn ? 0 : fk[i].toFixed(3)); li.classList.toggle('is-on', i === fn); }); }
       return;
     }
