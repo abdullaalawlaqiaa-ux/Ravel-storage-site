@@ -638,7 +638,7 @@
 
   /* ---------------- the opening film: on a phone held upright, the scroll plays a filmed walk frame by frame ---------------- */
   var F = D.film, film = null, filmEl = $('#film'), realEl = $('#filmReal'), filmBar = $('#filmBar'), filmSteps = $$('#filmBar li');
-  var FILM_END = .8;   // the part of the opening scroll the film takes; the rest shows the real photo, then fades to white
+  var FILM_END = .84;   // the part of the opening scroll the film takes; after it the camera steps up to the closed door and the white of the next section takes over
   var filmFits = !!(F && filmEl && filmEl.getContext && !reduced && params.film !== '0' && window.matchMedia && window.matchMedia('(max-width:600px) and (orientation:portrait)').matches);
   // the single-file preview carries the film's first picture inside the page
   if (filmFits && D.img && D.img['film-poster']) poster.src = D.img['film-poster'];
@@ -766,10 +766,10 @@
       heroPanel.style.opacity = hp ? (1 - hp).toFixed(3) : ''; heroPanel.style.pointerEvents = hp > .5 ? 'none' : '';
       heroTop.style.transform = hp ? 'translate3d(0,' + (-46 * hp).toFixed(1) + 'px,0)' : '';
       heroTop.style.opacity = hp ? (1 - hp).toFixed(3) : '';
-      whiteEl.style.opacity = (fo ? seg(p, .93, 1) : seg(p, .84, .98)).toFixed(3);
+      whiteEl.style.opacity = (fo ? seg(p, .9, .99) : seg(p, .84, .98)).toFixed(3);
       if (fo) {
         // the film closes on the real photo of the unit, then the steps under it leave
-        realEl.style.opacity = film.ready ? seg(p, FILM_END, FILM_END + .05).toFixed(3) : 0;
+        realEl.style.opacity = 0;
         var bo = seg(p, .05, .1) * (1 - seg(p, .9, .95));
         filmBar.style.opacity = bo.toFixed(3); filmBar.style.transform = 'translate3d(0,' + ((1 - bo) * 14).toFixed(1) + 'px,0)'; filmBar.style.pointerEvents = bo > .5 ? '' : 'none'; filmBar.style.visibility = bo > 0 ? '' : 'hidden';
         filmBar.classList.toggle('is-real', p > FILM_END + .03);
@@ -785,7 +785,7 @@
       film.pos += (ft - film.pos) * (1 - Math.exp(-dt / 100)); if (Math.abs(ft - film.pos) < .015) film.pos = ft;
       drawFilm(film.pos);
       // resting on the first screen, the picture drifts slowly toward the door
-      var fz = 1 + .06 * (creep / CREEP_MAX) * (1 - seg(p, 0, .1));
+      var fz = (1 + .06 * (creep / CREEP_MAX) * (1 - seg(p, 0, .1))) * (1 + .32 * ease(seg(p, FILM_END, 1)));   // at the end, a few steps up to the door
       if (fz !== film.z) { film.z = fz; filmEl.style.transform = fz > 1.0005 ? 'scale(' + fz.toFixed(4) + ')' : ''; }
       // the three steps under the film fill as it plays
       var fc = F.cuts, fk = [seg(film.pos, 0, fc[0]), seg(film.pos, fc[0], fc[1]), seg(film.pos, fc[1], F.n - 1)], fn = fk[1] <= 0 ? 0 : fk[2] <= 0 ? 1 : 2, key = fn + ':' + Math.round(fk[fn] * 100);
