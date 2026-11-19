@@ -2,3 +2,4 @@
 output/*_preview/
 __pycache__/
 reference/
+output/*/render_tall.png
