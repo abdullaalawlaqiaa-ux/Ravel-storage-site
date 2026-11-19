@@ -16,11 +16,11 @@ import argparse, base64, html, json, os, re
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 THREE_CDN = "https://cdnjs.cloudflare.com/ajax/libs/three.js/0.149.0/three.min.js"
-EARLY = ("<script>(function(d){var l='ar';try{l=localStorage.getItem('rv_lang')||'ar'}catch(e){}"
+EARLY_T = ("<script>(function(d){var l='ar';try{l=localStorage.getItem('rv_lang')||'ar'}catch(e){}"
          "if(location.hash==='#en'||/[?&]lang=en/.test(location.search))l='en';"
          "d.lang=l==='en'?'en':'ar';d.dir=l==='en'?'ltr':'rtl';d.classList.add('js');"
-         # the feature cards carry photographs, unless the visitor has asked the browser to save data
-         "var c=navigator.connection;d.classList.toggle('ph',!(c&&c.saveData));"
+         # the feature cards carry photographs (when data.json's "photoCards" is on), unless the visitor saves data
+         "var c=navigator.connection;d.classList.toggle('ph',PHOTOCARDS&&!(c&&c.saveData));"
          # motion is switched on before the first paint, and off again if the motion script never arrives
          "if(!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)){d.classList.add('fx');"
          "setTimeout(function(){if(!window.RVFX)d.classList.remove('fx')},4000)}"
@@ -89,6 +89,7 @@ def main():
     data_js = "window.RV_DATA=" + json.dumps(data, ensure_ascii=False, separators=(",", ":")) + ";"
     write(os.path.join(ROOT, "assets/js/data.js"), data_js)
 
+    EARLY = EARLY_T.replace("PHOTOCARDS", "true" if D.get("photoCards", True) else "false")
     page = tpl.replace("<!--HEAD-->", EARLY).replace("<!--/HEAD-->", "")
     page = page.replace("<!--BODY-->", "").replace("<!--/BODY-->", "")
     page = page.replace("<!--SCRIPTS-->", '<script src="assets/js/data.js" defer></script>\n<script src="assets/js/app.js" defer></script>\n<script src="assets/js/fx.js" defer></script>')
