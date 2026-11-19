@@ -1,0 +1,47 @@
+{
+  "_note": "Shared construction constants for every unit (visual identity). Values marked approx are visual estimates from the reference photo, NOT owner-confirmed, and are never shown as measurements.",
+  "wall_panel_thickness_m": 0.05,
+  "top_cap_height_m": 0.04,
+  "door": {
+    "type": "single_hinged_outward",
+    "frame_profile_width_m": 0.05,
+    "clear_width_m": 0.9,
+    "clear_width_approx": true,
+    "clear_height_m": 2.22,
+    "clear_height_approx": true,
+    "open_angle_deg": 100,
+    "hinge_side": "right"
+  },
+  "trim": {
+    "galvanized_thickness_m": 0.0015,
+    "skirting_height_m": 0.05,
+    "corner_angle_leg_m": 0.035
+  },
+  "colors_srgb": {
+    "panel": [
+      0.9,
+      0.91,
+      0.89
+    ],
+    "concrete_light": [
+      0.68,
+      0.68,
+      0.67
+    ],
+    "concrete_dark": [
+      0.52,
+      0.52,
+      0.51
+    ],
+    "galvanized_light": [
+      0.88,
+      0.89,
+      0.9
+    ],
+    "galvanized_dark": [
+      0.76,
+      0.77,
+      0.79
+    ]
+  }
+}

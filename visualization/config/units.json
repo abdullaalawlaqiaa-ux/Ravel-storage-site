@@ -1,0 +1,24 @@
+{
+  "_note": "Catalog of Ravel Storage units. All dimensions in meters, INTERIOR CLEAR (net) dimensions. Only units with status 'approved' are final.",
+  "units": [
+    {
+      "id": "U01",
+      "label_ar": "وحدة 1 متر مربع",
+      "area_m2": 1.0,
+      "width_m": 1.0,
+      "depth_m": 1.0,
+      "wall_height_m": 2.4,
+      "allowed_height_m": 3.0,
+      "dimension_basis": "interior_clear",
+      "floor_level": "ground",
+      "confirmed_by_owner": {
+        "width": true,
+        "depth": true,
+        "wall_height": true,
+        "allowed_height": true
+      },
+      "status": "pending_review",
+      "owner_notes_ar": "ارتفاع الجدار 2.4 م (لا يُذكر في الصور). الارتفاع المسموح 3 م ويُعرض بسهم يتجاوز أعلى الجدار. المقاس داخلي صافي. الباب يظهر مفتوحاً وغير بارز."
+    }
+  ]
+}
