@@ -502,7 +502,7 @@
       sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nuniform vec3 uRimDir, uRimCol;\nuniform float uRimK;')
         .replace('#include <output_fragment>', 'vec3 rvN = normalize(normal);\nfloat rvF = pow(1.0 - clamp(dot(rvN, normalize(vViewPosition)), 0.0, 1.0), 2.6);\nfloat rvD = clamp(dot(rvN, uRimDir) * .7 + .35, 0.0, 1.0);\noutgoingLight += uRimCol * rvF * rvD * uRimK;\n#include <output_fragment>');
     };
-    var JH = 1.98, sil = new T.Mesh(buildSilhouette(T), jMat); sil.scale.setScalar(JH / 1.83); james.add(sil);
+    var JH = 2.2, sil = new T.Mesh(buildSilhouette(T), jMat); sil.scale.setScalar(JH / 1.83); james.add(sil);
     var photo = null, photoMat = null, photoTex = null, photoAsp = .413;
     if (o.jamesImg) {
       var img = new Image();
@@ -702,8 +702,8 @@
   // A and C are the two photographs of the same room, composited in 2D (Ken Burns push, parallax, a light-sweep wipe);
   // B is real 3D: the wrapped pieces leave the house through its lit doorway in a line and are stored in a white Ravel unit.
   // The hand-offs hide in the window's light: A pushes into the window, the light blooms, B opens on the house's lit doorway.
-  var RTM = { swapA: 4.65, move: 5.0, moveGap: .32, moveDur: 3.0, close: 11.3, lock: 12.6, swapB: 15.35, wipe: [15.9, 17.4] };
-  var RPOS = { P: { u: .28, v: .69, h: .255 }, Len: { u: .8, v: .81, h: .45 }, Lar: { u: .29, v: .79, h: .44 } };   // Rashid's feet and height in the photo (fractions of the photo)
+  var RTM = { swapA: 4.65, load: 5.0, loadGap: .28, loadDur: 1.7, drive: 8.8, cut: 10.0, arrive: 11.7, unload: 11.9, unloadGap: .26, unloadDur: 1.7, close: 15.6, lock: 16.9, swapB: 19.65, wipe: [20.2, 21.7] };
+  var RPOS = { P: { u: .33, v: .9, h: .48 }, Len: { u: .82, v: .975, h: .74 }, Lar: { u: .25, v: .975, h: .74 } };   // Rashid's feet and height in the photo (fractions of the photo)
   var PFOCUS = { P: [.8, .42], L: [.66, .38] };                                                                        // the window: where A pushes in and C comes out
   function createRashid(host, o) {
     var T = W.THREE, R = W.RV3D;
@@ -784,44 +784,109 @@
     var glass = new T.Mesh(merge(T, [[-3.4, 1.75, 1.3], [.85, 1.75, .9], [-4.6, 4.75, 1.2], [-2.0, 4.75, 1.2], [.6, 4.75, 1.2]].map(function (w, i) { return { g: new T.PlaneGeometry(w[2], 1.42), m: M(w[0], w[1], .045), c: i < 2 ? 0xFFDDB0 : 0xC9D3E0 }; })), new T.MeshBasicMaterial({ vertexColors: true })); scene.add(glass);
     var spill = quad(addMat({ map: softTex, color: 0xFFC98E, opacity: .55 }), 3); spill.rotation.x = -Math.PI / 2; spill.position.set(DXH, .02, 1.3); spill.scale.set(2.6, 3.2, 1); scene.add(spill);
     var doorGlow = quad(addMat({ map: glowTex, color: 0xFFE0B0, opacity: .5, fog: false }), 6); doorGlow.position.set(DXH, 1.3, .1); doorGlow.scale.set(2.6, 3.4, 1); scene.add(doorGlow);
-    // the unit, its doorway on the same building line as the house's
+    // the unit, at a Ravel site away from the house: a white block of units, navy band, cyan line
     var UW = Math.max(3.6, o.unit && o.unit.w || 3), UD = o.unit && o.unit.d || 4, UH = o.unit && o.unit.h || 3, ZF = UD / 2 + .035;
-    var UX = HX1 + 1.0 + UW / 2, UZ = -ZF;
-    var unitG = new T.Group(); unitG.position.set(UX, 0, UZ); scene.add(unitG);
+    var UX = 40, UZ = -ZF;
+    var site = new T.Group(); scene.add(site);
+    var unitG = new T.Group(); unitG.position.set(UX, 0, UZ); site.add(unitG);
     var U4 = makeUnit({ T: T, R: R, canvasTex: canvasTex, radial: radial, quad: quad, addMat: addMat, softTex: softTex }, unitG, { w: UW, d: UD, h: UH }, []);
+    (function () {
+      var WALL = 0xF4F5F6, NAVY = 0x1B2A55, CY = 0x2EC5FF, DOOR = 0xE1E4E8, FR = 0xB8BEC6, L = [], x0 = UX - UW / 2 - .05, x1 = UX + UW / 2 + .05, BH = UH + .55;
+      [[x0 - 11, x0], [x1, x1 + 13]].forEach(function (s) {
+        var w = s[1] - s[0], cx = (s[0] + s[1]) / 2;
+        L.push({ g: new T.BoxGeometry(w, BH, UD), m: M(cx, BH / 2, -UD / 2 - .02), c: WALL });
+        L.push({ g: new T.BoxGeometry(w, .42, .06), m: M(cx, BH - .3, .03), c: NAVY });
+        L.push({ g: new T.BoxGeometry(w, .05, .07), m: M(cx, BH - .56, .035), c: CY });
+        for (var dx = s[0] + 1.9; dx < s[1] - 1.2; dx += 3.7) {
+          L.push({ g: new T.BoxGeometry(2.2, 2.45, .05), m: M(dx, 1.225, .03), c: FR });
+          L.push({ g: new T.BoxGeometry(1.04, 2.36, .06), m: M(dx - .54, 1.2, .04), c: DOOR });
+          L.push({ g: new T.BoxGeometry(1.04, 2.36, .06), m: M(dx + .54, 1.2, .04), c: DOOR });
+        }
+      });
+      L.push({ g: new T.BoxGeometry(UW + .1, BH - UH - .02, UD), m: M(UX, UH + (BH - UH) / 2 + .01, -UD / 2 - .02), c: WALL });
+      L.push({ g: new T.BoxGeometry(UW + .1, .42, .06), m: M(UX, BH - .3, .03), c: NAVY });
+      L.push({ g: new T.BoxGeometry(60, .02, 9), m: M(UX, .005, 3.6), c: 0xD9D6D0 });
+      site.add(new T.Mesh(merge(T, L), new T.MeshLambertMaterial({ vertexColors: true })));
+    })();
 
-    /* ---------- the pieces, wrapped, in a line from the house into the unit ---------- */
-    var CAT = { box: [.5, .45, .42, '#C69D70'], wardrobeS: [1.0, .58, 1.95, '#7A5236'], carpet: [.56, .5, 2.0, '#8E2F3A'], majlis: [1.9, .7, .8, '#8E2F3A'], dresser: [.9, .45, .8, '#7A5236'], tv: [1.25, .2, .78, '#C69D70'], suit: [.5, .3, .72, '#4A5A73'] };
-    // [kind, slot x, slot z, slot yaw, extra]  (unit-local metres; back rows first, which is also the order they leave)
-    var LIST = [['carpet', -1.45, -1.68, 0], ['box', -.85, -1.7, 0, { n: 3 }], ['dresser', -.05, -1.72, 0, { top: true }], ['box', .75, -1.7, 0, { n: 2 }], ['tv', 1.35, -1.1, Math.PI / 2],
-      ['box', -1.45, -.9, 0, { n: 1 }], ['box', -.85, -.9, 0, { n: 2, small: true }], ['suit', -.25, -.9, 0, { v: 1 }], ['suit', .2, -.9, 0, { v: 0 }], ['majlis', .3, -.05, 0], ['wardrobeS', -1.2, .5, 0]];
-    var itemMat = new T.MeshLambertMaterial({ vertexColors: true }), movers = [];
+    /* ---------- the pickup: a plain white pickup with an open bed; it faces +x, its origin under the middle of the bed ---------- */
+    var BED_Y = .95, WR = .4;
+    function makeTruck() {
+      var g = new T.Group(), BODY = 0xF3F3F1, DARK = 0x2C2F35, GL = 0x5B6E86, TR = 0x9AA1AA, L = [];
+      function bx(x0, x1, y0, y1, z0, z1, c) { L.push({ g: new T.BoxGeometry(x1 - x0, y1 - y0, z1 - z0), m: M((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2), c: c }); }
+      bx(-1.38, 3.98, .46, .76, -.88, .88, DARK);             // chassis
+      bx(-1.32, 1.32, .74, BED_Y, -.94, .94, BODY);            // bed floor
+      bx(-1.32, 1.32, BED_Y, 1.47, -.95, -.88, BODY); bx(-1.32, 1.32, BED_Y, 1.47, .88, .95, BODY);   // bed sides
+      bx(1.26, 1.32, BED_Y, 1.47, -.88, .88, BODY); bx(-1.32, -1.26, BED_Y, 1.42, -.88, .88, BODY);   // bulkhead, tailgate
+      bx(-1.34, 1.34, 1.45, 1.5, -.96, -.86, TR); bx(-1.34, 1.34, 1.45, 1.5, .86, .96, TR);           // rails
+      bx(1.38, 2.95, .74, 2.02, -.93, .93, BODY);              // cab
+      bx(1.62, 2.82, 1.36, 1.9, -.94, .94, GL);                // side windows
+      bx(1.37, 1.39, 1.4, 1.88, -.72, .72, GL);                // rear window
+      bx(2.95, 2.97, 1.34, 1.92, -.82, .82, GL);               // windscreen
+      bx(2.9, 3.98, .74, 1.34, -.93, .93, BODY);               // bonnet
+      bx(3.97, 4.0, .82, 1.2, -.66, .66, DARK);                // grille
+      bx(3.97, 4.01, 1.12, 1.27, -.88, -.62, 0xFFF4D6); bx(3.97, 4.01, 1.12, 1.27, .62, .88, 0xFFF4D6);  // headlamps
+      bx(-1.35, -1.31, 1.08, 1.36, -.92, -.78, 0xB3262E); bx(-1.35, -1.31, 1.08, 1.36, .78, .92, 0xB3262E);  // tail lamps
+      bx(-1.46, -1.32, .5, .66, -.95, .95, DARK); bx(3.96, 4.1, .5, .7, -.95, .95, DARK);                // bumpers
+      bx(2.02, 2.06, 1.1, 1.14, -.96, .96, TR);                // door line
+      g.add(new T.Mesh(merge(T, L), new T.MeshLambertMaterial({ vertexColors: true })));
+      var wheels = [], tg = new T.CylinderGeometry(WR, WR, .3, 22); tg.rotateX(Math.PI / 2);
+      var hg2 = new T.CylinderGeometry(.21, .21, .32, 14); hg2.rotateX(Math.PI / 2);
+      var tm = new T.MeshLambertMaterial({ color: 0x25272B }), hm = new T.MeshLambertMaterial({ color: 0xC4C8CE });
+      [[-.55, -.8], [-.55, .8], [3.2, -.8], [3.2, .8]].forEach(function (p) {
+        var w = new T.Group(); w.position.set(p[0], WR, p[1]);
+        w.add(new T.Mesh(tg, tm)); var hb = new T.Mesh(hg2, hm); w.add(hb);
+        var sp = new T.Mesh(new T.BoxGeometry(.36, .05, .33), hm); w.add(sp);
+        g.add(w); wheels.push(w);
+      });
+      var sh = quad(new T.MeshBasicMaterial({ map: blobTex, transparent: true, depthWrite: false, opacity: .75 }), 1); sh.rotation.x = -Math.PI / 2; sh.position.set(1.3, .015, 0); sh.scale.set(6.6, 2.7, 1); g.add(sh);
+      g.userData.wheels = wheels; return g;
+    }
+    var truck = makeTruck(); scene.add(truck);
+    var TX1 = DXH + 2.4, TZ1 = 1.75, TX2 = UX + UW / 2 + .55 + 1.32, TZ2 = 2.25;
+    function truckAt(t, out) {
+      if (t < RTM.cut) { var a = seg(t, RTM.drive, RTM.cut); out.x = TX1 + 30 * a * a * a; out.z = TZ1; }
+      else { var b = 1 - seg(t, RTM.cut, RTM.arrive); out.x = TX2 - 26 * b * b; out.z = TZ2; }
+      return out;
+    }
+
+    /* ---------- the pieces, wrapped: out of the house into the pickup's bed, then out of the bed into the unit ---------- */
+    var CAT = { box: [.5, .45, .42, '#C69D70'], wardrobeS: [1.0, .58, 1.95, '#7A5236'], dresser: [.9, .45, .8, '#7A5236'], suit: [.5, .3, .72, '#4A5A73'] };
+    // [kind, place in the bed (x along the truck, z across), place in the unit (unit-local x, z), extra] in the order they are loaded
+    var LIST = [['wardrobeS', .7, -.45, -1.2, .2], ['dresser', .72, .42, .6, -.95, { top: true }], ['box', -.05, -.5, -.85, -.9, { n: 3 }], ['box', -.05, .1, -1.45, -1.7, { n: 2 }],
+      ['suit', -.08, .58, .3, -1.75, { v: 1 }], ['box', -.75, -.5, -.85, -1.7, { n: 2, small: true }], ['box', -.75, .08, 1.4, -1.7, { n: 1 }], ['suit', -.78, .58, .85, -1.75, { v: 0 }]];
+    var itemMat = new T.MeshLambertMaterial({ vertexColors: true }), movers = [], NL = LIST.length;
+    function poly(P) { var lens = [], tot = 0; for (var j = 0; j < P.length - 1; j++) { var dx = P[j + 1][0] - P[j][0], dy = P[j + 1][1] - P[j][1], dz = P[j + 1][2] - P[j][2], l = Math.sqrt(dx * dx + dy * dy + dz * dz) || .001; lens.push(l); tot += l; } return { P: P, lens: lens, tot: tot }; }
+    function along(pl, u, out) {
+      var d = u * pl.tot, j = 0; while (j < pl.lens.length - 1 && d > pl.lens[j]) { d -= pl.lens[j]; j++; }
+      var f = clamp(d / pl.lens[j], 0, 1), A = pl.P[j], B = pl.P[j + 1];
+      out.x = lerp(A[0], B[0], f); out.y = lerp(A[1], B[1], f); out.z = lerp(A[2], B[2], f); return out;
+    }
     LIST.forEach(function (L2, i) {
-      var c = CAT[L2[0]], ex = L2[4] || {}, it = { kind: L2[0], x: 0, z: 0, w: c[0], d: c[1], h: c[2], c: c[3], yaw: 0, v: ex.v != null ? ex.v : i }, k;
+      var c = CAT[L2[0]], ex = L2[5] || {}, it = { kind: L2[0], x: 0, z: 0, w: c[0], d: c[1], h: c[2], c: c[3], yaw: 0, v: ex.v != null ? ex.v : i }, k;
       for (k in ex) it[k] = ex[k];
       var hh = it.kind === 'box' ? it.n * .42 : it.kind === 'dresser' && it.top ? it.h + .4 : it.h;
-      var b = new R.BoxBatch(T); R.addItem(b, it); var mesh = b.mesh(itemMat); scene.add(mesh);
-      var hy = Math.max(.04, Math.min(.35, DHH - .08 - hh)), sx = UX + L2[1], sz = UZ + L2[2];
-      var P = [[DXH, hy, -1.4], [DXH, hy, .5], [DXH + .9, .22, 1.7], [UX - 1.3, .2, 1.7], [UX, .05, .45], [UX, .04, -.6], [sx, 0, sz]];
-      var lens = [], tot = 0; for (var j = 0; j < P.length - 1; j++) { var dx = P[j + 1][0] - P[j][0], dy = P[j + 1][1] - P[j][1], dz = P[j + 1][2] - P[j][2], l = Math.sqrt(dx * dx + dy * dy + dz * dz) * (j === 2 ? 2.0 : 1); lens.push(l); tot += l; }
+      var b = new R.BoxBatch(T); R.addItem(b, it); var mesh = b.mesh(itemMat); mesh.visible = false; scene.add(mesh);
+      var hy = Math.max(.04, Math.min(.35, DHH - .08 - hh)), bxp = L2[1], bzp = L2[2], sx = UX + L2[3], sz = UZ + L2[4], lift = 1.58;
+      var P1 = poly([[DXH, hy, -1.4], [DXH, hy, .9], [TX1 - 2.05, .3, TZ1 + bzp * .4], [TX1 - 1.6, lift, TZ1 + bzp * .4], [TX1 + bxp, lift, TZ1 + bzp], [TX1 + bxp, BED_Y, TZ1 + bzp]]);
+      var P2 = poly([[TX2 + bxp, BED_Y, TZ2 + bzp], [TX2 + bxp, lift, TZ2 + bzp], [TX2 - 1.95, 1.0, TZ2 + bzp * .4], [UX + .5, .2, 1.45], [UX, .05, .45], [UX, .04, -.6], [sx, 0, sz]]);
       var shadow = quad(new T.MeshBasicMaterial({ map: blobTex, transparent: true, depthWrite: false, opacity: 0 }), 2); shadow.rotation.x = -Math.PI / 2; scene.add(shadow);
-      movers.push({ it: it, mesh: mesh, shadow: shadow, P: P, lens: lens, tot: tot, yaw0: it.w > 1.1 ? Math.PI / 2 : 0, syaw: L2[3], foot: Math.max(it.w, it.d) * .9, tm: RTM.move + i * RTM.moveGap });
+      movers.push({ it: it, mesh: mesh, shadow: shadow, P1: P1, P2: P2, bx: bxp, bz: bzp, yaw0: it.w > 1.1 ? Math.PI / 2 : 0, syaw: 0, foot: Math.max(it.w, it.d) * .9,
+        tL: RTM.load + i * RTM.loadGap, tU: RTM.unload + (NL - 1 - i) * RTM.unloadGap });
     });
-    var mv = {};
+    var TP = { x: 0, z: 0 };
+    // where a piece is at t: in the house, on the way to the bed, riding in the bed, on the way into the unit, stored
     function moverAt(m, t, out) {
-      var u = io(seg(t, m.tm, m.tm + RTM.moveDur)), d = u * m.tot, j = 0, acc = 0;
-      while (j < m.lens.length - 1 && d > m.lens[j]) { d -= m.lens[j]; acc += m.lens[j]; j++; }
-      var f = m.lens[j] ? clamp(d / m.lens[j], 0, 1) : 1, A = m.P[j], B = m.P[j + 1];
-      out.x = lerp(A[0], B[0], f); out.y = lerp(A[1], B[1], f); out.z = lerp(A[2], B[2], f);
-      var tr = u * m.tot, toLane = m.lens[0] + m.lens[1], toDoor = m.tot - m.lens[5] - m.lens[4];
-      out.yaw = lerp(m.yaw0, 0, io(clamp((tr - m.lens[0]) / Math.max(m.lens[1], .3), 0, 1)));
-      out.yaw = lerp(out.yaw, m.syaw, io(clamp((tr - toDoor) / (m.tot - toDoor), 0, 1)));
-      out.u = u; out.lane = tr > toLane; return out;
+      out.free = false;
+      if (t < m.tL) { out.u = 0; out.x = DXH; out.y = 0; out.z = -2; out.yaw = 0; return out; }
+      if (t < m.tL + RTM.loadDur) { var u = io(seg(t, m.tL, m.tL + RTM.loadDur)); along(m.P1, u, out); out.yaw = lerp(m.yaw0, 0, io(clamp(u * 3, 0, 1))); out.u = .01 + .49 * u; out.free = true; return out; }
+      if (t < m.tU) { truckAt(t, TP); out.x = TP.x + m.bx; out.y = BED_Y; out.z = TP.z + m.bz; out.yaw = 0; out.u = .5; return out; }
+      var v = io(seg(t, m.tU, m.tU + RTM.unloadDur)); along(m.P2, v, out); out.yaw = lerp(0, m.syaw, v); out.u = .5 + .5 * v; out.free = v < 1; return out;
     }
 
     /* ---------- Rashid at the unit, greeting (the waving photo) ---------- */
-    var RH = 1.96, RW = new T.Vector3(UX + UW / 2 + .65, 0, 1.15);
-    var rashid = new T.Group(); rashid.position.copy(RW); scene.add(rashid);
+    var RH = 2.2, RW = new T.Vector3(UX - UW / 2 - .75, 0, 1.25);
+    var rashid = new T.Group(); rashid.position.copy(RW); site.add(rashid);
     var rShadow = quad(new T.MeshBasicMaterial({ map: blobTex, transparent: true, depthWrite: false, opacity: .7 }), 2); rShadow.rotation.x = -Math.PI / 2; rShadow.position.y = .01; rShadow.scale.set(1.1, .6, 1); rashid.add(rShadow);
     var sil = new T.Mesh(buildKandura(T), new T.MeshPhongMaterial({ vertexColors: true, specular: 0x333333, shininess: 18 })); sil.scale.setScalar(RH / 1.78); rashid.add(sil);
     var wavePhoto = null, rFace = 0;
@@ -831,29 +896,37 @@
       wavePhoto.scale.set(RH * a, RH, 1); wavePhoto.renderOrder = 5; rashid.add(wavePhoto); sil.visible = false;
     });
 
-    /* ---------- camera keys for B ---------- */
-    var CAMS = [], aspect = 1, camV = [0, 0, 0, 0, 0, 0, 0], set = 'P', pw = 1, ph = 1;
+    /* ---------- camera keys for B: shot 1 at the house (loading, the pickup leaves), a cut, shot 2 at the unit ---------- */
+    var CAMS = [], CAMS2 = [], aspect = 1, camV = [0, 0, 0, 0, 0, 0, 0], set = 'P', pw = 1, ph = 1, C0 = RTM.close;
     function camKeys() {
       return [
         { t: RTM.swapA, pos: [DXH, 1.35, 1.7], look: [DXH, 1.25, -1], fovL: 44, fovP: 58 },
-        { t: 6.3, L: { c: [1.4, 1.1, .4], w: 9.6, h: 3.6, d: 2, az: .08, el: .2, fill: .95, fov: 36 }, P: { c: [.4, 1.1, .6], w: 4.8, h: 3.6, d: 2, az: .14, el: .2, fill: .98, fov: 46 } },
-        { t: 9.0, L: { c: [2.6, 1.0, .6], w: 9.2, h: 3.4, d: 2, az: .06, el: .22, fill: .95, fov: 36 }, P: { c: [2.5, 1.0, .8], w: 4.6, h: 3.4, d: 2, az: .1, el: .22, fill: .98, fov: 46 } },
-        { t: 10.8, L: { c: [UX, 1.3, .3], w: 6.2, h: 3.4, d: 2, az: .06, el: .16, fill: .95, fov: 36 }, P: { c: [UX, 1.3, .4], w: 3.8, h: 3.6, d: 2, az: .08, el: .16, fill: .98, fov: 46 } },
-        { t: 12.1, pos: [UX + 1.0, 1.9, 6.4], look: [UX, 1.3, 0], fovL: 38, fovP: 50 },
-        { t: 12.85, pos: [UX + .22, 1.24, 1.2], look: [UX - .07, 1.06, .08], fovL: 30, fovP: 38, hold: 1 },
-        { t: 13.4, pos: [UX + .21, 1.24, 1.16], look: [UX - .07, 1.06, .08], fovL: 30, fovP: 38 },
-        { t: 14.3, L: { c: [UX + 1.2, 1.45, .5], w: 6.6, h: 3.4, d: 2, az: -.1, el: .1, fill: .9, fov: 34 }, P: { c: [UX + 1.55, 1.25, .9], w: 3.4, h: 3.6, d: 1, az: -.12, el: .1, fill: .95, fov: 44 } },
-        { t: 15.4, L: { c: [UX + 1.2, 1.45, .5], w: 6.6, h: 3.4, d: 2, az: -.05, el: .1, fill: .92, fov: 34 }, P: { c: [UX + 1.55, 1.25, .9], w: 3.4, h: 3.6, d: 1, az: -.07, el: .1, fill: .97, fov: 44 }, hold: 1 }
+        { t: 6.1, L: { c: [DXH + 2.9, 1.25, 1.2], w: 9.4, h: 3.6, d: 3, az: .1, el: .2, fill: .95, fov: 36 }, P: { c: [DXH + 2.9, 1.25, 1.3], w: 7.2, h: 3.8, d: 3, az: .2, el: .2, fill: .98, fov: 46 } },
+        { t: 8.7, L: { c: [DXH + 3.2, 1.25, 1.3], w: 9.2, h: 3.6, d: 3, az: .06, el: .19, fill: .95, fov: 36 }, P: { c: [DXH + 3.2, 1.25, 1.4], w: 7.0, h: 3.8, d: 3, az: .14, el: .19, fill: .98, fov: 46 } },
+        { t: RTM.cut, L: { c: [DXH + 7.0, 1.2, 1.6], w: 8.2, h: 3.6, d: 3, az: -.05, el: .16, fill: .95, fov: 36 }, P: { c: [DXH + 5.0, 1.2, 1.7], w: 4.5, h: 3.8, d: 3, az: -.04, el: .16, fill: .98, fov: 46 } }
+      ];
+    }
+    function camKeys2() {
+      return [
+        { t: RTM.cut, L: { c: [UX + 1.0, 1.15, 1.1], w: 10.4, h: 3.6, d: 2, az: .06, el: .18, fill: .95, fov: 36 }, P: { c: [UX + .7, 1.15, 1.2], w: 5.4, h: 3.6, d: 2, az: .1, el: .18, fill: .98, fov: 46 } },
+        { t: RTM.arrive + .3, L: { c: [UX + 1.2, 1.15, 1.0], w: 9.6, h: 3.6, d: 2, az: .05, el: .18, fill: .95, fov: 36 }, P: { c: [UX + 1.6, 1.15, 1.1], w: 6.4, h: 3.6, d: 2, az: .08, el: .18, fill: .98, fov: 46 } },
+        { t: C0 - 1.6, L: { c: [UX + .7, 1.2, .7], w: 8.0, h: 3.5, d: 2, az: .05, el: .17, fill: .95, fov: 36 }, P: { c: [UX + 1.3, 1.2, .9], w: 6.0, h: 3.6, d: 2, az: .07, el: .17, fill: .98, fov: 46 } },
+        { t: C0 - .5, L: { c: [UX, 1.3, .3], w: 6.2, h: 3.4, d: 2, az: .06, el: .16, fill: .95, fov: 36 }, P: { c: [UX, 1.3, .4], w: 3.8, h: 3.6, d: 2, az: .08, el: .16, fill: .98, fov: 46 } },
+        { t: C0 + .8, pos: [UX - 1.0, 1.9, 6.4], look: [UX, 1.3, 0], fovL: 38, fovP: 50 },
+        { t: C0 + 1.55, pos: [UX + .22, 1.24, 1.2], look: [UX - .07, 1.06, .08], fovL: 30, fovP: 38, hold: 1 },
+        { t: C0 + 2.1, pos: [UX + .21, 1.24, 1.16], look: [UX - .07, 1.06, .08], fovL: 30, fovP: 38 },
+        { t: C0 + 3.0, L: { c: [UX - 1.2, 1.45, .5], w: 6.6, h: 3.4, d: 2, az: .1, el: .1, fill: .9, fov: 34 }, P: { c: [UX - 1.6, 1.3, .9], w: 3.4, h: 3.8, d: 1, az: .12, el: .1, fill: .95, fov: 44 } },
+        { t: C0 + 4.1, L: { c: [UX - 1.2, 1.45, .5], w: 6.6, h: 3.4, d: 2, az: .05, el: .1, fill: .92, fov: 34 }, P: { c: [UX - 1.6, 1.3, .9], w: 3.4, h: 3.8, d: 1, az: .07, el: .1, fill: .97, fov: 44 }, hold: 1 }
       ];
     }
     function resolveCams() {
-      var q = clamp((aspect - .8) / .4, 0, 1), K = [];
-      camKeys().forEach(function (k) { K.push({ t: k.t, v: k.pos ? k.pos.concat(k.look, [lerp(k.fovP, k.fovL, q)]) : frame(blend(k.L, k.P || k.L, q), aspect), hold: k.hold }); });
-      tangents(K); CAMS = K;
-      herm(K, 14.4, camV); rFace = Math.atan2(camV[0] - RW.x, camV[2] - RW.z);
+      var q = clamp((aspect - .8) / .4, 0, 1);
+      function build(keys) { var K = []; keys.forEach(function (k) { K.push({ t: k.t, v: k.pos ? k.pos.concat(k.look, [lerp(k.fovP, k.fovL, q)]) : frame(blend(k.L, k.P || k.L, q), aspect), hold: k.hold }); }); tangents(K); return K; }
+      CAMS = build(camKeys()); CAMS2 = build(camKeys2());
+      herm(CAMS2, C0 + 3.1, camV); rFace = Math.atan2(camV[0] - RW.x, camV[2] - RW.z);
     }
     function camera(t) {
-      herm(CAMS, t, camV);
+      herm(t < RTM.cut ? CAMS : CAMS2, t, camV);
       var dx = .008 * Math.sin(1.7 * t), dy = .008 * Math.sin(2.3 * t + 1);
       cam.position.set(camV[0] + dx, camV[1] + dy, camV[2]); cam.lookAt(camV[3] + dx, camV[4] + dy, camV[5]);
       if (cam.fov !== camV[6] || cam.aspect !== aspect) { cam.fov = camV[6]; cam.aspect = aspect; cam.updateProjectionMatrix(); }
@@ -867,7 +940,7 @@
       PU.tA.value = full; PU.tB.value = tidy;
       var s, F = PFOCUS[set];
       if (t < RTM.swapB) s = 1 + .1 * io(seg(t, 0, 4.2)) + .5 * inq(seg(t, 3.85, RTM.swapA));
-      else s = lerp(1.22, 1.0, io(seg(t, RTM.swapB, 18.4)));
+      else s = lerp(1.22, 1.0, io(seg(t, RTM.swapB, RTM.swapB + 3.05)));
       var ww = RTM.wipe, wu = seg(t, ww[0], ww[1]);
       PU.uW.value = t < ww[0] ? -1 : t > ww[1] ? 2 : lerp(-.2, 1.25, io(wu)); PU.uBand.value = .75 * bell(wu); PU.uBright.value = 1 + .05 * bell(wu);
       photo.scale.set(pw * s, ph * s, 1); photo.position.set(-(F[0] - .5) * pw * (s - 1), (F[1] - .5) * ph * (s - 1), 0);
@@ -892,14 +965,18 @@
         info.door = t < RTM.swapA ? 0 : 0; info.lock = t >= RTM.swapB ? 1 : 0;
       } else {
         camera(t);
+        var atSite = t >= RTM.cut;
+        house.visible = glass.visible = doorLight.visible = spill.visible = doorGlow.visible = !atSite; site.visible = atSite;
+        truckAt(t, TP); truck.position.set(TP.x, 0, TP.z);
+        var roll = (TP.x - TX1) / WR; truck.userData.wheels.forEach(function (w) { w.rotation.z = -roll; });
         for (i = 0; i < movers.length; i++) {
           m = movers[i]; p = moverAt(m, t, st);
           var vis = p.u > 0 && !(p.u >= 1 && t > RTM.close + 1.3);
           m.mesh.visible = vis; m.mesh.position.set(p.x, p.y, p.z); m.mesh.rotation.y = p.yaw;
-          m.shadow.visible = vis && p.u < 1 && p.z > -.25; m.shadow.material.opacity = .5 / (1 + p.y * 2); m.shadow.position.set(p.x, .012, p.z); m.shadow.scale.set(m.foot * 1.6, m.foot * 1.6, 1);
+          m.shadow.visible = vis && p.free && p.z > -.25; m.shadow.material.opacity = .5 / (1 + p.y * 2); m.shadow.position.set(p.x, .012, p.z); m.shadow.scale.set(m.foot * 1.6, m.foot * 1.6, 1);
         }
-        var ur = animUnit(U4, t, { b: -10, o: RTM.move - .9, i: 0, c: RTM.close, l: RTM.lock, ang: 2.95, glow: 0 }, cam);
-        info.door = ur.door; info.lock = ur.lock;
+        var ur = animUnit(U4, t, { b: -10, o: RTM.arrive - .5, i: 0, c: RTM.close, l: RTM.lock, ang: 2.95, glow: 0 }, cam);
+        info.door = ur.door; info.lock = ur.lock; info.truck = +TP.x.toFixed(2);
         rashid.rotation.y = rFace;
         renderer.render(scene, cam);
       }
@@ -1054,8 +1131,8 @@
         m1: 'مسافر لعدة أشهر؟', m2: 'لماذا تستمر في دفع الإيجار؟', m3: ['خزّن أثاثك بأمان مع ', 'رافل للتخزين', '.'], m4: ['سافر بخفة.', 'ووفّر أكثر.'] }
     },
     rashid: {
-      dur: 20.6, sc: [0, 4.6, 11.3, 15.35, 17.3], skip: 19.4, dayAt: 0, bloom: [[4.2, 4.65, 5.15], [14.95, 15.35, 15.85]], scrim: [16.9, 17.7],
-      j1: [1.0, 3.85, 4.1], j2: [5.6, 10.4, 10.6], m3: [17.3, 19.1, 19.4], rule: [17.9, 18.4], m4: 19.4, hl: [19.7, 20.2], end: 19.8,
+      dur: 24.9, sc: [0, 4.6, 10.0, 19.65, 21.6], skip: 23.7, dayAt: 0, bloom: [[4.2, 4.65, 5.15], [9.7, 10.0, 10.3], [19.25, 19.65, 20.15]], scrim: [21.2, 22.0],
+      j1: [1.0, 3.85, 4.1], j2: [5.6, 14.6, 14.8], m3: [21.6, 23.4, 23.7], rule: [22.2, 22.7], m4: 23.7, hl: [24.0, 24.5], end: 24.1,
       en: { title: "Rashid's story", name: 'Rashid', j1: 'His home was full.', j2: ['', '', 'He moved the extras into a Ravel unit.'], m3: ['For only ', 'AED 500', ' a month.'], m4: ['More space at home.', 'A tidier house.'] },
       ar: { title: 'قصة راشد', name: 'راشد', j1: 'بيته كان ممتلئاً بالأغراض.', j2: ['', '', 'نقل الأغراض الزائدة إلى وحدة في رافل.'], m3: ['بـ ', '500 درهم', ' فقط شهرياً.'], m4: ['مساحة أكبر في البيت،', 'وبيت أكثر ترتيباً.'] }
     }
