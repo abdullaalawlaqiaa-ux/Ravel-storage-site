@@ -552,7 +552,8 @@
         if (!ok) return;
         filmOpen = true; if (viewer) viewer.setActive(false);
         window.RVMotion.open({
-          lang: state.lang, opener: opener || null, story: story, rashidImg: imgUrl('char-rashid'),
+          lang: state.lang, opener: opener || null, story: story, rashidImg: imgUrl('char-rashid'), rashidStandImg: imgUrl('char-rashid-stand'),
+          roomImgs: { fullP: imgUrl('room-full-p'), fullL: imgUrl('room-full-l'), tidyP: imgUrl('room-tidy-p'), tidyL: imgUrl('room-tidy-l') },
           items: buildLayout(unitFor(12)), unit: { w: unitFor(12).w, d: unitFor(12).d, h: D.height },
           jamesImg: imgUrl('char-james'),
           wa: wa([plain('wa.hello'), plain('wa.ask')]), tel: 'tel:' + D.phone,

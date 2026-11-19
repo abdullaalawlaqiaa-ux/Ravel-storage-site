@@ -112,7 +112,7 @@ def main():
         body = re.sub(r'src="assets/img/([a-z0-9-]+)\.(?:png|jpg|webp)"', inline_img, body)
         names.update(s["photo"] for s in D["sizes"] if s["photo"])
         names.update(("logo-white", "film-poster", "film-real"))
-        names.update(["char-rashid", "char-james"])   # the two people in the 3D view and the film
+        names.update(["char-rashid", "char-james", "char-rashid-stand", "room-full-p", "room-full-l", "room-tidy-p", "room-tidy-l"])   # the two people in the 3D view and the film
         # fonts: only the digits face is embedded; the text faces come from the same families on Google Fonts
         css = read("assets/css/style.css")
         # the film's styles and script travel inside the single page too (in the hosted copy they load on demand)
