@@ -251,11 +251,10 @@
   function personKind() { return who() === 'rashid' ? 'kandura' : 'suit'; }
   function renderWho() {
     var w = who(), card = $('#whoCard'), desc = $('#whoDesc');
-    $$('#whoSel .who__btn').forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-who') === w); });
+    $$('#whoSel .pick__btn').forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-who') === w); });
     $('#whoName').textContent = plain(w === 'rashid' ? 'who.rashid' : 'who.james');
     desc.innerHTML = t(w === 'rashid' ? 'who.rashidD' : 'who.jamesD');
-    desc.setAttribute('dir', w === 'james' ? 'ltr' : state.lang === 'ar' ? 'rtl' : 'ltr'); desc.setAttribute('lang', w === 'james' ? 'en' : state.lang);
-    $('#whoPlay').hidden = w !== 'james';
+    $('#whoPlayText').textContent = plain(w === 'rashid' ? 'who.playR' : 'who.play');   // each has his own story
     openCard();
   }
   // On a phone the card would hide part of the unit, so it opens for a few seconds and then folds to his name;
@@ -270,7 +269,7 @@
   function foldCard() { clearTimeout(cardT); $('#whoCard').classList.toggle('is-min', true); }
   $('#whoCard').addEventListener('click', function (e) { if (e.target.closest && e.target.closest('#whoPlay')) return; if (this.classList.contains('is-min')) openCard(); else foldCard(); });
   function selectWho(w, user) {
-    if (user && w === 'james') openFilm($('#whoPlay'));   // choosing James plays his story
+    if (user && w === 'james') openFilm($('#whoPlay'), 'james');   // choosing James plays his story
     if (w === who() && state.who) return;
     state.who = w; renderWho(); updateViewer(true);
   }
@@ -543,7 +542,8 @@
     if (filmLoading) return; filmLoading = true;
     loadScript(ASSET + 'js/motion.js', function (ok) { filmLoading = false; cb(ok && !!window.RVMotion); });
   }
-  function openFilm(opener) {
+  function openFilm(opener, story) {
+    story = story === 'rashid' ? 'rashid' : 'james';
     if (filmOpen) return;
     stopAutoWalk(); if (!menu.hidden) setMenu(false);
     var still = reduced || state.lite || !webglOk();
@@ -552,20 +552,20 @@
         if (!ok) return;
         filmOpen = true; if (viewer) viewer.setActive(false);
         window.RVMotion.open({
-          lang: state.lang, opener: opener || null,
+          lang: state.lang, opener: opener || null, story: story, rashidImg: imgUrl('char-rashid'),
           items: buildLayout(unitFor(12)), unit: { w: unitFor(12).w, d: unitFor(12).d, h: D.height },
           jamesImg: imgUrl('char-james'),
           wa: wa([plain('wa.hello'), plain('wa.ask')]), tel: 'tel:' + D.phone,
           reduced: still, low: !!lowEnd,
-          onExplore: function () { selectSize(12, true); setView('3d'); $('#explorer').scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' }); },
-          onClose: function () { filmOpen = false; lastY = -1; if (viewer) viewer.setActive(state.view === '3d' && viewerVisible && !state.lite); }
+          onExplore: function () { if (story === 'james') selectSize(12, true); setView('3d'); $('#explorer').scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' }); },
+          onClose: function () { filmOpen = false; if (state.who !== story) { state.who = story; renderWho(); updateViewer(true); } lastY = -1; if (viewer) viewer.setActive(state.view === '3d' && viewerVisible && !state.lite); }
         });
       });
     };
     if (still) go(); else ensure3D(function (ok) { if (ok) go(); else { still = true; go(); } });
   }
   $('#whoSel').addEventListener('click', function (e) { var b = e.target.closest ? e.target.closest('[data-who]') : null; if (b) selectWho(b.getAttribute('data-who'), true); });
-  $('#whoPlay').addEventListener('click', function () { openFilm(this); });
+  $('#whoPlay').addEventListener('click', function () { openFilm(this, who()); });
 
   /* ---------------- 3D: loading, lite mode ---------------- */
   var stage = $('#stage'), poster = $('#poster'), corridor = null, viewerVisible = false, loading3d = false, cbs = [];

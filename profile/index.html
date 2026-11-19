@@ -187,14 +187,14 @@
               <div class="viewer__plan" id="unitPlan" aria-hidden="true"></div>
               <div class="viewer__labels" id="unitLabels" aria-hidden="true"></div>
               <span class="viewer__hint" id="unitHint"><svg class="ic"><use href="#i-rotate"/></svg><span data-i18n="u.drag">اسحب للتدوير · اضغط لفتح الباب</span></span>
-              <div class="who" id="whoSel" role="group" data-i18n-attr="aria-label:who.pick" aria-label="اختر الشخصية">
-                <button class="who__btn" type="button" data-who="rashid" aria-pressed="false" data-i18n="who.rashid">راشد</button>
-                <button class="who__btn" type="button" data-who="james" aria-pressed="false" data-i18n="who.james">James</button>
+              <div class="pick" id="whoSel" role="group" data-i18n-attr="aria-label:who.pick" aria-label="اختر الشخصية">
+                <button class="pick__btn" type="button" data-who="rashid" aria-pressed="false" data-i18n="who.rashid">راشد</button>
+                <button class="pick__btn" type="button" data-who="james" aria-pressed="false" data-i18n="who.james">جيمس</button>
               </div>
               <div class="vcard" id="whoCard" aria-live="polite">
                 <b class="vcard__n" id="whoName"></b>
                 <span class="vcard__d" id="whoDesc"></span>
-                <button class="vcard__play" id="whoPlay" type="button" hidden><svg class="ic"><use href="#i-play"/></svg><span data-i18n="who.play">شاهد رحلة James</span></button>
+                <button class="vcard__play" id="whoPlay" type="button"><svg class="ic"><use href="#i-play"/></svg><span id="whoPlayText"></span></button>
                 <small class="vcard__tag" data-i18n="who.tag">مثال توضيحي</small>
               </div>
               <button class="viewer__door" id="doorBtn" type="button" aria-pressed="true"><svg class="ic"><use href="#i-lock"/></svg><span id="doorBtnText"></span></button>
