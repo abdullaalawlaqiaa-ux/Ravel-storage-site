@@ -211,6 +211,13 @@ main{position:relative;z-index:1;overflow-x:clip}
 .vault__img{object-fit:cover}
 .vault figcaption{position:absolute;z-index:3;inset-inline-start:10px;bottom:10px;max-width:calc(100% - 20px);padding:4px 12px;border-radius:999px;background:var(--navy);color:#fff;font:600 12.5px/1.7 var(--f-text)}
 .vault__door,.vault__relock{display:none}
+.vault__arrow{position:absolute;z-index:4;top:50%;display:grid;place-items:center;width:34px;height:34px;margin-top:-17px;padding:0;border:0;border-radius:50%;background:rgba(255,255,255,.88);color:var(--navy);cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.18);transition:transform .2s var(--ease),opacity .4s ease}
+.vault__arrow[hidden]{display:none}
+.vault__arrow svg{width:18px;height:18px}
+.vault__arrow:active{transform:scale(.9)}
+.vault__arrow--prev{left:10px}
+.vault__arrow--next{right:10px}
+.fx .vault:not(.is-open) .vault__arrow{opacity:0;pointer-events:none}
 .fx .vault picture{position:absolute;inset:0;z-index:2;-webkit-clip-path:circle(0% at 50% 44%);clip-path:circle(0% at 50% 44%);transition:clip-path 1.15s var(--ease-out),-webkit-clip-path 1.15s var(--ease-out)}
 .fx .vault .vault__img{transform:scale(1.14);transition:transform 1.6s var(--ease-out)}
 .fx .vault.is-open picture{-webkit-clip-path:circle(76% at 50% 44%);clip-path:circle(76% at 50% 44%)}
