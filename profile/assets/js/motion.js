@@ -1133,8 +1133,8 @@
     rashid: {
       dur: 24.9, sc: [0, 4.6, 10.0, 19.65, 21.6], skip: 23.7, dayAt: 0, bloom: [[4.2, 4.65, 5.15], [9.7, 10.0, 10.3], [19.25, 19.65, 20.15]], scrim: [21.2, 22.0],
       j1: [1.0, 3.85, 4.1], j2: [5.6, 14.6, 14.8], m3: [21.6, 23.4, 23.7], rule: [22.2, 22.7], m4: 23.7, hl: [24.0, 24.5], end: 24.1,
-      en: { title: "Rashid's story", name: 'Rashid', j1: 'His home was full.', j2: ['', '', 'He moved the extras into a Ravel unit.'], m3: ['For only ', 'AED 500', ' a month.'], m4: ['More space at home.', 'A tidier house.'] },
-      ar: { title: 'قصة راشد', name: 'راشد', j1: 'بيته كان ممتلئاً بالأغراض.', j2: ['', '', 'نقل الأغراض الزائدة إلى وحدة في رافل.'], m3: ['بـ ', '500 درهم', ' فقط شهرياً.'], m4: ['مساحة أكبر في البيت،', 'وبيت أكثر ترتيباً.'] }
+      en: { title: "Rashid's story", name: 'Rashid', j1: 'His home was full.', j2: ['', '', 'He moved the extras into a Ravel unit.'], m3: ['For only ', 'AED 300', ' a month.'], m4: ['More space at home.', 'A tidier house.'] },
+      ar: { title: 'قصة راشد', name: 'راشد', j1: 'بيته كان ممتلئاً بالأغراض.', j2: ['', '', 'نقل الأغراض الزائدة إلى وحدة في رافل.'], m3: ['بـ ', '300 درهم', ' فقط شهرياً.'], m4: ['مساحة أكبر في البيت،', 'وبيت أكثر ترتيباً.'] }
     }
   };
   function plainCopy(C) { return [C.name + ': ' + C.j1, C.j2.join(''), C.m1 || '', C.m2 || '', C.m3.join(''), C.m4.join(' ')].filter(Boolean).join(' '); }
@@ -1167,8 +1167,7 @@
         '<div class="mfilm__end">' +
           '<div class="mfilm__row"><button class="mfilm__btn mfilm__btn--navy mfilm__cta" type="button">' + esc(L.cta) + ICON.arrow + '</button>' +
           '<button class="mfilm__btn mfilm__btn--ghost mfilm__replay" type="button">' + ICON.replay + '<span>' + esc(L.replay) + '</span></button></div>' +
-          '<div class="mfilm__row mfilm__contact"><a class="mfilm__btn mfilm__btn--wa" href="' + wa + '" target="_blank" rel="noopener">' + ICON.wa + '<span>' + esc(L.wa) + '</span></a>' +
-          '<a class="mfilm__btn mfilm__btn--tel" href="' + tel + '">' + ICON.tel + '<span>' + esc(L.call) + '</span></a></div>' +
+          '<div class="mfilm__row mfilm__contact"><a class="mfilm__btn mfilm__btn--wa" href="' + wa + '" target="_blank" rel="noopener">' + ICON.wa + '<span>' + esc(L.wa) + '</span></a></div>' +
         '</div>' +
       '</div>' +
       '<div class="mfilm__still" ' + LG + ' hidden></div>' +
@@ -1183,7 +1182,7 @@
     return {
       root: root, stage: q('.mfilm__stage'), black: q('.mfilm__black'), bloom: q('.mfilm__bloom'), scrim: q('.mfilm__scrim'), j1: q('.mfilm__j1'), j2: q('.mfilm__j2'),
       copy: q('.mfilm__copy'), msg: q('.mfilm__msg'), m12: q('.mfilm__m12'), l1: q('.mfilm__l1'), l2: q('.mfilm__l2'), m3: q('.mfilm__m3'), m4: q('.mfilm__m4'), rule: q('.mfilm__ruleb'), hl: q('.mfilm__hlb'),
-      end: q('.mfilm__end'), endBtns: [q('.mfilm__cta'), q('.mfilm__replay'), q('.mfilm__btn--wa'), q('.mfilm__btn--tel')], cta: q('.mfilm__cta'), replay: q('.mfilm__replay'),
+      end: q('.mfilm__end'), endBtns: [q('.mfilm__cta'), q('.mfilm__replay'), q('.mfilm__btn--wa')], cta: q('.mfilm__cta'), replay: q('.mfilm__replay'),
       still: q('.mfilm__still'), bar: q('.mfilm__bar'), segs: [].slice.call(root.querySelectorAll('.mfilm__seg')), close: q('.mfilm__close'), skip: q('.mfilm__skip'), fab: q('.mfilm__fab'),
       pause: q('.mfilm__pause'), flash: q('.mfilm__flash')
     };

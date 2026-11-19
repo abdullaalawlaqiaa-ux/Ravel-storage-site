@@ -233,7 +233,6 @@
     if (u.price) h += '<p class="tiny">' + t('u.priceNote') + '</p>';
     h += '<div class="unitinfo__actions"><a class="btn btn--wa" id="unitWa" target="_blank" rel="noopener" href="' + wa(unitLines(u)) + '">' + icon('i-chat') + '<span>' + t('u.cta') + '</span></a>';
     h += '<button class="btn btn--ghost btn--save" id="saveBtn" type="button" aria-pressed="' + saved + '">' + icon('i-save') + '<span>' + t(saved ? 'u.saved' : 'u.save') + '</span></button>';
-    if (!u.price) h += '<a class="btn btn--line unitinfo__call" href="tel:' + D.phone + '">' + icon('i-phone') + '<span>' + t('u.callAsk') + '</span><span class="num" dir="ltr">' + D.phoneDisplay + '</span></a>';
     h += '</div>';
     h += '<a class="link" href="#helper">' + t('u.unsure') + '</a>';
     infoEl.innerHTML = h;
