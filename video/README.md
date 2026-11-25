@@ -5,7 +5,7 @@
 ## إعادة التصدير
 ```bash
 cd video/source
-mkdir node && (cd node && npm init -y && npm i @fontsource/tajawal @fontsource/montserrat)
+mkdir node && (cd node && npm init -y && npm i @fontsource/cairo)
 npm i playwright   # أو استخدم المثبت مسبقاً
 python3 music.py          # الموسيقى -> music.wav
 node render.js            # الفيديو بدون صوت -> silent.mp4
