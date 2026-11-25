@@ -49,27 +49,26 @@ body{font-family:Taj,sans-serif;color:#fff}
 #s4 .range .n{color:var(--blue);font-size:76px}
 /* S5 */
 #s5{background:linear-gradient(180deg,var(--navy) 0%,#0a1c46 100%)}
-#s5 .bgimg{transform-origin:50% 0;position:absolute;left:0;right:0;top:0;height:900px;object-fit:cover;width:100%;opacity:.45}
-#s5 .fade{position:absolute;left:0;right:0;top:300px;height:860px;background:linear-gradient(180deg,rgba(14,37,87,0),var(--navy))}
-#s5 .title{position:absolute;width:100%;top:330px;text-align:center;font-size:100px;font-weight:800}
-#s5 .stitle{position:absolute;width:100%;top:470px;text-align:center;font-size:30px;color:var(--sky);font-weight:600}
-.feat{position:absolute;width:420px;height:360px;background:rgba(255,255,255,.07);border:2px solid rgba(255,255,255,.14);border-radius:36px;text-align:center}
-.feat .ic{width:150px;height:150px;margin:36px auto 18px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center}
-.feat .ic svg{width:88px;height:88px}
+#s5 .bgimg{transform-origin:50% 0;position:absolute;left:0;right:0;top:0;height:1000px;object-fit:cover;width:100%;opacity:.5;-webkit-mask-image:linear-gradient(180deg,#000 25%,transparent 92%);mask-image:linear-gradient(180deg,#000 25%,transparent 92%)}
+#s5 .title{position:absolute;width:100%;top:230px;text-align:center;font-size:100px;font-weight:800}
+#s5 .stitle{position:absolute;width:100%;top:370px;text-align:center;font-size:30px;color:var(--sky);font-weight:600}
+.feat{position:absolute;width:420px;height:320px;background:rgba(255,255,255,.07);border:2px solid rgba(255,255,255,.14);border-radius:36px;text-align:center}
+.feat .ic{width:130px;height:130px;margin:30px auto 14px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center}
+.feat .ic svg{width:78px;height:78px}
+.feat.wide{left:90px;right:90px;width:auto;height:210px;background:#fff;border-color:#fff;color:var(--navy);display:flex;align-items:center;justify-content:center;gap:40px;text-align:right;box-shadow:0 24px 60px rgba(63,182,242,.35)}
+.feat.wide .ic{margin:0;background:var(--navy);flex:none}
+.feat.wide b{font-size:72px;line-height:1.1}
+.feat.wide i{color:var(--blue);font-size:24px;font-weight:600}
 .feat b{display:block;font-size:46px;font-weight:800}
 .feat i{display:block;font-style:normal;font-size:22px;color:#9fd4ff;margin-top:6px;letter-spacing:.08em}
 /* S6 */
 #s6 .shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(8,23,57,.92) 0%,rgba(8,23,57,.55) 45%,rgba(8,23,57,.95) 100%)}
 #s6 .l1{position:absolute;width:100%;top:220px;text-align:center;font-size:140px;font-weight:800}
 #s6 .stamp{position:absolute;left:50%;top:420px;background:var(--red);padding:10px 60px 26px;border-radius:24px;font-size:120px;font-weight:800;white-space:nowrap;box-shadow:0 20px 50px rgba(227,38,47,.45)}
-#s6 .cal{position:absolute;left:110px;right:110px;top:900px;height:560px;background:#fff;border-radius:40px;color:var(--navy);box-shadow:0 40px 80px rgba(0,0,0,.4)}
-#s6 .cal .rings{position:absolute;top:-34px;left:60px;right:60px;display:flex;justify-content:space-between}
-#s6 .cal .rings span{width:26px;height:72px;border-radius:14px;background:linear-gradient(90deg,#8a96a8,#e7edf5,#8a96a8)}
-#s6 .num{position:absolute;top:110px;width:330px;text-align:center}
-#s6 .num b{display:block;font-family:Mont;font-weight:900;font-size:230px;line-height:1}
-#s6 .num i{display:block;font-style:normal;font-size:60px;font-weight:800;margin-top:8px}
-#s6 .plus{position:absolute;left:50%;top:170px;font-family:Mont;font-weight:900;font-size:160px;color:var(--blue);transform:translateX(-50%)}
-#s6 .foot{position:absolute;width:100%;top:1560px;text-align:center;font-size:48px;font-weight:700;color:#dfeaff}
+#s6 .photo{position:absolute;left:110px;right:110px;top:800px;height:680px;border-radius:40px;overflow:hidden;border:8px solid #fff;box-shadow:0 40px 90px rgba(0,0,0,.5)}
+#s6 .photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+#s6 .foot{position:absolute;width:100%;top:1570px;text-align:center;font-size:54px;font-weight:800;color:#fff}
+#s6 .foot span{display:inline-block;padding:22px 56px 28px;border-radius:80px;background:rgba(255,255,255,.12);border:2px solid rgba(255,255,255,.35)}
 /* S7 */
 #s7{background:radial-gradient(circle at 50% 30%,#1d4596 0%,var(--navy) 55%,#081739 100%)}
 #s7 .logo{position:absolute;left:50%;top:330px;width:720px;transform:translateX(-50%)}
@@ -123,7 +122,6 @@ body{font-family:Taj,sans-serif;color:#fff}
 
 <section class="scene" id="s5">
   <img class="bgimg" id="s5img" src="img/corridor2.jpg">
-  <div class="fade"></div>
   <div class="title" id="s5t">ليش رافل؟</div>
   <div class="stitle en" id="s5st">WHY RAVEL STORAGE</div>
   <div id="feats"></div>
@@ -134,13 +132,8 @@ body{font-family:Taj,sans-serif;color:#fff}
   <div class="shade"></div>
   <div class="l1" id="s6l1">استأجر سنوي</div>
   <div class="stamp" id="s6stamp">وخذ شهرين مجاناً!</div>
-  <div class="cal" id="s6cal">
-    <div class="rings"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
-    <div class="num" id="n12" style="right:40px"><b>12</b><i>شهر</i></div>
-    <div class="plus" id="plus">+</div>
-    <div class="num" id="n2m" style="left:40px;color:var(--red)"><b>2</b><i>شهر مجاناً</i></div>
-  </div>
-  <div class="foot" id="s6foot">ادفع لسنة واحصل على شهرين إضافيين</div>
+  <div class="photo" id="s6photo"><img id="s6pimg" src="img/unitfull_hd.jpg"></div>
+  <div class="foot" id="s6foot"><span>اسأل عن عرض الإيجار السنوي</span></div>
 </section>
 
 <section class="scene" id="s7">
@@ -164,13 +157,17 @@ const ICONS={
  guard:`<svg viewBox="0 0 48 48" fill="none" stroke="${N}" stroke-width="3.2" stroke-linejoin="round"><path d="M24 4l16 6v12c0 10-7 18-16 22C15 40 8 32 8 22V10z"/><path d="M16 24l6 6 10-12"/></svg>`,
  snow:`<svg viewBox="0 0 48 48" fill="none" stroke="${N}" stroke-width="3.2" stroke-linecap="round"><path d="M24 4v40M7 14l34 20M7 34l34-20"/><path d="M19 7l5 5 5-5M19 41l5-5 5 5M6 21l7-1-3-6M42 27l-7 1 3 6M6 27l7 1-3 6M42 21l-7-1 3-6"/></svg>`,
  lock:`<svg viewBox="0 0 48 48" fill="none" stroke="${N}" stroke-width="3.2"><rect x="9" y="21" width="30" height="22" rx="4"/><path d="M15 21v-6a9 9 0 0 1 18 0v6"/><circle cx="24" cy="31" r="3" fill="${N}"/><path d="M24 33v4"/></svg>`,
+ tag:`<svg viewBox="0 0 48 48" fill="none" stroke="#fff" stroke-width="3.4" stroke-linejoin="round" stroke-linecap="round"><path d="M5 6h18l20 20-17 17L5 23z"/><circle cx="15" cy="16" r="3.2"/><path d="M21 30l9-9M21.5 23.5h.1M29.5 30.5h.1"/></svg>`,
  spark:`<svg viewBox="0 0 48 48" fill="${N}"><path d="M20 6l4 12 12 4-12 4-4 12-4-12-12-4 12-4z"/><path d="M37 4l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"/><path d="M37 30l1.6 4 4 1.6-4 1.6-1.6 4-1.6-4-4-1.6 4-1.6z"/></svg>`
 };
-const FEATS=[['clock','دخول 24/7','ACCESS ANYTIME'],['cam','كاميرات مراقبة','CCTV 24/7'],['guard','حارس أمن','24/7 SECURITY'],['snow','مكيف وغير مكيف','AC & NON-AC'],['lock','وحدات خاصة','PRIVATE UNITS'],['spark','نظافة عالية','CLEAN & TIDY']];
+const FEATS=[['clock','دخول 24/7','ACCESS ANYTIME'],['cam','كاميرات مراقبة','CCTV 24/7'],['guard','حارس أمن','24/7 SECURITY'],['snow','مكيف وغير مكيف','AC & NON-AC'],['lock','وحدات خاصة','PRIVATE UNITS'],['spark','نظافة عالية','CLEAN & TIDY'],['tag','أفضل الأسعار','BEST PRICES']];
 const fw=document.getElementById('feats');
 FEATS.forEach((f,i)=>{const d=document.createElement('div');d.className='feat';d.id='f'+i;
- const col=i%2, row=Math.floor(i/2); d.style.right=(90+col*480)+'px'; d.style.top=(640+row*410)+'px';
- d.innerHTML=`<div class="ic">${ICONS[f[0]]}</div><b>${f[1]}</b><i class="en">${f[2]}</i>`; fw.appendChild(d);});
+ if(i<6){const col=i%2,row=Math.floor(i/2);d.style.right=(90+col*480)+'px';d.style.top=(490+row*350)+'px';
+  d.innerHTML=`<div class="ic">${ICONS[f[0]]}</div><b>${f[1]}</b><i class="en">${f[2]}</i>`;}
+ else{d.classList.add('wide');d.style.top='1550px';
+  d.innerHTML=`<div class="ic">${ICONS[f[0]]}</div><div><b>${f[1]}</b><i class="en">${f[2]}</i></div>`;}
+ fw.appendChild(d);});
 
 const $=id=>document.getElementById(id);
 const cl=x=>Math.max(0,Math.min(1,x));
@@ -227,10 +224,10 @@ function render(t){
  { const l=t-26; $('s6img').style.transform=`scale(${lerp(1.25,1.08,eo(P(l,0,5.7)))})`; $('s6img').style.filter='blur(3px)';
    rise($('s6l1'),l,.45,.6,90);
    const st=$('s6stamp'); const p=P(l,1.0,1.4); st.style.opacity=p>0?1:0; st.style.transform=`translateX(-50%) rotate(-4deg) scale(${p<1?lerp(2.4,1,eo(p)):1+Math.sin(Math.max(0,l-1.4)*6)*.025*Math.exp(-(l-1.4))})`;
-   rise($('s6cal'),l,1.6,.7,300);
-   const pop=(el,a)=>{const q=back(P(l,a,a+.5));el.style.opacity=P(l,a,a+.2);el.style.transform=`scale(${lerp(.3,1,q)})`;};
-   pop($('n12'),2.1); $('plus').style.opacity=P(l,2.5,2.7); $('plus').style.transform=`translateX(-50%) rotate(${(1-eo(P(l,2.5,3)))*180}deg)`; pop($('n2m'),2.8);
-   rise($('s6foot'),l,3.4,.6,40);}
+   { const ph=$('s6photo'); const q=eo(P(l,1.6,2.4)); ph.style.opacity=P(l,1.6,1.95);
+     ph.style.transform=`translateY(${(1-q)*260}px) rotate(${lerp(5,0,q)}deg)`;
+     $('s6pimg').style.transform=`scale(${lerp(1.14,1.02,P(l,1.6,5.7))})`; }
+   rise($('s6foot'),l,2.6,.6,40);}
  // S7
  { const l=t-31.5; const lg=$('s7logo'); const p=eo(P(l,.4,1.2)); lg.style.opacity=p; lg.style.transform=`translateX(-50%) scale(${lerp(.85,1,p)})`;
    rise($('s7cta'),l,1.0,.6); rise($('s7ctaen'),l,1.2,.6,30);

@@ -54,9 +54,9 @@ for s in [27.0,33.1,0.3]:
     boom=np.sin(2*np.pi*(40+60*np.exp(-tt*8))*tt)*np.exp(-tt*3)
     add(boom*0.6,s)
 # ding/sparkle on feature pops
-for i in range(6):
+for i in range(7):
     s=20.5+1+i*0.32; n=int(0.5*SR); tt=np.arange(n)/SR
-    add(np.sin(2*np.pi*f(84+[0,4,7,12,7,12][i])*tt)*np.exp(-tt*8)*0.07,s,0.3*(1 if i%2 else -1))
+    add(np.sin(2*np.pi*f(84+[0,4,7,12,7,12,16][i])*tt)*np.exp(-tt*8)*0.07,s,0.3*(1 if i%2 else -1))
 mix=np.stack([L,R],1)
 fade=np.ones(N); fi=int(SR*0.5); fade[:fi]=np.linspace(0,1,fi); fo=int(SR*2.5); fade[-fo:]=np.linspace(1,0,fo)
 mix*=fade[:,None]; mix/=np.max(np.abs(mix))*1.12
