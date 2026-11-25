@@ -63,9 +63,10 @@ body{font-family:Taj,sans-serif;color:#fff}
 .feat i{display:block;font-style:normal;font-size:22px;color:#9fd4ff;margin-top:6px;letter-spacing:.08em}
 /* S6 */
 #s6 .shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(8,23,57,.92) 0%,rgba(8,23,57,.55) 45%,rgba(8,23,57,.95) 100%)}
-#s6 .l1{position:absolute;width:100%;top:220px;text-align:center;font-size:140px;font-weight:800}
-#s6 .stamp{position:absolute;left:50%;top:420px;background:var(--red);padding:10px 60px 26px;border-radius:24px;font-size:120px;font-weight:800;white-space:nowrap;box-shadow:0 20px 50px rgba(227,38,47,.45)}
-#s6 .photo{position:absolute;left:110px;right:110px;top:800px;height:680px;border-radius:40px;overflow:hidden;border:8px solid #fff;box-shadow:0 40px 90px rgba(0,0,0,.5)}
+#s6 .l1{position:absolute;width:100%;top:170px;text-align:center;font-size:140px;font-weight:800}
+#s6 .l2{position:absolute;width:100%;top:345px;text-align:center;font-size:112px;font-weight:800}
+#s6 .stamp{position:absolute;left:50%;top:530px;background:var(--red);padding:10px 60px 26px;border-radius:24px;font-size:120px;font-weight:800;white-space:nowrap;box-shadow:0 20px 50px rgba(227,38,47,.45)}
+#s6 .photo{position:absolute;left:110px;right:110px;top:850px;height:640px;border-radius:40px;overflow:hidden;border:8px solid #fff;box-shadow:0 40px 90px rgba(0,0,0,.5)}
 #s6 .photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 #s6 .foot{position:absolute;width:100%;top:1570px;text-align:center;font-size:54px;font-weight:800;color:#fff}
 #s6 .foot span{display:inline-block;padding:22px 56px 28px;border-radius:80px;background:rgba(255,255,255,.12);border:2px solid rgba(255,255,255,.35)}
@@ -131,7 +132,8 @@ body{font-family:Taj,sans-serif;color:#fff}
   <img class="full" id="s6img" src="img/unitfull.jpg">
   <div class="shade"></div>
   <div class="l1" id="s6l1">استأجر سنوي</div>
-  <div class="stamp" id="s6stamp">وخذ شهرين مجاناً!</div>
+  <div class="l2" id="s6l2">واحصل على خصم</div>
+  <div class="stamp" id="s6stamp">شهرين مجاناً!!</div>
   <div class="photo" id="s6photo"><img id="s6pimg" src="img/unitfull_hd.jpg"></div>
   <div class="foot" id="s6foot"><span>اسأل عن عرض الإيجار السنوي</span></div>
 </section>
@@ -222,7 +224,7 @@ function render(t){
      el.querySelector('.ic').style.transform=`rotate(${(1-eo(P(l,a,a+.8)))*-90}deg)`;});}
  // S6
  { const l=t-26; $('s6img').style.transform=`scale(${lerp(1.25,1.08,eo(P(l,0,5.7)))})`; $('s6img').style.filter='blur(3px)';
-   rise($('s6l1'),l,.45,.6,90);
+   rise($('s6l1'),l,.35,.6,90); rise($('s6l2'),l,.6,.6,90);
    const st=$('s6stamp'); const p=P(l,1.0,1.4); st.style.opacity=p>0?1:0; st.style.transform=`translateX(-50%) rotate(-4deg) scale(${p<1?lerp(2.4,1,eo(p)):1+Math.sin(Math.max(0,l-1.4)*6)*.025*Math.exp(-(l-1.4))})`;
    { const ph=$('s6photo'); const q=eo(P(l,1.6,2.4)); ph.style.opacity=P(l,1.6,1.95);
      ph.style.transform=`translateY(${(1-q)*260}px) rotate(${lerp(5,0,q)}deg)`;
