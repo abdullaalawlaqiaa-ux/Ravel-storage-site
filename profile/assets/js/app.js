@@ -539,7 +539,7 @@
   function ensureFilm(cb) {
     if (window.RVMotion) return cb(true);
     if (filmLoading) return; filmLoading = true;
-    loadScript(ASSET + 'js/motion.js', function (ok) { filmLoading = false; cb(ok && !!window.RVMotion); });
+    loadScript(ASSET + 'js/motion.js' + (D.v ? '?v=' + D.v : ''), function (ok) { filmLoading = false; cb(ok && !!window.RVMotion); });
   }
   function openFilm(opener, story) {
     story = story === 'rashid' ? 'rashid' : 'james';
@@ -576,7 +576,7 @@
     if (window.THREE && window.RV3D) return cb(true);
     cbs.push(cb); if (loading3d) return; loading3d = true;
     var done = function (ok) { loading3d = false; var q = cbs; cbs = []; q.forEach(function (f) { f(ok && !!window.THREE && !!window.RV3D); }); };
-    var scene = function (ok) { if (!ok) return done(false); if (window.RV3D) return done(true); loadScript(ASSET + 'js/scene3d.js', done); };
+    var scene = function (ok) { if (!ok) return done(false); if (window.RV3D) return done(true); loadScript(ASSET + 'js/scene3d.js' + (D.v ? '?v=' + D.v : ''), done); };
     // a hosted copy tries its own file first, the single-file preview tries the CDN first; each falls back to the other
     var own = ASSET + 'vendor/three.min.js', first = D.threeFirst && D.threeCdn ? D.threeCdn : own, second = first === own ? D.threeCdn : own;
     if (window.THREE) scene(true);
