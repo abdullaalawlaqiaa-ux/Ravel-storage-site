@@ -299,10 +299,10 @@
     set.sort(function (a, b) { return a - b; });
     var units = set.map(sizeObj), maxW = 0, maxL = 0;
     units.forEach(function (s) { maxW = Math.max(maxW, s.w); maxL = Math.max(maxL, s.d); });
-    var P = 300, rtl = state.lang === 'ar', carW = 1.8, carL = 4.5, gap = maxW > 6 ? 1 : .5;
+    var P = 300, rtl = state.lang === 'ar';
     var padA = 30, padB = 8, padTop = 36, padBot = 30;   // padA: the side the shapes grow from, with the length scale
-    var k = Math.min((P - padA - padB) / (maxW + gap + carW), (P - padTop - padBot) / Math.max(maxL, carL));
-    var baseY = P - padBot - ((P - padTop - padBot) - Math.max(maxL, carL) * k) / 2, x0 = rtl ? P - padA : padA, dir = rtl ? -1 : 1, parts = [];
+    var k = Math.min((P - padA - padB) / maxW, (P - padTop - padBot) / maxL);
+    var baseY = P - padBot - ((P - padTop - padBot) - maxL * k) / 2, x0 = rtl ? P - padA : padA, dir = rtl ? -1 : 1, parts = [];
     function X(m) { return x0 + dir * m * k; }
     function rectAttrs(s) { var w = s.w * k, h = s.d * k; return 'x="' + (rtl ? x0 - w : x0).toFixed(1) + '" y="' + (baseY - h).toFixed(1) + '" width="' + w.toFixed(1) + '" height="' + h.toFixed(1) + '"'; }
     units.slice().reverse().forEach(function (s) {
@@ -324,10 +324,6 @@
       if (w < 15 && !on) return;
       parts.push('<text class="cmp__t' + (on ? ' is-on' : '') + '" x="' + X(s.w - 5 / k).toFixed(1) + '" y="' + (baseY - h + 13).toFixed(1) + '" text-anchor="' + (rtl ? 'start' : 'end') + '">' + s.a + '</text>');
     });
-    // a parked car (1.8 x 4.5 m) beside the shapes, at the same scale
-    var cx = rtl ? X(maxW + gap + carW) : X(maxW + gap), cy = baseY - carL * k;
-    parts.push('<rect class="cmp__ref" x="' + cx.toFixed(1) + '" y="' + cy.toFixed(1) + '" width="' + (carW * k).toFixed(1) + '" height="' + (carL * k).toFixed(1) + '" rx="' + (carW * k * .28).toFixed(1) + '"/>');
-    parts.push('<text class="cmp__r" x="' + (cx + carW * k / 2).toFixed(1) + '" y="' + (cy + carL * k / 2 + 3).toFixed(1) + '" text-anchor="middle">' + plain('cmp.car') + '</text>');
     return '<svg viewBox="0 0 300 300" role="group" aria-label="' + plain('cmp.title') + '">' + parts.join('') + '</svg>';
   }
   function renderCompare() {
