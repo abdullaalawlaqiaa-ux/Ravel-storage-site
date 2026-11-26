@@ -1133,8 +1133,8 @@
     rashid: {
       dur: 24.9, sc: [0, 4.6, 10.0, 19.65, 21.6], skip: 23.7, dayAt: 0, bloom: [[4.2, 4.65, 5.15], [9.7, 10.0, 10.3], [19.25, 19.65, 20.15]], scrim: [21.2, 22.0],
       j1: [1.0, 3.85, 4.1], j2: [5.6, 14.6, 14.8], m3: [21.6, 23.4, 23.7], rule: [22.2, 22.7], m4: 23.7, hl: [24.0, 24.5], end: 24.1,
-      en: { title: "Rashid's story", name: 'Rashid', j1: 'His home was full.', j2: ['', '', 'He moved the extras into a Ravel unit.'], m3: ['For only ', 'AED 300', ' a month.'], m4: ['More space at home.', 'A tidier house.'] },
-      ar: { title: 'قصة راشد', name: 'راشد', j1: 'بيته كان ممتلئاً بالأغراض.', j2: ['', '', 'نقل الأغراض الزائدة إلى وحدة في رافل.'], m3: ['بـ ', '300 درهم', ' فقط شهرياً.'], m4: ['مساحة أكبر في البيت،', 'وبيت أكثر ترتيباً.'] }
+      en: { title: "Rashid's story", name: 'Rashid', j1: 'His home was full.', j2: ['', '', 'He moved the extras into a Ravel unit.'], m3: ['For only ', 'AED 250', ' a month.'], m4: ['More space at home.', 'A tidier house.'] },
+      ar: { title: 'قصة راشد', name: 'راشد', j1: 'بيته كان ممتلئاً بالأغراض.', j2: ['', '', 'نقل الأغراض الزائدة إلى وحدة في رافل.'], m3: ['بـ ', '250 درهم', ' فقط شهرياً.'], m4: ['مساحة أكبر في البيت،', 'وبيت أكثر ترتيباً.'] }
     }
   };
   function plainCopy(C) { return [C.name + ': ' + C.j1, C.j2.join(''), C.m1 || '', C.m2 || '', C.m3.join(''), C.m4.join(' ')].filter(Boolean).join(' '); }
