@@ -21,6 +21,8 @@ EARLY_T = ("<script>(function(d){var l='ar';try{l=localStorage.getItem('rv_lang'
          "d.lang=l==='en'?'en':'ar';d.dir=l==='en'?'ltr':'rtl';d.classList.add('js');"
          # the feature cards carry photographs (when data.json's "photoCards" is on), unless the visitor saves data
          "var c=navigator.connection;d.classList.toggle('ph',PHOTOCARDS&&!(c&&c.saveData));"
+         # served on its own (not inside a viewer), the host may lay a small badge over the bottom corner: keep a strip free for it
+         "try{if(window.self===window.top)d.classList.add('nfb')}catch(e){}"
          # motion is switched on before the first paint, and off again if the motion script never arrives
          "if(!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)){d.classList.add('fx');"
          "setTimeout(function(){if(!window.RVFX)d.classList.remove('fx')},4000)}"

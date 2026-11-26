@@ -142,3 +142,6 @@ html.mfilm-lock,html.mfilm-lock body{overflow:hidden!important;overscroll-behavi
   .mfilm--rashid .mfilm__scrim{background:linear-gradient(90deg,rgba(244,246,248,.9) 0%,rgba(244,246,248,.72) 26%,rgba(244,246,248,0) 46%)}
   .mfilm--rashid[dir=rtl] .mfilm__scrim{background:linear-gradient(270deg,rgba(244,246,248,.9) 0%,rgba(244,246,248,.72) 26%,rgba(244,246,248,0) 46%)}
 }
+
+/* keep the bottom controls clear of a host's corner badge */
+.nfb .mfilm{--mf-safe-b:calc(env(safe-area-inset-bottom,0px) + 64px)}

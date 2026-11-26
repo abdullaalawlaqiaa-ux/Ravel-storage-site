@@ -649,3 +649,14 @@ main{position:relative;z-index:1;overflow-x:clip}
 .ph.fxdeck .fcard.is-top .fcard__ph{animation:drift 14s ease-in-out infinite alternate}
 @keyframes drift{from{transform:scale(1)}to{transform:scale(1.09)}}
 @media (min-width:860px){.ph.fxdeck .deck{height:540px}}
+
+/* a strip at the bottom kept free for a host's corner badge (the page served on its own, e.g. on Netlify) */
+.nfb{--nfb:64px}
+.nfb .hero__panel{margin-bottom:calc(10px + var(--nfb))}
+.nfb .dock{padding-bottom:calc(9px + var(--nfb) + env(safe-area-inset-bottom,0px))}
+.nfb .filmbar{bottom:calc(max(16px,env(safe-area-inset-bottom,0px)) + var(--nfb))}
+.nfb .toast{bottom:calc(84px + var(--nfb) + env(safe-area-inset-bottom,0px))}
+.nfb .sec--last{padding-bottom:calc(120px + var(--nfb) + env(safe-area-inset-bottom,0px))}
+.nfb .callsheet__panel{padding-bottom:calc(20px + var(--nfb) + env(safe-area-inset-bottom,0px))}
+.nfb .menu__panel{padding-bottom:calc(22px + var(--nfb) + env(safe-area-inset-bottom,0px))}
+@media (min-width:900px){.nfb .dock{padding-bottom:8px;bottom:calc(22px + var(--nfb))}}
