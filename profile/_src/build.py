@@ -85,7 +85,14 @@ def main():
     tpl = tpl.replace("<!--PRICEROWS-->", rows).replace("<!--GUIDE-->", guide)
     tpl = tpl.replace("<!--SIZES-->", "").replace("<!--UNITINFO-->", "")
 
+    # a version for the page's own files: a phone that kept an older copy fetches the new one after an update
+    import hashlib
+    hv = hashlib.sha1()
+    for f in ('assets/css/style.css', 'assets/css/motion.css', 'assets/js/app.js', 'assets/js/fx.js', 'assets/js/motion.js', 'assets/js/scene3d.js', '_src/data.json', '_src/strings.json', '_src/template.html'):
+        if os.path.exists(os.path.join(ROOT, f)): hv.update(open(os.path.join(ROOT, f), 'rb').read())
+    VER = hv.hexdigest()[:10]
     data = dict(D)
+    data["v"] = VER
     data["strings"] = S
     data["film"] = json.loads(read("_src/film.json"))
     data_js = "window.RV_DATA=" + json.dumps(data, ensure_ascii=False, separators=(",", ":")) + ";"
@@ -95,6 +102,7 @@ def main():
     page = tpl.replace("<!--HEAD-->", EARLY).replace("<!--/HEAD-->", "")
     page = page.replace("<!--BODY-->", "").replace("<!--/BODY-->", "")
     page = page.replace("<!--SCRIPTS-->", '<script src="assets/js/data.js" defer></script>\n<script src="assets/js/app.js" defer></script>\n<script src="assets/js/fx.js" defer></script>')
+    page = re.sub(r'(assets/(?:css|js)/[A-Za-z0-9_.-]+\.(?:css|js))"', lambda m: m.group(1) + '?v=' + VER + '"', page)
     write(os.path.join(ROOT, "index.html"), page)
     print("index.html", len(page.encode("utf-8")), "bytes")
 
